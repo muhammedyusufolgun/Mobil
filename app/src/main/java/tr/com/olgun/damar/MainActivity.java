@@ -23,6 +23,7 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.view.PreviewView;
 import androidx.camera.view.LifecycleCameraController;
+import androidx.camera.view.CameraController;
 import androidx.core.content.ContextCompat;
 
 import java.nio.ByteBuffer;
@@ -174,7 +175,7 @@ public class MainActivity extends ComponentActivity {
                     .setResolutionStrategy(new androidx.camera.core.resolutionselector.ResolutionStrategy(
                             new android.util.Size(640, 480), androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER))
                     .build());
-            cameraController.setEnabledUseCases(LifecycleCameraController.USE_CASE_PREVIEW | LifecycleCameraController.USE_CASE_IMAGE_ANALYSIS);
+            cameraController.setEnabledUseCases(CameraController.IMAGE_ANALYSIS);
             cameraController.setImageAnalysisAnalyzer(analysisExecutor, this::analyzeFrame);
             previewView.setController(cameraController);
             cameraController.bindToLifecycle(this);
