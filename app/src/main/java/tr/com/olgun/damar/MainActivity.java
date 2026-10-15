@@ -21,8 +21,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
-import androidx.camera.lifecycle.LifecycleCameraController;
 import androidx.camera.view.PreviewView;
+import androidx.camera.view.LifecycleCameraController;
 import androidx.core.content.ContextCompat;
 
 import java.nio.ByteBuffer;
@@ -158,7 +158,7 @@ public class MainActivity extends ComponentActivity {
     private Button makeButton(String label) {
         Button b = new Button(this);
         b.setText(label);
-        b.setTextAllCaps(false);
+        b.setAllCaps(false);
         b.setTextSize(13);
         b.setTextColor(Color.WHITE);
         b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(GREEN_DARK));
