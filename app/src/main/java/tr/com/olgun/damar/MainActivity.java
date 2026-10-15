@@ -13,7 +13,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ArrayAdapter;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,10 +38,14 @@ public class MainActivity extends ComponentActivity {
     private PreviewView previewView;
     private ImageView filteredView;
     private TextView status;
+    private Button originalButton;
+    private Button filterButton;
+    private Bitmap displayedBitmap;
     private LifecycleCameraController cameraController;
     private ExecutorService analysisExecutor;
     private volatile boolean enhance = false;
-    private volatile float strength = 1.7f;
+    private volatile float strength = 2.3f;
+    private volatile int tone = VeinFilter.TONE_GREEN;
     private ActivityResultLauncher<String> cameraPermission;
 
     @Override public void onCreate(Bundle savedInstanceState) {
@@ -107,13 +113,33 @@ public class MainActivity extends ComponentActivity {
         LinearLayout actions = new LinearLayout(this);
         actions.setGravity(Gravity.CENTER);
         actions.setOrientation(LinearLayout.HORIZONTAL);
-        Button original = makeButton("Normal Görüntü");
-        Button filter = makeButton("Damarı Netleştir");
-        actions.addView(original, new LinearLayout.LayoutParams(0, dp(48), 1f));
+        originalButton = makeButton("Normal Görüntü");
+        filterButton = makeButton("Damarı Netleştir");
+        actions.addView(originalButton, new LinearLayout.LayoutParams(0, dp(48), 1f));
         LinearLayout.LayoutParams filterParams = new LinearLayout.LayoutParams(0, dp(48), 1f);
         filterParams.leftMargin = dp(8);
-        actions.addView(filter, filterParams);
+        actions.addView(filterButton, filterParams);
         root.addView(actions, new LinearLayout.LayoutParams(-1, dp(52)));
+
+        TextView toneLabel = new TextView(this);
+        toneLabel.setText("Netleştirme rengi");
+        toneLabel.setTextColor(GREEN_DARK);
+        toneLabel.setTextSize(13);
+        root.addView(toneLabel, new LinearLayout.LayoutParams(-1, dp(22)));
+        Spinner tonePicker = new Spinner(this);
+        ArrayAdapter<String> toneAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, new String[]{"Yeşil", "Mavi", "Gri"});
+        toneAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tonePicker.setAdapter(toneAdapter);
+        tonePicker.setSelection(tone);
+        tonePicker.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                tone = position;
+                if (enhance) status.setText("Netleştirilmiş görüntü • " + toneName(position));
+            }
+            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) { }
+        });
+        root.addView(tonePicker, new LinearLayout.LayoutParams(-1, dp(44)));
 
         TextView strengthLabel = new TextView(this);
         strengthLabel.setText("Filtre gücü");
@@ -122,12 +148,12 @@ public class MainActivity extends ComponentActivity {
         root.addView(strengthLabel, new LinearLayout.LayoutParams(-1, dp(22)));
         SeekBar strengthBar = new SeekBar(this);
         strengthBar.setMax(100);
-        strengthBar.setProgress(35);
+        strengthBar.setProgress(51);
         strengthBar.setProgressTintList(android.content.res.ColorStateList.valueOf(GREEN_DARK));
         strengthBar.setThumbTintList(android.content.res.ColorStateList.valueOf(GREEN_DARK));
         strengthBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
-                strength = 0.5f + (progress / 100f) * 2.5f;
+                strength = 0.5f + (progress / 100f) * 3.5f;
             }
             @Override public void onStartTrackingTouch(SeekBar bar) { }
             @Override public void onStopTrackingTouch(SeekBar bar) { }
@@ -141,18 +167,19 @@ public class MainActivity extends ComponentActivity {
         note.setGravity(Gravity.CENTER);
         root.addView(note, new LinearLayout.LayoutParams(-1, dp(32)));
 
-        original.setOnClickListener(v -> {
+        originalButton.setOnClickListener(v -> {
             enhance = false;
             filteredView.setVisibility(View.GONE);
             previewView.setVisibility(View.VISIBLE);
             status.setText("Normal kamera görüntüsü");
+            updateModeButtons();
         });
-        filter.setOnClickListener(v -> {
+        filterButton.setOnClickListener(v -> {
             enhance = true;
-            filteredView.setVisibility(View.VISIBLE);
-            previewView.setVisibility(View.GONE);
-            status.setText("Filtreli görüntü • yaklaşık görünüm");
+            status.setText("Netleştirme açık • " + toneName(tone) + " • görüntü bekleniyor…");
+            updateModeButtons();
         });
+        updateModeButtons();
         setContentView(root);
     }
 
@@ -164,6 +191,20 @@ public class MainActivity extends ComponentActivity {
         b.setTextColor(Color.WHITE);
         b.setBackgroundTintList(android.content.res.ColorStateList.valueOf(GREEN_DARK));
         return b;
+    }
+
+    private void updateModeButtons() {
+        if (originalButton == null || filterButton == null) return;
+        originalButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                enhance ? Color.rgb(111, 157, 122) : GREEN_DARK));
+        filterButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                enhance ? GREEN_DARK : Color.rgb(111, 157, 122)));
+    }
+
+    private String toneName(int value) {
+        if (value == VeinFilter.TONE_BLUE) return "Mavi";
+        if (value == VeinFilter.TONE_GRAY) return "Gri";
+        return "Yeşil";
     }
 
     private void startCamera() {
@@ -190,9 +231,16 @@ public class MainActivity extends ComponentActivity {
             if (enhance) {
                 Bitmap bitmap = yuvToBitmap(image);
                 if (bitmap != null) {
-                    Bitmap result = VeinFilter.enhance(bitmap, strength);
+                    Bitmap result = VeinFilter.enhance(bitmap, strength, tone);
                     runOnUiThread(() -> {
-                        if (enhance && !isFinishing()) filteredView.setImageBitmap(result);
+                        if (enhance && !isFinishing()) {
+                            Bitmap previous = displayedBitmap;
+                            displayedBitmap = result;
+                            filteredView.setImageBitmap(result);
+                            filteredView.setVisibility(View.VISIBLE);
+                            status.setText("Netleştirilmiş görüntü • " + toneName(tone));
+                            if (previous != null && previous != result && !previous.isRecycled()) previous.recycle();
+                        }
                         else result.recycle();
                     });
                     if (bitmap != result && !bitmap.isRecycled()) bitmap.recycle();
@@ -232,7 +280,7 @@ public class MainActivity extends ComponentActivity {
         rotation.postRotate(image.getImageInfo().getRotationDegrees());
         Bitmap rotated = Bitmap.createBitmap(raw, 0, 0, width, height, rotation, true);
         if (rotated != raw) raw.recycle();
-        int targetWidth = Math.min(480, rotated.getWidth());
+        int targetWidth = Math.min(640, rotated.getWidth());
         if (targetWidth < rotated.getWidth()) {
             int targetHeight = Math.max(1, (int) (rotated.getHeight() * (targetWidth / (float) rotated.getWidth())));
             Bitmap small = Bitmap.createScaledBitmap(rotated, targetWidth, targetHeight, true);
@@ -256,6 +304,7 @@ public class MainActivity extends ComponentActivity {
     @Override protected void onDestroy() {
         if (cameraController != null) cameraController.clearImageAnalysisAnalyzer();
         if (analysisExecutor != null) analysisExecutor.shutdown();
+        if (displayedBitmap != null && !displayedBitmap.isRecycled()) displayedBitmap.recycle();
         super.onDestroy();
     }
 }
