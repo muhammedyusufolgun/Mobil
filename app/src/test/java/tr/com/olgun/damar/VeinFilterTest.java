@@ -30,4 +30,16 @@ public class VeinFilterTest {
         int surrounding = (output[0] >>> 8) & 0xff;
         org.junit.Assert.assertTrue(center < surrounding);
     }
+
+    @Test public void supportsBlueAndGrayscaleColorChoices() {
+        int[] input = new int[]{0xffc0c0c0};
+        int blue = VeinFilter.apply(input, 1, 1, 1f, VeinFilter.TONE_BLUE)[0];
+        int blueR = (blue >>> 16) & 0xff, blueG = (blue >>> 8) & 0xff, blueB = blue & 0xff;
+        org.junit.Assert.assertTrue(blueB > blueG);
+        org.junit.Assert.assertTrue(blueG > blueR);
+
+        int gray = VeinFilter.apply(input, 1, 1, 1f, VeinFilter.TONE_GRAY)[0];
+        assertEquals((gray >>> 16) & 0xff, (gray >>> 8) & 0xff);
+        assertEquals((gray >>> 8) & 0xff, gray & 0xff);
+    }
 }
