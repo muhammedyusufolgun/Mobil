@@ -217,17 +217,27 @@ fun VisionApp(activity: MainActivity) {
                                         TextButton(onClick={store.deleteDraft(s.id); drafts=store.drafts()}) { Text("Sil") }
                                     }
                                 }
+                                Button(enabled=drafts.isNotEmpty(), onClick={
+                                    scope.launch {
+                                        runCatching { DriveSync.publishDraftsLocally(store) }
+                                            .onSuccess { count ->
+                                                published=store.published()
+                                                message="$count tanım bu cihazda yayınlandı. Kameraya dönüp referansı okutun."
+                                            }
+                                            .onFailure { message="Yerel yayın başarısız: ${it.message}" }
+                                    }
+                                }, modifier=Modifier.fillMaxWidth()) { Text("Bu Cihazda Yayınla (Hemen Aktif)") }
                                 Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                                    OutlinedButton(onClick={preview=true}) { Text("Önizle") }
-                                    Button(onClick={
+                                    OutlinedButton(onClick={preview=true}) { Text("Taslak Önizleme") }
+                                    OutlinedButton(onClick={
                                         if(drafts.isEmpty()) message="Önce bir tanım ekleyin"
                                         else saveZip.launch(DriveSync.BUNDLE)
-                                    }) { Text("Drive'a Yayın Paketi") }
+                                    }) { Text("Drive ZIP Paketi") }
                                 }
                                 OutlinedButton(onClick={importPublishedZip.launch(arrayOf("application/zip", "application/octet-stream"))}) {
                                     Text("Yayın ZIP'ini Cihaza İçe Aktar")
                                 }
-                                Text("İçe aktarım bu telefonun okuma modunu hemen günceller; diğer telefonlar için Drive'a yayınlayın.",
+                                Text("Bu Cihazda Yayınla bu telefonu hemen günceller. Diğer kullanıcılar için ZIP paketini Drive’a yükleyin.",
                                     style=MaterialTheme.typography.bodySmall,color=Color.Gray)
                                 Text("Kaydetme penceresinde Google Drive uygulamanızdaki hedef klasörü seçin. Google Drive dosya sağlayıcısı görünmüyorsa dosyayı indirip elle yükleyin.",style=MaterialTheme.typography.bodySmall,color=Color.Gray)
                             }
@@ -310,6 +320,7 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
     var matchCenter by remember { mutableStateOf(Pair(0.5f,0.5f)) }
     var error by remember { mutableStateOf("") }
     var arSupported by remember { mutableStateOf(false) }
+    var arFailed by remember { mutableStateOf(false) }
     var installRequested by remember { mutableStateOf(false) }
     val lifecycleOwner = LocalLifecycleOwner.current
     // No UI gate: camera display attempts immediately; unsupported devices get a camera-only fallback.
@@ -322,8 +333,14 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
         } catch (e: Exception) { error="ARCore hazır değil, normal kamera açılıyor"; false }
     }
     Box(Modifier.fillMaxSize()) {
-        if (arSupported) {
-            val camera = remember { ArCameraView(activity) { msg -> activity.runOnUiThread { error=msg } } }
+        if (arSupported && !arFailed) {
+            val camera = remember { ArCameraView(activity) { msg ->
+                activity.runOnUiThread {
+                    error=msg
+                    if (msg.startsWith("AR kamera") || msg.startsWith("AR grafik") || msg.startsWith("AR motoru"))
+                        arFailed=true
+                }
+            } }
             LaunchedEffect(camera,scenes) { camera.scenes(scenes) }
             AndroidView(factory={camera},modifier=Modifier.fillMaxSize())
             DisposableEffect(camera,lifecycleOwner) {
@@ -335,7 +352,7 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
                     }
                 }
                 lifecycleOwner.lifecycle.addObserver(listener)
-                camera.start()
+                if (lifecycleOwner.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) camera.start()
                 onDispose { lifecycleOwner.lifecycle.removeObserver(listener); camera.dispose() }
             }
             LaunchedEffect(camera) {
@@ -344,12 +361,24 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
                 }
             }
         } else {
+            var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
+            var cameraDisposed by remember { mutableStateOf(false) }
+            DisposableEffect(lifecycleOwner) {
+                cameraDisposed = false
+                onDispose {
+                    cameraDisposed = true
+                    cameraProvider?.unbindAll()
+                    cameraProvider = null
+                }
+            }
             AndroidView(modifier=Modifier.fillMaxSize(),factory={context ->
                 PreviewView(context).also { pv ->
                     val future=ProcessCameraProvider.getInstance(context)
                     future.addListener({
                         runCatching {
+                            if (cameraDisposed) return@runCatching
                             val provider=future.get()
+                            cameraProvider = provider
                             val preview=Preview.Builder().build().also { it.surfaceProvider=pv.surfaceProvider }
                             provider.unbindAll()
                             provider.bindToLifecycle(activity,CameraSelector.DEFAULT_BACK_CAMERA,preview)
@@ -374,6 +403,7 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
             }
         }
         if(error.isNotBlank()) Text(error,Modifier.align(Alignment.BottomCenter).padding(bottom=90.dp, start=20.dp,end=20.dp).background(Color(0xCC142F46),RoundedCornerShape(6.dp)).padding(10.dp),color=Color.White)
-        if(!arSupported) Text("AR görüntüleme için desteklenen telefon ve ARCore gerekir",Modifier.align(Alignment.BottomCenter).padding(bottom=20.dp),color=Color.White,style=MaterialTheme.typography.labelSmall)
+        if(!arSupported || arFailed) Text("AR takip çalışmıyor; standart kamerada AR içerikleri görünmez.",Modifier.align(Alignment.BottomCenter).padding(bottom=20.dp,start=16.dp,end=16.dp),color=Color.White,style=MaterialTheme.typography.labelSmall)
+        else if(scenes.isEmpty()) Text("Yayınlanan görsel yok. Admin > Bu Cihazda Yayınla.",Modifier.align(Alignment.BottomCenter).padding(bottom=20.dp,start=16.dp,end=16.dp),color=Color.White,style=MaterialTheme.typography.labelSmall)
     }
 }
