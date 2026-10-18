@@ -1,4 +1,4 @@
-# AR Vision Studio Pro — Android prototip 0.2
+# AR Vision Studio Pro — Android önizleme 0.3
 
 ## Çalışma modu
 - Her açılışta **Canlı Kamera** gelir; küçük `admin` düğmesi dışındaki yönetim araçları kullanıcıya gösterilmez.
@@ -11,17 +11,19 @@
 - Kotlin + Compose arayüzü, kullanıcı/admin geçişi, yerel hash tabanlı prototip parola kapısı
 - Kamera izni ve ARCore destekli cihazlarda canlı ARCore kamera altlığı
 - Görsel referansları için `AugmentedImageDatabase`, görsel algılanınca görsel merkezini izleyen **ekran üstü** yazı kartı
+- ARCore ile izlenen görselin gerçek koordinatında dönen **OpenGL ES 3B küp** ve hareketli **3B yön oku** (boyut/yükseklik/renk düzenlenebilir)
 - ARCore desteklemeyen cihazlarda CameraX sadece-kamera modu
 - Admin'de fotoğraf seçme veya kamera ile çekme, yerel taslak tanımlama/silme
 - Admin özel Drive klasör adresi ve API anahtarı ayarı; başlangıç adresini arayüzden gizleme
 - Drive API'den yayın ZIP sürümünü kontrol etme, boyut ve arşiv yolu doğrulama, yerel çevrimdışı paket deposu
 - Admin'de `ARVISION_PUBLISHED.zip` oluşturma (Android belge kaydetme penceresi ile Google Drive klasörü seçilebilir)
+- Admin panelinden yayın paketini **cihaza içe aktarma**; kullanıcı kamerası yerel paketi kullanabilir
 
 ## Henüz tamamlanmamış özellikler
-- 3D nesnelerin gerçek konuma anchor ile sabitlenmesi; GLB modeller, yollar ve animasyon editörü
+- GLB/glTF içe alan tam sahne editörü, çok duraklı yollar ve gelişmiş animasyon editörü; v0.3 yalnızca temel 3B küp ve yön oku sağlar
 - OpenCV ile **kalibre edilmiş** %80 benzerlik skoru (ARCore'ın tanıma olayı yüzde değildir)
 - Google OAuth ile Drive'a **otomatik** telefon içinden yayınlama. Şimdilik sistem dosya penceresiyle Drive klasörüne kaydedilir; Drive sağlayıcısı mevcut değilse ZIP elle yüklenir.
-- APK ve fiziksel cihaz doğrulaması: yerel çalışma ortamında Android SDK/Gradle bulunmadığından build çalıştırılmadı.
+- Fiziksel cihaz, işlevsel AR ve Drive gerçek veri senkronizasyonu testleri (GitHub derlemesi bunların yerine geçmez).
 
 ## Drive kurulum
 1. Google Cloud Console'da Drive API etkinleştirilir; yalnız **Drive API** erişimli, Android paket adı ve SHA-1 ile kısıtlanmış API key oluşturulur. Hedef klasör ve paket dosyası okuyuculara `bağlantıya sahip herkes görüntüleyebilir` yetkisiyle paylaşılmalıdır.
@@ -47,3 +49,14 @@ gradle :app:assembleDebug
 - **Drive API key ile genel klasör araması bazı paylaşım türlerinde boş/403 dönebilir.** Bu istemcide gerçek API anahtarı, herkese açık yayın dosyası ve cihaz üzerinde test gerekir; kurumsal gizli Drive verileri için Google OAuth ya da ayrı yetkilendirilmiş aktarım servisi gereklidir.
 - API anahtarı güvenlik sınırı değildir. Sunucudaki hassas içerikleri herkesin görebildiği şekilde paylaşmayın.
 - Kamera üstü yazı görsel merkezini takip eder, fiziksel bir 3D GLB hologram değildir. 3D editör, kalibre edilmiş benzerlik ve cihaz testleri tamamlanmadı.
+
+
+## v0.3 kullanım
+1. Admin girişinden sonra fotoğraf seçin veya çekin.
+2. Yazı kartı, **3B Küp** ya da **3B Ok** seçin; renk, boyut ve yükseklik ayarlayın.
+3. Taslağı kaydedip **Önizle** ile kamerada test edin.
+4. **Drive'a Yayın Paketi** ile ZIP oluşturun; Android belge kaydetme arayüzüyle klasöre gönderin.
+5. API anahtarı olmadan tek telefonda çalışmak için **Yayın ZIP'ini Cihaza İçe Aktar** seçin.
+
+### Dürüst özellik durumu
+GitHub Actions APK üretimi yazılımın derlendiğini gösterir. Fiziksel cihazdaki ARCore uyumluluğu ve gerçek zamanlı görüntüleme bağımsız test gerektirir. Kalibre edilmiş %80 benzerlik skoru, GLB model editörü, gelişmiş yollar ve OAuth destekli otomatik Drive'a yazma henüz mevcut değildir.
