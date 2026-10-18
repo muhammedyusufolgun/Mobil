@@ -53,7 +53,7 @@ object DriveSync {
         val q = "'$folder' in parents and name = '$BUNDLE' and trashed = false"
         val listUrl = "https://www.googleapis.com/drive/v3/files?q=${enc(q)}&fields=${enc("files(id,name,md5Checksum,modifiedTime,size),nextPageToken")}&orderBy=${enc("modifiedTime desc")}&pageSize=10&key=${enc(apiKey)}"
         val items = JSONObject(String(request(listUrl, 100_000), Charsets.UTF_8)).getJSONArray("files")
-        if (items.length() == 0) return@withContext Result(false, "Henüz yayınlanmış AR paketi bulunamadı")
+        if (items.length() == 0) return@withContext Result(false, "Drive klasöründe ARVISION_PUBLISHED.zip henüz yok")
         val item = items.getJSONObject(0)
         val fileId = item.getString("id")
         val version = item.optString("md5Checksum").ifBlank { fileId + ":" + item.optString("modifiedTime") }
@@ -132,6 +132,14 @@ object DriveSync {
         val scenes = extractVerifiedBundle(store, data, version)
         store.replacePublished(scenes, version)
         scenes.size
+    }
+
+    /** Make saved admin drafts readable by this device immediately.
+     * Shared Google Drive distribution still requires exporting the ZIP. */
+    suspend fun publishDraftsLocally(store: ProjectStore): Int = withContext(Dispatchers.IO) {
+        require(store.drafts().isNotEmpty()) { "Önce bir görsel tanımlayın" }
+        val file = exportDrafts(store)
+        importBundle(store, file.readBytes())
     }
 
     /** Export local admin drafts for selection of target Google Drive folder via Android's file picker. */
