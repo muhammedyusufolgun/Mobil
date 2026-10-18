@@ -11,3 +11,6 @@
 - Önceden indirilmiş paket olmadan çevrimdışı ilk kurulumda algılanabilecek referans bulunmaz.
 - Önceki başarılı yayın saklanır. Mevcut kaynak değişirse ilk kontrollü karşılaştırmada yeni yayın yüklenir.
 - Bu ilk sürümde dosya seçimi Android sistem belge kaydetme penceresiyle yapılır; kullanıcı Google Drive hedef klasörünü seçer. Google OAuth yetkilendirilmiş doğrudan `files.create` ileri aşamadır.
+
+### v0.3 isteğe bağlı AR görünüm alanları
+Her `scenes[]` öğesinde `effect` (`CARD`, `CUBE`, `ARROW`), `color` (`#RRGGBB`), `sizeMeters` ve `heightMeters` bulunabilir. Eksik alanlar varsayılanlarla doldurulur. Formatın şema sürümü 1 olarak kalır.
