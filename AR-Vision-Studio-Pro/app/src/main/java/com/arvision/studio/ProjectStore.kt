@@ -28,6 +28,24 @@ class ProjectStore(private val context: Context) {
     private val publishedFile = File(dir, "published.json")
     private val prefs = context.getSharedPreferences("arvision-admin", Context.MODE_PRIVATE)
 
+    /** For Google Cloud API keys restricted to this Android package + signing SHA-1.
+     * These request headers identify the app; they are not user authentication. */
+    @Suppress("DEPRECATION")
+    fun driveAndroidIdentity(): Pair<String, String>? = runCatching {
+        val pm = context.packageManager
+        val packageName = context.packageName
+        val bytes = if (android.os.Build.VERSION.SDK_INT >= 28) {
+            val info = pm.getPackageInfo(packageName, android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES)
+            requireNotNull(info.signingInfo).apkContentsSigners.first().toByteArray()
+        } else {
+            val info = pm.getPackageInfo(packageName, android.content.pm.PackageManager.GET_SIGNATURES)
+            requireNotNull(info.signatures).first().toByteArray()
+        }
+        val fingerprint = java.security.MessageDigest.getInstance("SHA-1")
+            .digest(bytes).joinToString("") { "%02x".format(it) }
+        packageName to fingerprint
+    }.getOrNull()
+
     fun driveApiKey(): String = prefs.getString("drive_api_key", "") ?: ""
     fun setDriveApiKey(key: String) { prefs.edit().putString("drive_api_key", key.trim()).apply() }
     fun customFolder(): String? = prefs.getString("custom_drive_folder", null)?.takeIf { it.isNotBlank() }
