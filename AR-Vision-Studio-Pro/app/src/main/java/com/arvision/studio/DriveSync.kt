@@ -23,11 +23,16 @@ object DriveSync {
     private const val MAX_ZIP = 25 * 1024 * 1024
     private const val MAX_EXPANDED = 70 * 1024 * 1024L
 
-    private fun request(url: String, maxBytes: Int): ByteArray {
+    private fun request(url: String, maxBytes: Int, androidIdentity: Pair<String,String>? = null): ByteArray {
         val connection = (URL(url).openConnection() as HttpURLConnection).apply {
             connectTimeout = 4500; readTimeout = 9000
             requestMethod = "GET"; setRequestProperty("Accept", "application/json, application/octet-stream")
             instanceFollowRedirects = true
+            // Android-restricted Google Cloud keys require both headers.
+            androidIdentity?.let { (pkg, sha1) ->
+                setRequestProperty("X-Android-Package", pkg)
+                setRequestProperty("X-Android-Cert", sha1)
+            }
         }
         try {
             if (connection.responseCode != 200) throw IllegalStateException("Drive HTTP ${connection.responseCode}")
@@ -49,10 +54,11 @@ object DriveSync {
         val apiKey = store.driveApiKey().ifBlank { BuildConfig.DRIVE_API_KEY }
         if (apiKey.isBlank()) return@withContext Result(false, "Drive API anahtarı yapılandırılmadı; yerel içerikler kullanılabilir")
         val folder = store.activeFolderId()
+        val identity = store.driveAndroidIdentity()
         require(folder.isNotBlank()) { "Başlangıç klasörü yapılandırılmadı" }
         val q = "'$folder' in parents and name = '$BUNDLE' and trashed = false"
         val listUrl = "https://www.googleapis.com/drive/v3/files?q=${enc(q)}&fields=${enc("files(id,name,md5Checksum,modifiedTime,size),nextPageToken")}&orderBy=${enc("modifiedTime desc")}&pageSize=10&key=${enc(apiKey)}"
-        val items = JSONObject(String(request(listUrl, 100_000), Charsets.UTF_8)).getJSONArray("files")
+        val items = JSONObject(String(request(listUrl, 100_000, identity), Charsets.UTF_8)).getJSONArray("files")
         if (items.length() == 0) return@withContext Result(false, "Drive klasöründe ARVISION_PUBLISHED.zip henüz yok")
         val item = items.getJSONObject(0)
         val fileId = item.getString("id")
@@ -60,7 +66,7 @@ object DriveSync {
         if (version == store.publishedVersion()) return@withContext Result(false, "Güncel")
         if (item.optLong("size", 0) > MAX_ZIP) throw IllegalStateException("Paket 25 MB sınırını aşıyor")
         onDownloading()
-        val data = request("https://www.googleapis.com/drive/v3/files/${enc(fileId)}?alt=media&key=${enc(apiKey)}", MAX_ZIP)
+        val data = request("https://www.googleapis.com/drive/v3/files/${enc(fileId)}?alt=media&key=${enc(apiKey)}", MAX_ZIP, identity)
         val expectedMd5 = item.optString("md5Checksum")
         if (expectedMd5.isNotBlank()) {
             val got = MessageDigest.getInstance("MD5").digest(data).joinToString("") { "%02x".format(it) }
