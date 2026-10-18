@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.net.Uri
-import android.graphics.Bitmap
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.ar.core.ArCoreApk
@@ -78,12 +78,12 @@ fun VisionApp(activity: MainActivity) {
     var drafts by remember { mutableStateOf(store.drafts()) }
     var customUrl by remember { mutableStateOf(store.customFolder() ?: "") }
     var customApiKey by remember { mutableStateOf(store.driveApiKey()) }
-    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
+    var pendingPhotoUri by remember { mutableStateOf<Uri?>(null) }
     var selectedFile by remember { mutableStateOf<Uri?>(null) }
     var title by remember { mutableStateOf("") }
     var text by remember { mutableStateOf("") }
     var widthCm by remember { mutableStateOf("20") }
-    var effect by remember { mutableStateOf("CARD") }
+    var effect by remember { mutableStateOf("CUBE") }
     var effectColor by remember { mutableStateOf("#38BDF8") }
     var sizeCm by remember { mutableStateOf("12") }
     var heightCm by remember { mutableStateOf("8") }
@@ -117,9 +117,19 @@ fun VisionApp(activity: MainActivity) {
                 .onFailure { message="İçe aktarma başarısız: ${it.message}" }
         }
     }
-    val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { selectedFile = it; capturedImage = null }
-    val captureImage = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { image ->
-        if (image != null) { capturedImage = image; selectedFile = null }
+    val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { selectedFile = it }
+    // TakePicturePreview() produced tiny thumbnails, unsuitable for ARCore reference feature tracking.
+    val captureImage = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) selectedFile = pendingPhotoUri
+        else message = "Fotoğraf çekimi iptal edildi"
+    }
+    fun launchFullResolutionPhoto() {
+        runCatching {
+            val file = File(activity.cacheDir, "ar-reference-${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(activity, "${activity.packageName}.files", file)
+            pendingPhotoUri = uri
+            captureImage.launch(uri)
+        }.onFailure { message="Kamera fotoğrafı açılamadı: ${it.message}" }
     }
     var cameraAllowed by remember { mutableStateOf(ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
     val askCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { cameraAllowed = it }
@@ -151,7 +161,7 @@ fun VisionApp(activity: MainActivity) {
             }
         } else if (!admin || preview) {
             val scenes = if (preview) drafts else published
-            CameraPanel(activity, scenes)
+            CameraPanel(activity, scenes, preview)
         } else {
             Column(Modifier.fillMaxSize().statusBarsPadding()) {
                 Row(Modifier.fillMaxWidth().background(Color.White).padding(12.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
@@ -165,9 +175,9 @@ fun VisionApp(activity: MainActivity) {
                                 Text("Yeni AR tanımı", fontWeight=FontWeight.SemiBold)
                                 Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                                     Button(onClick={chooseImage.launch("image/*")}) { Text("Dosya Seç") }
-                                    OutlinedButton(onClick={captureImage.launch(null)}) { Text("Resim Çek") }
+                                    OutlinedButton(onClick={launchFullResolutionPhoto()}) { Text("Resim Çek") }
                                 }
-                                if (selectedFile != null || capturedImage != null) Text("Görsel seçildi ✓", color=Blue)
+                                if (selectedFile != null) Text("Görsel seçildi ✓", color=Blue)
                                 OutlinedTextField(value=title,onValueChange={title=it.take(100)}, label={Text("Tanım adı")}, modifier=Modifier.fillMaxWidth(),singleLine=true)
                                 OutlinedTextField(value=text,onValueChange={text=it.take(500)},label={Text("Tanıma sonrası ekranda görülecek yazı")},modifier=Modifier.fillMaxWidth())
                                 OutlinedTextField(value=widthCm,onValueChange={widthCm=it.filter { c -> c.isDigit() || c == '.' }.take(8)},label={Text("Basılı görsel genişliği (cm)")},singleLine=true)
@@ -191,16 +201,14 @@ fun VisionApp(activity: MainActivity) {
                                             label={Text("Yükseklik (cm)")},modifier=Modifier.weight(1f),singleLine=true)
                                     }
                                 }
-                                Button(enabled=(selectedFile != null || capturedImage != null) && title.isNotBlank(), onClick={
+                                Button(enabled=(selectedFile != null) && title.isNotBlank(), onClick={
                                     scope.launch {
                                         runCatching { withContext(Dispatchers.IO) {
                                             val width = (widthCm.toFloatOrNull() ?: 20f).coerceIn(1f,1000f)/100f
-                                            val bitmap = capturedImage
                                             val size = (sizeCm.toFloatOrNull() ?: 12f).coerceIn(2f,200f)/100f
                                             val height = (heightCm.toFloatOrNull() ?: 8f).coerceIn(0f,200f)/100f
-                                            if (bitmap != null) store.addBitmapDraft(bitmap,title,text,width,effect,effectColor,size,height)
-                                            else store.addImageDraft(requireNotNull(selectedFile),title,text,width,effect,effectColor,size,height)
-                                        } }.onSuccess { drafts=store.drafts(); title=""; text=""; selectedFile=null; capturedImage=null; message="Taslak kaydedildi" }
+                                            store.addImageDraft(requireNotNull(selectedFile),title,text,width,effect,effectColor,size,height)
+                                        } }.onSuccess { drafts=store.drafts(); title=""; text=""; selectedFile=null; message="Taslak kaydedildi. Kullanıcıya göstermek için Bu Cihazda Yayınla'yı seçin." }
                                             .onFailure { message="Kayıt başarısız: ${it.message}" }
                                     }
                                 }) { Text("Taslak Olarak Kaydet") }
@@ -222,13 +230,13 @@ fun VisionApp(activity: MainActivity) {
                                         runCatching { DriveSync.publishDraftsLocally(store) }
                                             .onSuccess { count ->
                                                 published=store.published()
-                                                message="$count tanım bu cihazda yayınlandı. Kameraya dönüp referansı okutun."
+                                                message="$count tanım bu cihazda yayınlandı. Kameraya dönüp tanımlı görseli okutun."
                                             }
-                                            .onFailure { message="Yerel yayın başarısız: ${it.message}" }
+                                            .onFailure { message="Yerel yayın yapılamadı: ${it.message}" }
                                     }
                                 }, modifier=Modifier.fillMaxWidth()) { Text("Bu Cihazda Yayınla (Hemen Aktif)") }
                                 Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                                    OutlinedButton(onClick={preview=true}) { Text("Taslak Önizleme") }
+                                    OutlinedButton(onClick={preview=true}) { Text("Efekti Test Et (tanıma olmadan)") }
                                     OutlinedButton(onClick={
                                         if(drafts.isEmpty()) message="Önce bir tanım ekleyin"
                                         else saveZip.launch(DriveSync.BUNDLE)
@@ -237,7 +245,9 @@ fun VisionApp(activity: MainActivity) {
                                 OutlinedButton(onClick={importPublishedZip.launch(arrayOf("application/zip", "application/octet-stream"))}) {
                                     Text("Yayın ZIP'ini Cihaza İçe Aktar")
                                 }
-                                Text("Bu Cihazda Yayınla bu telefonu hemen günceller. Diğer kullanıcılar için ZIP paketini Drive’a yükleyin.",
+                                Text("Önizleme, 3B efektin çizilip çizilmediğini gösterir; gerçek görsel tanımayı doğrulamaz.",
+                                    style=MaterialTheme.typography.bodySmall,color=Color.Gray)
+                                Text("Bu Cihazda Yayınla yalnız bu telefonun kamera modunu günceller. Diğer cihazlar için yayın ZIP'ini Drive'a yükleyin.",
                                     style=MaterialTheme.typography.bodySmall,color=Color.Gray)
                                 Text("Kaydetme penceresinde Google Drive uygulamanızdaki hedef klasörü seçin. Google Drive dosya sağlayıcısı görünmüyorsa dosyayı indirip elle yükleyin.",style=MaterialTheme.typography.bodySmall,color=Color.Gray)
                             }
@@ -314,17 +324,27 @@ fun VisionApp(activity: MainActivity) {
 }
 
 @Composable
-private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
+private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>, adminPreview: Boolean) {
     var displayText by remember { mutableStateOf("") }
     var displayTitle by remember { mutableStateOf("") }
+    var trackingStatus by remember { mutableStateOf("AR başlatılıyor…") }
     var matchCenter by remember { mutableStateOf(Pair(0.5f,0.5f)) }
     var error by remember { mutableStateOf("") }
     var arSupported by remember { mutableStateOf(false) }
     var arFailed by remember { mutableStateOf(false) }
     var installRequested by remember { mutableStateOf(false) }
+    var retryInstall by remember { mutableIntStateOf(0) }
     val lifecycleOwner = LocalLifecycleOwner.current
     // No UI gate: camera display attempts immediately; unsupported devices get a camera-only fallback.
-    LaunchedEffect(Unit) {
+    DisposableEffect(lifecycleOwner) {
+        val listener = LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) retryInstall++
+        }
+        lifecycleOwner.lifecycle.addObserver(listener)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(listener) }
+    }
+    LaunchedEffect(retryInstall) {
+        if (arFailed) return@LaunchedEffect
         arSupported = try {
             when (ArCoreApk.getInstance().requestInstall(activity, !installRequested)) {
                 ArCoreApk.InstallStatus.INSTALLED -> true
@@ -337,11 +357,10 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
             val camera = remember { ArCameraView(activity) { msg ->
                 activity.runOnUiThread {
                     error=msg
-                    if (msg.startsWith("AR kamera") || msg.startsWith("AR grafik") || msg.startsWith("AR motoru"))
-                        arFailed=true
+                    if (msg.startsWith("AR kamera") || msg.startsWith("AR grafik") || msg.startsWith("AR motoru")) arFailed=true
                 }
             } }
-            LaunchedEffect(camera,scenes) { camera.scenes(scenes) }
+            LaunchedEffect(camera,scenes,adminPreview) { camera.scenes(scenes); camera.setPreviewMode(adminPreview) }
             AndroidView(factory={camera},modifier=Modifier.fillMaxSize())
             DisposableEffect(camera,lifecycleOwner) {
                 val listener = LifecycleEventObserver { _, event ->
@@ -357,19 +376,17 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
             }
             LaunchedEffect(camera) {
                 while (true) {
-                    displayText=camera.currentText.get();displayTitle=camera.currentTitle.get();matchCenter=camera.screenCenter.get();delay(120)
+                    displayText=camera.currentText.get();displayTitle=camera.currentTitle.get()
+                    matchCenter=camera.screenCenter.get(); trackingStatus=camera.currentStatus.get()
+                    delay(90)
                 }
             }
         } else {
             var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
             var cameraDisposed by remember { mutableStateOf(false) }
             DisposableEffect(lifecycleOwner) {
-                cameraDisposed = false
-                onDispose {
-                    cameraDisposed = true
-                    cameraProvider?.unbindAll()
-                    cameraProvider = null
-                }
+                cameraDisposed=false
+                onDispose { cameraDisposed=true; cameraProvider?.unbindAll(); cameraProvider=null }
             }
             AndroidView(modifier=Modifier.fillMaxSize(),factory={context ->
                 PreviewView(context).also { pv ->
@@ -378,7 +395,7 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
                         runCatching {
                             if (cameraDisposed) return@runCatching
                             val provider=future.get()
-                            cameraProvider = provider
+                            cameraProvider=provider
                             val preview=Preview.Builder().build().also { it.surfaceProvider=pv.surfaceProvider }
                             provider.unbindAll()
                             provider.bindToLifecycle(activity,CameraSelector.DEFAULT_BACK_CAMERA,preview)
@@ -402,8 +419,12 @@ private fun CameraPanel(activity: MainActivity, scenes: List<ArScene>) {
                 } }
             }
         }
+        if(arSupported && !arFailed) Text(trackingStatus,
+            Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top=58.dp)
+                .background(Color(0xA8071625),RoundedCornerShape(6.dp)).padding(horizontal=12.dp,vertical=6.dp),
+            color=Color.White,style=MaterialTheme.typography.labelSmall)
         if(error.isNotBlank()) Text(error,Modifier.align(Alignment.BottomCenter).padding(bottom=90.dp, start=20.dp,end=20.dp).background(Color(0xCC142F46),RoundedCornerShape(6.dp)).padding(10.dp),color=Color.White)
-        if(!arSupported || arFailed) Text("AR takip çalışmıyor; standart kamerada AR içerikleri görünmez.",Modifier.align(Alignment.BottomCenter).padding(bottom=20.dp,start=16.dp,end=16.dp),color=Color.White,style=MaterialTheme.typography.labelSmall)
-        else if(scenes.isEmpty()) Text("Yayınlanan görsel yok. Admin > Bu Cihazda Yayınla.",Modifier.align(Alignment.BottomCenter).padding(bottom=20.dp,start=16.dp,end=16.dp),color=Color.White,style=MaterialTheme.typography.labelSmall)
+        if(!arSupported || arFailed) Text("AR takip devre dışı. Standart kamerada tanımlı AR içeriği yansıtılamaz.",Modifier.align(Alignment.BottomCenter).padding(bottom=20.dp, start=16.dp, end=16.dp),color=Color.White,style=MaterialTheme.typography.labelSmall)
+        else if (scenes.isEmpty()) Text("Yayınlanan görsel yok. Admin > Bu Cihazda Yayınla.",Modifier.align(Alignment.BottomCenter).padding(bottom=20.dp, start=16.dp, end=16.dp),color=Color.White,style=MaterialTheme.typography.labelSmall)
     }
 }
