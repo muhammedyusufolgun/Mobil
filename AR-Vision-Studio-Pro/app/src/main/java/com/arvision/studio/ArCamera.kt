@@ -16,12 +16,19 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicBoolean
+import android.util.Log
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 /** ARCore camera, tracked reference overlays and scene-pose 3D primitives. */
 class ArCameraView(private val activity: Activity, private val onError: (String)->Unit) : GLSurfaceView(activity), GLSurfaceView.Renderer {
     private var session: Session? = null
+    private val sessionLock = Any()
+    private val disposed = AtomicBoolean(false)
+    private var glReady = false
+    private var consecutiveFrameErrors = 0
+    private var lastLogAt = 0L
     private val effects = Simple3dRenderer()
     private var texture = 0
     private var program = 0
@@ -45,18 +52,34 @@ class ArCameraView(private val activity: Activity, private val onError: (String)
     }
     fun scenes(list: List<ArScene>) { pendingScenes.set(list.toList()) }
     fun start() {
+        if (disposed.get()) return
         try {
-            if (session == null) session = Session(activity)
-            session?.resume()
-            onResume()
-        } catch (e: Exception) { onError("AR kamera başlatılamadı: ${e.message}") }
+            synchronized(sessionLock) {
+                if (session == null) session = Session(activity)
+                session?.resume()
+            }
+            super.onResume()
+        } catch (e: Exception) {
+            reportFatal("AR kamera başlatılamadı: ${e.message}", e)
+        }
     }
     fun stop() {
-        onPause()
-        runCatching { session?.pause() }
+        // Official ARCore lifecycle order: pause GL rendering BEFORE pausing Session.
+        runCatching { super.onPause() }
+        synchronized(sessionLock) { runCatching { session?.pause() } }
+        currentText.set(""); currentTitle.set("")
     }
-    fun dispose() { stop(); session?.close(); session = null }
+    fun dispose() {
+        if (!disposed.compareAndSet(false, true)) return
+        stop()
+        synchronized(sessionLock) { runCatching { session?.close() }; session = null }
+    }
+    private fun reportFatal(message: String, error: Throwable) {
+        Log.e("ARVision/Camera", message, error)
+        activity.runOnUiThread { onError(message) }
+    }
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+        try {
         val ids = IntArray(1)
         GLES20.glGenTextures(1, ids, 0)
         texture = ids[0]
@@ -76,24 +99,45 @@ class ArCameraView(private val activity: Activity, private val onError: (String)
             GLES20.glLinkProgram(p)
         }
         effects.initialize()
+        glReady = true
+        } catch (e: Throwable) {
+            glReady = false
+            reportFatal("AR grafik motoru başlatılamadı: ${e.message}", e)
+        }
     }
     override fun onSurfaceChanged(gl: GL10?, w: Int, h: Int) { widthPx=w; heightPx=h; GLES20.glViewport(0,0,w,h) }
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClearColor(0.035f,0.08f,0.14f,1f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
+        if (!glReady || disposed.get()) return
+        synchronized(sessionLock) {
         val s = session ?: return
         try {
             val next = pendingScenes.get()
             if (next != appliedScenes) {
                 val db = AugmentedImageDatabase(s)
-                next.take(200).forEach { item ->
-                    val bitmap = BitmapFactory.decodeFile(item.imagePath) ?: return@forEach
-                    runCatching {
+                var accepted = 0
+                next.take(60).forEach { item ->
+                    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    BitmapFactory.decodeFile(item.imagePath, bounds)
+                    if (bounds.outWidth < 64 || bounds.outHeight < 64) return@forEach
+                    val opts = BitmapFactory.Options().apply {
+                        inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888
+                        var sample = 1
+                        while (bounds.outWidth / sample > 1100 || bounds.outHeight / sample > 1100) sample *= 2
+                        inSampleSize = sample
+                    }
+                    val bitmap = BitmapFactory.decodeFile(item.imagePath, opts) ?: return@forEach
+                    try {
                         if (item.widthMeters > 0f) db.addImage(item.id, bitmap, item.widthMeters)
                         else db.addImage(item.id,bitmap)
-                    }
-                    bitmap.recycle()
+                        accepted++
+                    } catch(e: Exception) {
+                        Log.w("ARVision/Camera", "Reference rejected: ${item.title}", e)
+                    } finally { bitmap.recycle() }
                 }
+                if (next.isNotEmpty() && accepted == 0)
+                    activity.runOnUiThread { onError("Referans görseller AR için kabul edilmedi; net, ayrıntılı bir görsel yükleyin") }
                 val cfg = Config(s).apply { augmentedImageDatabase = db }
                 s.configure(cfg)
                 appliedScenes = next
@@ -104,6 +148,7 @@ class ArCameraView(private val activity: Activity, private val onError: (String)
             val rotation = activity.windowManager.defaultDisplay.rotation
             s.setDisplayGeometry(rotation, widthPx, heightPx)
             val frame = s.update()
+            consecutiveFrameErrors = 0
             frame.transformCoordinates2d(Coordinates2d.OPENGL_NORMALIZED_DEVICE_COORDINATES, position, Coordinates2d.TEXTURE_NORMALIZED, texCoords)
             position.position(0); texCoords.position(0)
             GLES20.glUseProgram(program)
@@ -147,8 +192,21 @@ class ArCameraView(private val activity: Activity, private val onError: (String)
             }
             if (System.currentTimeMillis()-lastSeenAt > 2000) { currentText.set(""); currentTitle.set("") }
         } catch (e: Exception) {
-            // Camera updates can momentarily fail during pause/resume; avoid crashing render thread.
-            if (e !is com.google.ar.core.exceptions.SessionPausedException) onError(e.message ?: "AR hatası")
+            if (e !is com.google.ar.core.exceptions.SessionPausedException) {
+                consecutiveFrameErrors++
+                val now = System.currentTimeMillis()
+                if (now - lastLogAt > 2000L) {
+                    Log.w("ARVision/Camera", "AR frame failed", e)
+                    lastLogAt = now
+                }
+                if (consecutiveFrameErrors > 120) {
+                    consecutiveFrameErrors = 0
+                    reportFatal("AR kamera sürekli hata verdi; standart kameraya geçiliyor: ${e.message}", e)
+                }
+            }
+        } catch (e: Throwable) {
+            reportFatal("AR motoru durduruldu: ${e.message}", e)
+        }
         }
     }
 }
