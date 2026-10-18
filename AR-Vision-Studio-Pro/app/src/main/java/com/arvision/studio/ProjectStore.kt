@@ -14,7 +14,11 @@ data class ArScene(
     val displayText: String,
     val imagePath: String,
     val widthMeters: Float = 0.20f,
-    val origin: String = "local"
+    val origin: String = "local",
+    val effect: String = "CARD",
+    val color: String = "#38BDF8",
+    val sizeMeters: Float = 0.12f,
+    val heightMeters: Float = 0.08f
 )
 
 /** Durable local scene store; admin drafts and verified published scenes are separate. */
@@ -52,7 +56,9 @@ class ProjectStore(private val context: Context) {
         val array = JSONArray(file.readText(Charsets.UTF_8))
         (0 until array.length()).map { i ->
             val x = array.getJSONObject(i)
-            ArScene(x.getString("id"), x.optString("title"), x.optString("displayText"), x.getString("imagePath"), x.optDouble("widthMeters", 0.2).toFloat(), x.optString("origin", "local"))
+            ArScene(x.getString("id"), x.optString("title"), x.optString("displayText"), x.getString("imagePath"), x.optDouble("widthMeters", 0.2).toFloat(), x.optString("origin", "local"),
+                x.optString("effect", "CARD"), x.optString("color", "#38BDF8"),
+                x.optDouble("sizeMeters", 0.12).toFloat(), x.optDouble("heightMeters", 0.08).toFloat())
         }
     }.getOrDefault(emptyList())
     fun drafts(): List<ArScene> = read(draftsFile)
@@ -63,6 +69,7 @@ class ProjectStore(private val context: Context) {
         scenes.forEach { s -> json.put(JSONObject().apply {
             put("id", s.id); put("title", s.title); put("displayText", s.displayText)
             put("imagePath", s.imagePath); put("widthMeters", s.widthMeters); put("origin", s.origin)
+            put("effect", s.effect); put("color", s.color); put("sizeMeters", s.sizeMeters); put("heightMeters", s.heightMeters)
         }) }
         val tmp = File(dir, file.name + ".tmp")
         tmp.writeText(json.toString(), Charsets.UTF_8)
@@ -72,20 +79,24 @@ class ProjectStore(private val context: Context) {
         write(draftsFile, drafts().filterNot { it.id == scene.id } + scene)
     }
     fun deleteDraft(id: String) { write(draftsFile, drafts().filterNot { it.id == id }) }
-    fun addImageDraft(uri: Uri, title: String, displayText: String, widthMeters: Float): ArScene {
+    fun addImageDraft(uri: Uri, title: String, displayText: String, widthMeters: Float,
+                      effect: String, color: String, sizeMeters: Float, heightMeters: Float): ArScene {
         val id = UUID.randomUUID().toString()
         val imageDir = File(dir, "draft-images").apply { mkdirs() }
         val dst = File(imageDir, "$id.jpg")
         val src = requireNotNull(context.contentResolver.openInputStream(uri))
         src.use { input -> dst.outputStream().use { output -> input.copyTo(output) } }
-        return ArScene(id, title, displayText, dst.absolutePath, widthMeters, "local").also { saveDraft(it) }
+        return ArScene(id, title, displayText, dst.absolutePath, widthMeters, "local",
+            effect, color, sizeMeters, heightMeters).also { saveDraft(it) }
     }
-    fun addBitmapDraft(bitmap: Bitmap, title: String, displayText: String, widthMeters: Float): ArScene {
+    fun addBitmapDraft(bitmap: Bitmap, title: String, displayText: String, widthMeters: Float,
+                       effect: String, color: String, sizeMeters: Float, heightMeters: Float): ArScene {
         val id = UUID.randomUUID().toString()
         val imageDir = File(dir, "draft-images").apply { mkdirs() }
         val dst = File(imageDir, "$id.jpg")
         dst.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.JPEG, 92, it)) }
-        return ArScene(id, title, displayText, dst.absolutePath, widthMeters, "local").also { saveDraft(it) }
+        return ArScene(id, title, displayText, dst.absolutePath, widthMeters, "local",
+            effect, color, sizeMeters, heightMeters).also { saveDraft(it) }
     }
     fun replacePublished(scenes: List<ArScene>, version: String) {
         write(sourceFile(), scenes)
