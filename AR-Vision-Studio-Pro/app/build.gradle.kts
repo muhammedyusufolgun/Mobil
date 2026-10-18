@@ -16,8 +16,8 @@ android {
         applicationId = "com.arvision.studio"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "0.4.0-alpha"
+        versionCode = 5
+        versionName = "0.5.0-alpha"
         buildConfigField("String", "DRIVE_API_KEY", "\"${setting("DRIVE_API_KEY").replace("\"", "")}\"")
         // Bootstrap identifier intentionally NOT exposed in UI. Not a secret in a decompiled APK.
         buildConfigField("String", "BOOTSTRAP_FOLDER_ID", "\"${setting("BOOTSTRAP_FOLDER_ID").ifBlank { "1Q6oOl6ytaD0Qy5sKRwd5-bmoQDsu7UhO" }.replace("\"", "")}\"")
