@@ -1,4 +1,4 @@
-# AR Vision Studio Pro — Android önizleme 0.3
+# AR Vision Studio Pro — Android önizleme 0.4
 
 ## Çalışma modu
 - Her açılışta **Canlı Kamera** gelir; küçük `admin` düğmesi dışındaki yönetim araçları kullanıcıya gösterilmez.
@@ -60,3 +60,12 @@ gradle :app:assembleDebug
 
 ### Dürüst özellik durumu
 GitHub Actions APK üretimi yazılımın derlendiğini gösterir. Fiziksel cihazdaki ARCore uyumluluğu ve gerçek zamanlı görüntüleme bağımsız test gerektirir. Kalibre edilmiş %80 benzerlik skoru, GLB model editörü, gelişmiş yollar ve OAuth destekli otomatik Drive'a yazma henüz mevcut değildir.
+
+## v0.4 kapanma ve görünmeme düzeltmeleri
+- Admin taslağını okuyucuya aktarmak için artık önce ZIP dışa/içe aktarma gerekmez: **Bu Cihazda Yayınla**.
+- ARCore/GLSurfaceView pause/resume sırası düzeltildi; oturum kapanırken render thread'i korunur.
+- Yüksek çözünürlüklü resimler ARCore'a aktarılmadan önce örneklenir; GL başlatma hatalarında standart kamera moduna geçilir.
+- Bir görselin tanınması için fiziksel referansın net görünmesi, yeterli ayrıntı ve ARCore destekli telefon gerekir.
+- Standart CameraX yedek modu yalnızca kamera görüntüsüdür, AR tanıma yapmaz.
+- Google Drive klasörü paylaşımı API anahtarı değildir; otomatik bulut okuma için Google Cloud Drive API etkinleştirilip API anahtarı yapılandırılmalıdır.
+- GitHub'da başarılı derleme gerçek cihaz testi değildir; tekrar kapanma olursa Android logcat gereklidir.
