@@ -1,0 +1,35 @@
+name: AR Vision Studio Pro - Android APK
+on:
+  push:
+    branches: [main, ar-vision-studio-pro]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install SDK 35
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+      - name: Build debug APK
+        env:
+          DRIVE_API_KEY: ${{ secrets.DRIVE_API_KEY }}
+          BOOTSTRAP_FOLDER_ID: ${{ secrets.BOOTSTRAP_FOLDER_ID }}
+        run: gradle -p AR-Vision-Studio-Pro :app:assembleDebug --no-daemon --stacktrace
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARVisionStudioPro-debug
+          path: AR-Vision-Studio-Pro/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
