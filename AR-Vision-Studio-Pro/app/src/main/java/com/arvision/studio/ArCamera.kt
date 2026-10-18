@@ -19,9 +19,10 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-/** ARCore camera background + image recognition. Screen-space text overlay is v0.1; 3D anchors follow later. */
+/** ARCore camera, tracked reference overlays and scene-pose 3D primitives. */
 class ArCameraView(private val activity: Activity, private val onError: (String)->Unit) : GLSurfaceView(activity), GLSurfaceView.Renderer {
     private var session: Session? = null
+    private val effects = Simple3dRenderer()
     private var texture = 0
     private var program = 0
     private var widthPx = 1
@@ -38,6 +39,7 @@ class ArCameraView(private val activity: Activity, private val onError: (String)
 
     init {
         setEGLContextClientVersion(2)
+        setEGLConfigChooser(8,8,8,8,16,0)
         setRenderer(this)
         renderMode = RENDERMODE_CONTINUOUSLY
     }
@@ -73,11 +75,12 @@ class ArCameraView(private val activity: Activity, private val onError: (String)
             }
             GLES20.glLinkProgram(p)
         }
+        effects.initialize()
     }
     override fun onSurfaceChanged(gl: GL10?, w: Int, h: Int) { widthPx=w; heightPx=h; GLES20.glViewport(0,0,w,h) }
     override fun onDrawFrame(gl: GL10?) {
         GLES20.glClearColor(0.035f,0.08f,0.14f,1f)
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         val s = session ?: return
         try {
             val next = pendingScenes.get()
@@ -133,6 +136,7 @@ class ArCameraView(private val activity: Activity, private val onError: (String)
                     val x = 0.5f + (clip[0] / clip[3]) * 0.5f
                     val y = 0.5f - (clip[1] / clip[3]) * 0.5f
                     if (x !in 0f..1f || y !in 0f..1f) continue
+                    effects.draw(scene, pose, projection, view, System.currentTimeMillis())
                     currentTitle.set(scene.title)
                     currentText.set(scene.displayText)
                     screenCenter.set(Pair(x, y))
