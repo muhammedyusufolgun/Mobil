@@ -1,3 +1,14 @@
+# AR Vision Studio Pro — v0.5 Hız ve Görünürlük Düzeltmesi
+
+## Bu sürümde
+- Fotoğraf çekimi artık küçük önizleme değil tam çözünürlüklü JPEG referans üretir (FileProvider + TakePicture).
+- Görsel bitmap dekodlama AR çizim döngüsü dışında hazırlanır; veri tabanı değişimi kontrollüdür.
+- Canlı kamerada tanıma/yüklenme durum göstergesi vardır.
+- Admin Taslak Önizleme, görseli tanıma koşulu olmadan 3B efektin çizilip çizilmediğini test eder.
+- Yeni tanımda varsayılan efekt 3B Küp seçilidir; Yazı modu yine kullanılabilir.
+- Kullanıcıya yansıma için önce Bu Cihazda Yayınla gerekir.
+- AR olmayan kamerada nesne tanıma/efekt beklenmemelidir.
+
 # AR Vision Studio Pro — Android önizleme 0.4
 
 ## Çalışma modu
@@ -11,16 +22,15 @@
 - Kotlin + Compose arayüzü, kullanıcı/admin geçişi, yerel hash tabanlı prototip parola kapısı
 - Kamera izni ve ARCore destekli cihazlarda canlı ARCore kamera altlığı
 - Görsel referansları için `AugmentedImageDatabase`, görsel algılanınca görsel merkezini izleyen **ekran üstü** yazı kartı
-- ARCore ile izlenen görselin gerçek koordinatında dönen **OpenGL ES 3B küp** ve hareketli **3B yön oku** (boyut/yükseklik/renk düzenlenebilir)
+- ARCore ile izlenen görselin gerçek koordinatında dönen **OpenGL ES 3B küp** ve animasyonlu **3B yön oku** (boyut/yükseklik/renk düzenlenebilir)
 - ARCore desteklemeyen cihazlarda CameraX sadece-kamera modu
 - Admin'de fotoğraf seçme veya kamera ile çekme, yerel taslak tanımlama/silme
 - Admin özel Drive klasör adresi ve API anahtarı ayarı; başlangıç adresini arayüzden gizleme
 - Drive API'den yayın ZIP sürümünü kontrol etme, boyut ve arşiv yolu doğrulama, yerel çevrimdışı paket deposu
 - Admin'de `ARVISION_PUBLISHED.zip` oluşturma (Android belge kaydetme penceresi ile Google Drive klasörü seçilebilir)
-- Admin panelinden yayın paketini **cihaza içe aktarma**; kullanıcı kamerası yerel paketi kullanabilir
 
 ## Henüz tamamlanmamış özellikler
-- GLB/glTF içe alan tam sahne editörü, çok duraklı yollar ve gelişmiş animasyon editörü; v0.3 yalnızca temel 3B küp ve yön oku sağlar
+- GLB/glTF dosyalarını içe alan tam sahne editörü, çok duraklı yollar ve gelişmiş animasyon editörü; v0.3 yalnızca dönen küp ve temel 3B ok sağlar
 - OpenCV ile **kalibre edilmiş** %80 benzerlik skoru (ARCore'ın tanıma olayı yüzde değildir)
 - Google OAuth ile Drive'a **otomatik** telefon içinden yayınlama. Şimdilik sistem dosya penceresiyle Drive klasörüne kaydedilir; Drive sağlayıcısı mevcut değilse ZIP elle yüklenir.
 - Fiziksel cihaz, işlevsel AR ve Drive gerçek veri senkronizasyonu testleri (GitHub derlemesi bunların yerine geçmez).
@@ -48,24 +58,20 @@ gradle :app:assembleDebug
 - **Google Drive bağlantı paylaşımı, otomatik uygulama yazma izni vermez.** Yayın ZIP'i için Android belge kaydetme sağlayıcısı üzerinden Admin tarafından kaydetme gerekir. OAuth olmadan otomatik Drive yazma yoktur.
 - **Drive API key ile genel klasör araması bazı paylaşım türlerinde boş/403 dönebilir.** Bu istemcide gerçek API anahtarı, herkese açık yayın dosyası ve cihaz üzerinde test gerekir; kurumsal gizli Drive verileri için Google OAuth ya da ayrı yetkilendirilmiş aktarım servisi gereklidir.
 - API anahtarı güvenlik sınırı değildir. Sunucudaki hassas içerikleri herkesin görebildiği şekilde paylaşmayın.
-- Kamera üstü yazı görsel merkezini takip eder, fiziksel bir 3D GLB hologram değildir. 3D editör, kalibre edilmiş benzerlik ve cihaz testleri tamamlanmadı.
+- Kamera üstü bilgi yazısı hâlâ 2B ekran katmanıdır. Buna ek olarak gerçek dünyadaki izlenen resmin pozuna bağlanan OpenGL 3B küp ve ok desteklenir; GLB editörü, kalibre edilmiş benzerlik ve cihaz testleri tamamlanmadı.
 
+## v0.4 yayın akışı
+1. Admin girişinden sonra görsel yükleyin veya fotoğraf çekin.
+2. Yazı, **3B Küp** ya da **3B Ok** seçin. Renk, boyut ve yükseklik ayarlayın.
+3. Taslağı kaydedip kamera önizlemesinde deneyin.
+4. **Bu Cihazda Yayınla** / **Drive ZIP Paketi** ile ZIP üretin; sistemin Google Drive belge kaydetme arayüzü kullanılabiliyorsa hedef klasöre kaydedin.
+5. API anahtarı olmadan tek telefonda denemek için **Yayın ZIP’ini Cihaza İçe Aktar** seçin.
+6. Okuyucu telefonlar otomatik senkron için ayrı ayrı yapılandırılmış Drive API erişimine ve okunabilir yayın dosyasına ihtiyaç duyar.
 
-## v0.3 kullanım
-1. Admin girişinden sonra fotoğraf seçin veya çekin.
-2. Yazı kartı, **3B Küp** ya da **3B Ok** seçin; renk, boyut ve yükseklik ayarlayın.
-3. Taslağı kaydedip **Önizle** ile kamerada test edin.
-4. **Drive'a Yayın Paketi** ile ZIP oluşturun; Android belge kaydetme arayüzüyle klasöre gönderin.
-5. API anahtarı olmadan tek telefonda çalışmak için **Yayın ZIP'ini Cihaza İçe Aktar** seçin.
-
-### Dürüst özellik durumu
-GitHub Actions APK üretimi yazılımın derlendiğini gösterir. Fiziksel cihazdaki ARCore uyumluluğu ve gerçek zamanlı görüntüleme bağımsız test gerektirir. Kalibre edilmiş %80 benzerlik skoru, GLB model editörü, gelişmiş yollar ve OAuth destekli otomatik Drive'a yazma henüz mevcut değildir.
-
-## v0.4 kapanma ve görünmeme düzeltmeleri
-- Admin taslağını okuyucuya aktarmak için artık önce ZIP dışa/içe aktarma gerekmez: **Bu Cihazda Yayınla**.
-- ARCore/GLSurfaceView pause/resume sırası düzeltildi; oturum kapanırken render thread'i korunur.
-- Yüksek çözünürlüklü resimler ARCore'a aktarılmadan önce örneklenir; GL başlatma hatalarında standart kamera moduna geçilir.
-- Bir görselin tanınması için fiziksel referansın net görünmesi, yeterli ayrıntı ve ARCore destekli telefon gerekir.
-- Standart CameraX yedek modu yalnızca kamera görüntüsüdür, AR tanıma yapmaz.
-- Google Drive klasörü paylaşımı API anahtarı değildir; otomatik bulut okuma için Google Cloud Drive API etkinleştirilip API anahtarı yapılandırılmalıdır.
-- GitHub'da başarılı derleme gerçek cihaz testi değildir; tekrar kapanma olursa Android logcat gereklidir.
+## v0.4 kararlılık düzeltmeleri
+- AR kamera GL çiziminden önce hazır olma kontrolü, hataların sınırlandırılmış raporlanması ve başarısız AR durumunda standart kamera yedeği.
+- Session/GLSurfaceView durdurma sırası ARCore resmi örneğindeki gibi düzenlendi; oturumun kapanmasıyla render işlemleri senkronize edildi.
+- Büyük görseller, ARCore veritabanına eklenmeden önce uygun örnekleme ile küçültülür.
+- Admin **Bu Cihazda Yayınla** ile taslağı tek dokunuşta okuyucu kamerasına geçirebilir.
+- Drive API anahtarı yoksa bulut otomatik yenilenmez; paylaşımlı klasör izni bu anahtarın yerini tutmaz.
+- **Gerçek cihazda test ve kök nedenin logcat ile doğrulanması gereklidir; tam AR sahne editörü yoktur.**
