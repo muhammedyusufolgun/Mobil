@@ -83,6 +83,10 @@ fun VisionApp(activity: MainActivity) {
     var title by remember { mutableStateOf("") }
     var text by remember { mutableStateOf("") }
     var widthCm by remember { mutableStateOf("20") }
+    var effect by remember { mutableStateOf("CARD") }
+    var effectColor by remember { mutableStateOf("#38BDF8") }
+    var sizeCm by remember { mutableStateOf("12") }
+    var heightCm by remember { mutableStateOf("8") }
     var refreshKey by remember { mutableIntStateOf(0) }
     val saveZip = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
         if (uri != null) scope.launch {
@@ -92,6 +96,25 @@ fun VisionApp(activity: MainActivity) {
                     ?: error("Hedef dosya açılamadı")
             } }.onSuccess { message="Yayın paketi kaydedildi. Drive klasörüne kaydettiyseniz diğer cihazlar indirebilir." }
                 .onFailure { message="Paket kaydedilemedi: ${it.message}" }
+        }
+    }
+    val importPublishedZip = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) scope.launch {
+            runCatching { withContext(Dispatchers.IO) {
+                val bytes = requireNotNull(activity.contentResolver.openInputStream(uri)).use { input ->
+                    val out = java.io.ByteArrayOutputStream()
+                    val buf = ByteArray(8192)
+                    while (true) {
+                        val n = input.read(buf)
+                        if (n < 0) break
+                        require(out.size() + n <= 25 * 1024 * 1024) { "Paket 25 MB sınırını aşıyor" }
+                        out.write(buf, 0, n)
+                    }
+                    out.toByteArray()
+                }
+                DriveSync.importBundle(store, bytes)
+            } }.onSuccess { count -> published=store.published(); message="$count AR tanımı yüklendi" }
+                .onFailure { message="İçe aktarma başarısız: ${it.message}" }
         }
     }
     val chooseImage = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { selectedFile = it; capturedImage = null }
@@ -148,13 +171,35 @@ fun VisionApp(activity: MainActivity) {
                                 OutlinedTextField(value=title,onValueChange={title=it.take(100)}, label={Text("Tanım adı")}, modifier=Modifier.fillMaxWidth(),singleLine=true)
                                 OutlinedTextField(value=text,onValueChange={text=it.take(500)},label={Text("Tanıma sonrası ekranda görülecek yazı")},modifier=Modifier.fillMaxWidth())
                                 OutlinedTextField(value=widthCm,onValueChange={widthCm=it.filter { c -> c.isDigit() || c == '.' }.take(8)},label={Text("Basılı görsel genişliği (cm)")},singleLine=true)
+                                Text("AR içerik türü", fontWeight=FontWeight.Medium)
+                                Row(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                                    listOf("CARD" to "Yazı", "CUBE" to "3B Küp", "ARROW" to "3B Ok").forEach { (key, label) ->
+                                        FilterChip(selected=effect == key, onClick={effect=key}, label={Text(label)})
+                                    }
+                                }
+                                if(effect != "CARD") {
+                                    Text("3B nesne rengi", fontWeight=FontWeight.Medium)
+                                    Row(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                                        listOf("#38BDF8" to "Mavi", "#4ADE80" to "Yeşil", "#FACC15" to "Sarı").forEach { (hex, label) ->
+                                            FilterChip(selected=effectColor == hex, onClick={effectColor=hex}, label={Text(label)})
+                                        }
+                                    }
+                                    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                        OutlinedTextField(value=sizeCm,onValueChange={sizeCm=it.filter { c -> c.isDigit() || c=='.' }.take(5)},
+                                            label={Text("Boyut (cm)")},modifier=Modifier.weight(1f),singleLine=true)
+                                        OutlinedTextField(value=heightCm,onValueChange={heightCm=it.filter { c -> c.isDigit() || c=='.' }.take(5)},
+                                            label={Text("Yükseklik (cm)")},modifier=Modifier.weight(1f),singleLine=true)
+                                    }
+                                }
                                 Button(enabled=(selectedFile != null || capturedImage != null) && title.isNotBlank(), onClick={
                                     scope.launch {
                                         runCatching { withContext(Dispatchers.IO) {
                                             val width = (widthCm.toFloatOrNull() ?: 20f).coerceIn(1f,1000f)/100f
                                             val bitmap = capturedImage
-                                            if (bitmap != null) store.addBitmapDraft(bitmap,title,text,width)
-                                            else store.addImageDraft(requireNotNull(selectedFile),title,text,width)
+                                            val size = (sizeCm.toFloatOrNull() ?: 12f).coerceIn(2f,200f)/100f
+                                            val height = (heightCm.toFloatOrNull() ?: 8f).coerceIn(0f,200f)/100f
+                                            if (bitmap != null) store.addBitmapDraft(bitmap,title,text,width,effect,effectColor,size,height)
+                                            else store.addImageDraft(requireNotNull(selectedFile),title,text,width,effect,effectColor,size,height)
                                         } }.onSuccess { drafts=store.drafts(); title=""; text=""; selectedFile=null; capturedImage=null; message="Taslak kaydedildi" }
                                             .onFailure { message="Kayıt başarısız: ${it.message}" }
                                     }
@@ -179,6 +224,11 @@ fun VisionApp(activity: MainActivity) {
                                         else saveZip.launch(DriveSync.BUNDLE)
                                     }) { Text("Drive'a Yayın Paketi") }
                                 }
+                                OutlinedButton(onClick={importPublishedZip.launch(arrayOf("application/zip", "application/octet-stream"))}) {
+                                    Text("Yayın ZIP'ini Cihaza İçe Aktar")
+                                }
+                                Text("İçe aktarım bu telefonun okuma modunu hemen günceller; diğer telefonlar için Drive'a yayınlayın.",
+                                    style=MaterialTheme.typography.bodySmall,color=Color.Gray)
                                 Text("Kaydetme penceresinde Google Drive uygulamanızdaki hedef klasörü seçin. Google Drive dosya sağlayıcısı görünmüyorsa dosyayı indirip elle yükleyin.",style=MaterialTheme.typography.bodySmall,color=Color.Gray)
                             }
                         }
