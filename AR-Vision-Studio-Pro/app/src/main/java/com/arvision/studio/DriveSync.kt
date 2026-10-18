@@ -111,8 +111,27 @@ object DriveSync {
             bitmap.recycle()
             val width = obj.optDouble("widthMeters", 0.2).toFloat()
             require(width in 0.01f..10f) { "Geçersiz referans genişliği" }
-            ArScene(obj.getString("id"), obj.optString("title"), obj.optString("displayText"), image.absolutePath, width, "drive")
+
+            val effect = obj.optString("effect", "CARD")
+            require(effect in setOf("CARD", "CUBE", "ARROW")) { "Geçersiz AR efekt türü" }
+            val color = obj.optString("color", "#38BDF8")
+            require(Regex("#[0-9a-fA-F]{6}").matches(color)) { "Geçersiz renk" }
+            val size = obj.optDouble("sizeMeters", 0.12).toFloat()
+            val height = obj.optDouble("heightMeters", 0.08).toFloat()
+            require(size in 0.02f..2f && height in -1f..2f) { "3B boyutları geçersiz" }
+            ArScene(obj.getString("id"), obj.optString("title").take(100),
+                obj.optString("displayText").take(500), image.absolutePath, width, "drive", effect, color, size, height)
         }
+    }
+
+    /** Authorized Admin can import a valid publication ZIP without Drive/API access. */
+    suspend fun importBundle(store: ProjectStore, data: ByteArray): Int = withContext(Dispatchers.IO) {
+        require(data.size <= MAX_ZIP) { "Paket çok büyük" }
+        val version = "manual-" + MessageDigest.getInstance("SHA-256")
+            .digest(data).joinToString("") { "%02x".format(it) }.take(32)
+        val scenes = extractVerifiedBundle(store, data, version)
+        store.replacePublished(scenes, version)
+        scenes.size
     }
 
     /** Export local admin drafts for selection of target Google Drive folder via Android's file picker. */
@@ -125,6 +144,8 @@ object DriveSync {
                 list.forEach { s -> put(JSONObject().apply {
                     put("id", s.id); put("title", s.title); put("displayText", s.displayText)
                     put("widthMeters", s.widthMeters)
+                    put("effect", s.effect); put("color", s.color)
+                    put("sizeMeters", s.sizeMeters); put("heightMeters", s.heightMeters)
                     put("reference", "refs/${s.id}.jpg")
                 }) }
             })
