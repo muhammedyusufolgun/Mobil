@@ -395,7 +395,8 @@ body{background:#edf3f8}
 <script>
 'use strict';
 (()=>{
-const STORAGE_KEY='isg-risk-ltipi-matris-offline-v1';
+const STORAGE_KEY='isg-risk-ltipi-matris-mobil-meta-v2';
+const LEGACY_STORAGE_KEY='isg-risk-ltipi-matris-offline-v1';
 const $=id=>document.getElementById(id);
 const methodName={matrix:'5×5 L Tipi Matris'};
 const statusName={open:'Açık',inprogress:'Devam Ediyor',done:'Tamamlandı'};
@@ -421,8 +422,28 @@ function normalizeRecord(raw){
  }
  return {id:asText(raw.id)||randomId(),method:'matrix',unit:asText(raw.unit),activity:asText(raw.activity),hazard:asText(raw.hazard),risk:asText(raw.risk),affected:asText(raw.affected),existing:asText(raw.existing),action:asText(raw.action),responsible:asText(raw.responsible),deadline:/^\d{4}-\d{2}-\d{2}$/.test(asText(raw.deadline))?raw.deadline:'',status:Object.hasOwn(statusName,raw.status)?raw.status:'open',verified:(raw.verified===true||raw.verified==='true'||raw.verified==='Evet') && raw.status==='done',notes:asText(raw.notes),created:asText(raw.created)||today(),before:base.before,after:base.after};
 }
-function load(){try{const value=localStorage.getItem(STORAGE_KEY);if(!value)return;const parsed=JSON.parse(value);if(parsed.meta&&typeof parsed.meta==='object'){for(const k of Object.keys(state.meta))if(parsed.meta[k]!=null)state.meta[k]=asText(parsed.meta[k]);}if(Array.isArray(parsed.records))state.records=parsed.records.map(normalizeRecord).filter(Boolean);}catch(e){console.warn('Yerel veriler okunamadı:',e)}}
-function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$('saveState').textContent='Kaydedildi · '+new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})+' · JSON yedeği önerilir.'}catch(e){$('saveState').textContent='Tarayıcı depolaması kullanılamıyor; JSON dosyasına aktarın.'}}
+/* Risk kayıtları oturuma özeldir: F5/yeniden açılışta boş liste. Meta kalıcıdır. */
+function load(){
+ state.records=[];
+ try{
+   const value=localStorage.getItem(STORAGE_KEY)||localStorage.getItem(LEGACY_STORAGE_KEY);
+   if(!value)return;
+   const parsed=JSON.parse(value);
+   if(parsed.meta&&typeof parsed.meta==='object'){
+     for(const k of Object.keys(state.meta))if(parsed.meta[k]!=null)state.meta[k]=asText(parsed.meta[k]);
+   }
+ }catch(e){console.warn('Yerel işyeri bilgileri okunamadı:',e)}
+}
+function persist(){
+ try{
+   // Risk kayıtları localStorage'a yazılmaz; sadece bu WebView oturumunun belleğindedir.
+   localStorage.setItem(STORAGE_KEY,JSON.stringify({meta:state.meta}));
+   $('saveState').textContent='Risk kayıtları yalnızca açık oturumda tutulur. Düzenli JSON yedeği alın.';
+ }catch(e){
+   console.warn('İşyeri bilgileri kaydedilemedi:',e);
+   $('saveState').textContent='İşyeri bilgileri saklanamadı. JSON yedeği alın.';
+ }
+}
 function toast(message){clearTimeout(toastTimeout);const el=$('toast');el.textContent=message;el.classList.add('show');toastTimeout=setTimeout(()=>el.classList.remove('show'),3400)}
 function score(method,factors){const f=factors||defaults.matrix.before;return Number(f.p)*Number(f.s)}
 function level(method,value){const index=value<=2?0:value<=5?1:value<=10?2:value<=15?3:4;return [{className:'risk-vlow',label:'Çok Düşük',rank:0},{className:'risk-low',label:'Düşük',rank:1},{className:'risk-medium',label:'Orta',rank:2},{className:'risk-high',label:'Yüksek',rank:3},{className:'risk-critical',label:'Çok Yüksek',rank:4}][index]}
