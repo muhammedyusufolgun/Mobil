@@ -1,4 +1,4 @@
-name: Risk UI Mobile APK
+name: L Tipi Matris APK
 on:
   workflow_dispatch:
   push:
@@ -28,23 +28,50 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build APK
+      - name: Render Risk L Tipi launcher icon
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw, ImageFont
+          from pathlib import Path
+          out=Path('app/src/risk/res/drawable/ic_riskui.png')
+          out.parent.mkdir(parents=True,exist_ok=True)
+          im=Image.new('RGBA',(512,512),'#dff3e5')
+          d=ImageDraw.Draw(im)
+          d.rounded_rectangle((6,6,505,505),radius=76,outline='#2f855a',width=14)
+          d.rounded_rectangle((30,30,482,482),radius=55,outline='#9dcdae',width=3)
+          f='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+          def put(text,cy,start):
+              sz=start
+              while True:
+                  font=ImageFont.truetype(f,sz)
+                  bb=d.textbbox((0,0),text,font=font)
+                  w,h=bb[2]-bb[0],bb[3]-bb[1]
+                  if w<=420 and h<=130:break
+                  sz-=2
+              d.text(((512-w)/2,cy-(bb[1]+bb[3])/2),text,font=font,fill='#143d2a')
+          put('Risk',156,130)
+          d.line((65,256,447,256),fill='#afd4bb',width=3)
+          put('L Tipi',356,108)
+          im.save(out)
+          PY
+      - name: Build installable APK with v2 signature
         run: gradle --no-daemon assembleDebug
       - name: Name APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk Risk-UI-Mobil.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk L_Tipi_Matris.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Risk-UI-Mobil-APK
-          path: Risk-UI-Mobil.apk
+          name: L_Tipi_Matris_APK
+          path: L_Tipi_Matris.apk
           retention-days: 30
       - name: Publish APK to branch
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p release
-          cp Risk-UI-Mobil.apk release/Risk-UI-Mobil.apk
+          cp L_Tipi_Matris.apk release/L_Tipi_Matris.apk
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add release/Risk-UI-Mobil.apk
+          git add release/L_Tipi_Matris.apk
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish Risk UI mobile debug APK [skip ci]'
+          git commit -m 'Publish installable L Tipi Matris APK [skip ci]'
           git push origin HEAD:risk-ui-mobil
