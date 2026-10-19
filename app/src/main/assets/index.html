@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0284c7">
+<meta name="theme-color" content="#eaf7ee">
 <title>İSG Risk Analizi - L Tipi Matris | 5×5 Risk Değerlendirmesi</title>
 <style>
 :root{--bg:#f8fafc;--surface:#fff;--line:#dbe3eb;--text:#17283b;--muted:#64748b;--brand:#0284c7;--brand2:#0369a1;--pale:#eaf6fd;--radius:7px;--shadow:0 2px 10px rgba(22,44,68,.045)}
@@ -274,6 +274,31 @@ body{background:#edf3f8}
   #printPages .print-document{max-width:100%!important}
 }
 
+
+/* Olgun UI mobile - muted green palette */
+@media screen {
+ html, body { background:#eaf7ee!important; }
+ .olgun-frame {background:#f3fbf5!important;border-color:#9bbea6!important}
+ .header {border-top-color:#2f855a!important}
+ .card-header {background:#eaf8ee!important;border-left-color:#2f855a!important;border-bottom-color:#c9dfd0!important}
+ .card-header h2 {color:#1f5a3d!important}
+ .section-number {background:#dff3e5!important;color:#1d6a42!important}
+ .matrix-heading {background:#edf8f0!important}
+ .btn-primary {background:#2f855a!important;border-color:#2f855a!important}
+ .logo {background:#f1faf3!important;border-color:#b4d6c0!important;color:#1d6a42!important}
+ .organization {color:#1e6440!important}
+}
+.matrix-mode-controls{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.matrix-mode-btn{border:1px solid #b9d6c5;background:#fff;color:#315d47;padding:6px 9px;border-radius:5px;min-height:30px;font-size:11px;font-weight:700;line-height:1.2;white-space:normal}
+.matrix-mode-btn.active,.matrix-mode-btn[aria-pressed="true"]{background:#dcf3e3;color:#185837;border-color:#77b18b;box-shadow:inset 0 0 0 1px #87b89a}
+.matrix-summary{margin:5px auto 0;max-width:620px;min-height:22px;display:flex;align-items:center;justify-content:center;text-align:center;gap:6px;flex-wrap:wrap;color:#50677a;font-size:11px;line-height:1.3}
+.matrix-summary strong{color:#185837}
+.matrix-cell.matrix-distribution-cell{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;cursor:default;padding:2px!important;box-shadow:none}
+.matrix-distribution-cell .distribution-qty{font-size:19px;font-weight:900;line-height:1.04;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.matrix-distribution-cell .distribution-score{font-size:9px;font-weight:600;opacity:.86;line-height:1.25}
+.matrix-distribution-cell.is-empty .distribution-qty{opacity:.45}
+@media(max-width:680px){.matrix-heading{align-items:stretch;flex-direction:column}.matrix-mode-controls{display:grid;grid-template-columns:1fr 1fr;width:100%}.matrix-mode-btn{padding:7px 4px;font-size:10px}.matrix-distribution-cell .distribution-qty{font-size:16px}.matrix-distribution-cell .distribution-score{font-size:8px}.matrix-summary{font-size:10px}}
+@media print{.print-snapshot .matrix-mode-controls{display:none!important}.print-snapshot .matrix-distribution-cell .distribution-qty{font-size:13px!important}.print-snapshot .matrix-distribution-cell .distribution-score{font-size:7px!important}.print-snapshot .matrix-summary{font-size:9px!important;margin-top:1px!important;min-height:0!important}}
 </style>
 </head>
 <body>
@@ -326,9 +351,9 @@ body{background:#edf3f8}
             <section class="score-panel score-after" data-side="after" aria-label="Hedef risk puanlaması"><div class="score-top"><strong><i class="indicator ind-after"></i> HEDEF RİSK</strong><span class="hint" id="afterTitle">Planlanan seviye</span></div><div class="score-fields" id="afterFields"></div><div class="score-result"><div><span class="hint">Hedef / kalan risk</span><br><b id="afterScore">—</b></div><span id="afterLevel" class="risk-tag">—</span></div></section>
           </div>
           <section class="matrix-card" id="matrixGuide" aria-labelledby="matrixTitle">
-            <div class="matrix-heading"><h3 id="matrixTitle">▦ 5×5 L Tipi Risk Matrisi</h3></div>
+            <div class="matrix-heading"><h3 id="matrixTitle">▦ 5×5 L Tipi Risk Matrisi</h3><div class="matrix-mode-controls" role="group" aria-label="Matris görünümü"><button class="matrix-mode-btn active" id="matrixModeSingle" type="button" aria-pressed="true">Tekil Risk Matrisi</button><button class="matrix-mode-btn" id="matrixModeDistribution" type="button" aria-pressed="false">Genel Risk Dağılımı</button></div></div>
             <div class="matrix-layout">
-              <div class="matrix-scroll"><div class="matrix-axis">ŞİDDET →</div><div id="matrixVisual" aria-label="5 çarpı 5 renkli risk matrisi"></div><div class="matrix-axis matrix-axis-bottom">OLASILIK ↑</div></div>
+              <div class="matrix-scroll"><div class="matrix-axis">ŞİDDET →</div><div id="matrixVisual" aria-label="5 çarpı 5 renkli risk matrisi"></div><div id="matrixSummary" class="matrix-summary" aria-live="polite"></div><div class="matrix-axis matrix-axis-bottom">OLASILIK ↑</div></div>
             </div>
           </section>
         </div>
@@ -350,7 +375,7 @@ body{background:#edf3f8}
     <div class="tablebox"><table aria-label="Risk kayıtları"><thead><tr><th>No.</th><th>Bölüm / Faaliyet</th><th>Tehlike / Risk</th><th>İlk Risk (O×Ş)</th><th>Son Risk (O×Ş)</th><th>Termin / Sorumlu</th><th>Durum</th><th>İşlemler</th></tr></thead><tbody id="riskRows"></tbody></table><div id="emptyState" class="empty" hidden>Henüz kayıt bulunmuyor. Yukarıdaki formdan risk ekleyebilirsiniz.</div></div>
     <div class="card-body table-footer"><div class="toolbar record-bottom-actions"><button class="btn btn-danger" id="clearBtn" type="button">Tüm Kayıtları Sil</button></div></div>
   </section>
-  <footer class="foot"><span>İSG Risk Analizi – L Tipi Matris · Risk UI mobil · Cihazda yerel kayıtlar</span><span id="saveState">Veriler bu tarayıcıda saklanır. Düzenli JSON yedeği alın.</span></footer>
+  <footer class="foot"><span>Temel özelliği: Olasılık × Şiddet　 Kullanım alanı: Ofisler, küçük ve orta ölçekli işletmeler</span><span id="saveState" class="sr-only" aria-live="polite"></span></footer>
 </div>
 <div class="ui2-action-row"><div class="ui2-action-panel" aria-label="Dosya ve yazdırma işlemleri">
  <button class="btn btn-excel-import" id="importBtn" type="button">⬆ JSON İçeri Aktar</button>
@@ -402,29 +427,51 @@ function toast(message){clearTimeout(toastTimeout);const el=$('toast');el.textCo
 function score(method,factors){const f=factors||defaults.matrix.before;return Number(f.p)*Number(f.s)}
 function level(method,value){const index=value<=2?0:value<=5?1:value<=10?2:value<=15?3:4;return [{className:'risk-vlow',label:'Çok Düşük',rank:0},{className:'risk-low',label:'Düşük',rank:1},{className:'risk-medium',label:'Orta',rank:2},{className:'risk-high',label:'Yüksek',rank:3},{className:'risk-critical',label:'Çok Yüksek',rank:4}][index]}
 function matrixColor(value){return value<=2?'m-dark':value<=5?'m-light':value<=10?'m-yellow':value<=15?'m-orange':'m-red'}
-let matrixActiveSide='before';
+let matrixActiveSide='before';let matrixView='single';
 function fmt(v){return Number(v).toLocaleString('tr-TR',{maximumFractionDigits:2})}
 function factorFields(side){const method='matrix';return scheme[method].map(f=>`<div><label for="factor-${side}-${f.k}">${esc(f.l)}</label><select id="factor-${side}-${f.k}" data-side="${side}" data-factor="${f.k}">${f.opts.map(o=>`<option value="${o.v}" ${Number(working[side][f.k])===o.v?'selected':''}>${esc(o.t)}</option>`).join('')}</select></div>`).join('')}
 function renderScoreFields(){
  $('beforeFields').innerHTML=factorFields('before');$('afterFields').innerHTML=factorFields('after');
  updatePreview();
 }
-function renderMatrix(){const bp=working.before.p,bs=working.before.s,ap=working.after.p,as=working.after.s;
+function renderMatrix(){
+ const bp=working.before.p,bs=working.before.s,ap=working.after.p,as=working.after.s;
+ const isDistribution=matrixView==='distribution';
+ const counts=Array.from({length:6},()=>Array(6).fill(0));
+ if(isDistribution)for(const record of state.records){
+   const p=Number(record.before?.p),s=Number(record.before?.s);
+   if(Number.isInteger(p)&&p>=1&&p<=5&&Number.isInteger(s)&&s>=1&&s<=5)counts[p][s]++;
+ }
  let html='<table class="matrix-table"><thead><tr><th scope="col">O ↑ / Ş →</th>';
  for(let s=1;s<=5;s++)html+='<th scope="col">'+s+'</th>';html+='</tr></thead><tbody>';
  for(let p=5;p>=1;p--){html+='<tr><th scope="row">'+p+'</th>';for(let s=1;s<=5;s++){
- const v=p*s,isBefore=bp===p&&bs===s,isAfter=ap===p&&as===s;
- const marks=(isBefore?'<span title="Mevcut">M</span>':'')+(isAfter?'<span class="after-marker" title="Hedef">H</span>':'');
- html+=`<td><button type="button" class="matrix-cell ${matrixColor(v)} ${isBefore?'is-before':''} ${isAfter?'is-after':''}" data-p="${p}" data-s="${s}" title="Olasılık ${p} × Şiddet ${s} = ${v} · ${level('matrix',v).label}" aria-label="Olasılık ${p}, şiddet ${s}, risk puanı ${v}, ${level('matrix',v).label}${isBefore?', mevcut risk':''}${isAfter?', hedef risk':''}"><span>${v}</span><span class="cell-labels">${marks}</span></button></td>`;
+   const v=p*s;
+   if(isDistribution){
+     const n=counts[p][s];
+     html+=`<td><div class="matrix-cell matrix-distribution-cell ${matrixColor(v)} ${n===0?'is-empty':''}" role="img" title="Olasılık ${p} × Şiddet ${s}: ${n} risk kaydı; risk puanı ${v}" aria-label="Olasılık ${p}, şiddet ${s}, ${n} risk kaydı, risk puanı ${v}"><span class="distribution-qty">${n||'—'}</span><span class="distribution-score">${v} puan</span></div></td>`;
+   } else {
+     const isBefore=bp===p&&bs===s,isAfter=ap===p&&as===s;
+     const marks=(isBefore?'<span title="Mevcut">M</span>':'')+(isAfter?'<span class="after-marker" title="Hedef">H</span>':'');
+     html+=`<td><button type="button" class="matrix-cell ${matrixColor(v)} ${isBefore?'is-before':''} ${isAfter?'is-after':''}" data-p="${p}" data-s="${s}" title="Olasılık ${p} × Şiddet ${s} = ${v} · ${level('matrix',v).label}" aria-label="Olasılık ${p}, şiddet ${s}, risk puanı ${v}, ${level('matrix',v).label}${isBefore?', mevcut risk':''}${isAfter?', hedef risk':''}"><span>${v}</span><span class="cell-labels">${marks}</span></button></td>`;
+   }
  }html+='</tr>'}html+='</tbody></table>';
  $('matrixVisual').innerHTML=html;
+ $('matrixModeSingle').classList.toggle('active',!isDistribution);
+ $('matrixModeDistribution').classList.toggle('active',isDistribution);
+ $('matrixModeSingle').setAttribute('aria-pressed',String(!isDistribution));
+ $('matrixModeDistribution').setAttribute('aria-pressed',String(isDistribution));
+ const summary=$('matrixSummary');
+ summary.innerHTML=isDistribution
+   ? `<strong>Toplam ${state.records.length} risk kaydı</strong> <span>· Önlem öncesi dağılım · Büyük sayı: kayıt adedi</span>`
+   : `<span><strong>M</strong> Mevcut risk (mavi) &nbsp; <strong>H</strong> Hedef risk (mor)</span>`;
 }
-function setMatrixActiveSide(side){matrixActiveSide=side;document.querySelectorAll('.assessment-scores .score-panel').forEach(panel=>panel.classList.toggle('active-target',panel.dataset.side===side))}
+function setMatrixView(mode){matrixView=mode==='distribution'?'distribution':'single';renderMatrix()}
+function setMatrixActiveSide(side){if(matrixView!=='single')setMatrixView('single');matrixActiveSide=side;document.querySelectorAll('.assessment-scores .score-panel').forEach(panel=>panel.classList.toggle('active-target',panel.dataset.side===side))}
 function updatePreview(){for(const side of ['before','after']){const val=score('matrix',working[side]);$(side+'Score').textContent=fmt(val);const info=level('matrix',val),el=$(side+'Level');el.textContent=info.label;el.className='risk-tag '+info.className} $('afterTitle').textContent=$('verified').checked?'Kontrol sonrası doğrulandı':'Planlanan seviye';renderMatrix();}
 function updateVerifyState(){const complete=$('status').value==='done';$('verified').disabled=!complete;if(!complete)$('verified').checked=false;updatePreview()}
 function clearForm(){editingId=null;working=clone(defaults[$('method').value]);$('riskForm').reset();$('method').value='matrix';working=clone(defaults.matrix);$('formTitleText').textContent='Yeni Risk Kaydı';$('saveBtn').textContent='＋ Riski Kaydet';$('formInfo').textContent='Yeni kayıt oluşturuluyor.';renderScoreFields();updateVerifyState()}
 function recordFromForm(){const val=id=>$(id).value.trim();return normalizeRecord({id:editingId||randomId(),method:$('method').value,unit:val('unit'),activity:val('activity'),hazard:val('hazard'),risk:val('risk'),affected:val('affected'),existing:val('existing'),action:val('action'),responsible:val('responsible'),deadline:val('deadline'),status:val('status'),verified:$('verified').checked,notes:val('notes'),created:editingId?(state.records.find(x=>x.id===editingId)?.created||today()):today(),before:working.before,after:working.after})}
-function startEdit(id){const record=state.records.find(x=>x.id===id);if(!record)return;editingId=id;const fieldNames=['method','unit','activity','hazard','risk','affected','existing','action','responsible','deadline','status','notes'];for(const key of fieldNames)$(key).value=record[key]||'';$('verified').checked=record.verified;working={before:clone(record.before),after:clone(record.after)};$('formTitleText').textContent='Risk Kaydını Düzenle';$('saveBtn').textContent='✓ Değişiklikleri Kaydet';$('formInfo').textContent='Düzenlenen kayıt: '+record.id;renderScoreFields();updateVerifyState();$('formTitle').scrollIntoView({behavior:'smooth',block:'start'});$('unit').focus({preventScroll:true})}
+function startEdit(id){const record=state.records.find(x=>x.id===id);if(!record)return;setMatrixView('single');editingId=id;const fieldNames=['method','unit','activity','hazard','risk','affected','existing','action','responsible','deadline','status','notes'];for(const key of fieldNames)$(key).value=record[key]||'';$('verified').checked=record.verified;working={before:clone(record.before),after:clone(record.after)};$('formTitleText').textContent='Risk Kaydını Düzenle';$('saveBtn').textContent='✓ Değişiklikleri Kaydet';$('formInfo').textContent='Düzenlenen kayıt: '+record.id;renderScoreFields();updateVerifyState();$('formTitle').scrollIntoView({behavior:'smooth',block:'start'});$('unit').focus({preventScroll:true})}
 function deleteRecord(id){const r=state.records.find(x=>x.id===id);if(!r)return;if(!confirm('“'+r.hazard.slice(0,80)+'” kaydını kalıcı olarak silmek istiyor musunuz?'))return;state.records=state.records.filter(x=>x.id!==id);if(editingId===id)clearForm();persist();renderDashboard();toast('Risk kaydı silindi.')}
 function duplicateRecord(id){const r=state.records.find(x=>x.id===id);if(!r)return;const obj=clone(r);obj.id=randomId();obj.created=today();obj.verified=false;obj.status='open';state.records.push(obj);persist();renderDashboard();startEdit(obj.id);toast('Kopya kayıt oluşturuldu ve düzenlemeye açıldı.')}
 function scoreBadge(method,values){const v=score(method,values),l=level(method,v);return `<strong>${fmt(v)}</strong><div style="margin-top:4px"><span class="risk-tag ${l.className}">${l.label}</span></div>`}
@@ -439,6 +486,7 @@ function renderDashboard(){
  $('statCritical').textContent=state.records.filter(r=>!r.verified&&level(r.method,score(r.method,r.before)).rank>=3).length;
  $('statOverdue').textContent=state.records.filter(r=>!r.verified&&r.deadline&&r.deadline<t).length;
  $('statVerified').textContent=state.records.filter(r=>r.verified).length;
+ if(matrixView==='distribution')renderMatrix();
  const rows=matchingRecords();$('recordCount').textContent=`(${rows.length}/${state.records.length})`;
  $('emptyState').hidden=rows.length!==0;
  $('riskRows').innerHTML=rows.map((r,index)=>{
@@ -472,7 +520,7 @@ async function performJsonImport(file){
       for(const k of Object.keys(BRAND_DEFAULT))if(typeof incoming.brand[k]==='string')brand[k]=incoming.brand[k];
       storeBrand();$('brandTitle').textContent=brand.title;$('brandSubtitle').textContent=brand.subtitle;$('brandOrg').textContent=brand.org;setBrandLogo(brand.logo);
    }
-   persist();renderMeta();clearForm();renderDashboard();toast(records.length+' kayıt JSON dosyasından yüklendi.');
+   persist();renderMeta();clearForm();setMatrixView('distribution');renderDashboard();toast(records.length+' kayıt JSON dosyasından yüklendi.');
  }catch(e){console.error(e);alert('JSON içeri alma başarısız: '+e.message)}
  finally{$('importFile').value=''}
 }
@@ -513,7 +561,7 @@ function renderPrint(){const source=$('app'),clone=source.cloneNode(true);
      const l=clone.querySelector('#'+side+'Level');if(l){l.textContent=info.label;l.className='risk-tag '+info.className}
    }
    const aft=clone.querySelector('#afterTitle');if(aft)aft.textContent=latest.verified?'Kontrol sonrası doğrulandı':'Planlanan seviye';
-   for(const btn of clone.querySelectorAll('.matrix-cell')){
+   for(const btn of clone.querySelectorAll('.matrix-cell[data-p][data-s]')){
      const p=Number(btn.dataset.p),v=Number(btn.dataset.s),bef=latest.before.p===p&&latest.before.s===v,aft=latest.after.p===p&&latest.after.s===v;
      btn.classList.toggle('is-before',bef);btn.classList.toggle('is-after',aft);
      btn.querySelector('.cell-labels').innerHTML=(bef?'<span>M</span>':'')+(aft?'<span class="after-marker">H</span>':'');
@@ -563,8 +611,10 @@ function bind(){
  for(const container of [$('beforeFields'),$('afterFields')])container.addEventListener('change',event=>{const el=event.target;if(el.matches('select[data-factor]')){setMatrixActiveSide(el.dataset.side);working[el.dataset.side][el.dataset.factor]=Number(el.value);updatePreview()}});
  $('status').addEventListener('change',updateVerifyState);$('verified').addEventListener('change',updatePreview);
  document.querySelectorAll('.assessment-scores .score-panel').forEach(panel=>{panel.addEventListener('pointerdown',()=>setMatrixActiveSide(panel.dataset.side));panel.addEventListener('focusin',()=>setMatrixActiveSide(panel.dataset.side));});
+ $('matrixModeSingle').addEventListener('click',()=>setMatrixView('single'));
+ $('matrixModeDistribution').addEventListener('click',()=>setMatrixView('distribution'));
  $('matrixVisual').addEventListener('click',event=>{const btn=event.target.closest('button[data-p][data-s]');if(!btn)return;const side=matrixActiveSide,p=Number(btn.dataset.p),severity=Number(btn.dataset.s);working[side]={p,s:severity};$('factor-'+side+'-p').value=p;$('factor-'+side+'-s').value=severity;updatePreview()});
- $('riskForm').addEventListener('submit',event=>{event.preventDefault();const form=$('riskForm');if(!form.checkValidity()){form.reportValidity();return}if($('verified').checked&&$('status').value!=='done'){alert('Kalan risk doğrulaması için aksiyon durumu “Tamamlandı” olmalıdır.');return}const r=recordFromForm();const wasEditing=Boolean(editingId);if(editingId){const i=state.records.findIndex(x=>x.id===editingId);if(i<0)return;state.records[i]=r}else state.records.push(r);persist();clearForm();renderDashboard();toast(wasEditing?'Risk güncellendi.':'Risk kaydı başarıyla kaydedildi.')});
+ $('riskForm').addEventListener('submit',event=>{event.preventDefault();const form=$('riskForm');if(!form.checkValidity()){form.reportValidity();return}if($('verified').checked&&$('status').value!=='done'){alert('Kalan risk doğrulaması için aksiyon durumu “Tamamlandı” olmalıdır.');return}const r=recordFromForm();const wasEditing=Boolean(editingId);if(editingId){const i=state.records.findIndex(x=>x.id===editingId);if(i<0)return;state.records[i]=r}else state.records.push(r);persist();clearForm();setMatrixView('distribution');renderDashboard();toast(wasEditing?'Risk güncellendi.':'Risk kaydı başarıyla kaydedildi.')});
  $('newBtn').addEventListener('click',clearForm);$('cancelBtn').addEventListener('click',clearForm);
  $('riskRows').addEventListener('click',event=>{const btn=event.target.closest('button[data-act]');if(!btn)return;const id=btn.dataset.id;if(btn.dataset.act==='edit')startEdit(id);if(btn.dataset.act==='delete')deleteRecord(id);if(btn.dataset.act==='duplicate')duplicateRecord(id)});
  for(const id of ['searchInput','statusFilter'])$(id).addEventListener('input',renderDashboard);
@@ -573,7 +623,7 @@ function bind(){
  $('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>performJsonImport(e.target.files?.[0]));
  $('clearBtn').addEventListener('click',()=>{if(!state.records.length){toast('Silinecek kayıt bulunmuyor.');return}if(!confirm(`DİKKAT: ${state.records.length} risk kaydının tamamı silinecek. Bu işlem geri alınamaz. Önce JSON Dışarı Aktar ile yedek aldığınızdan emin olun. Devam edilsin mi?`))return;state.records=[];persist();clearForm();renderDashboard();toast('Tüm risk kayıtları silindi.')});
 }
-load();initializeBrand();renderMeta();$('method').value='matrix';renderScoreFields();updateVerifyState();bind();renderDashboard();
+load();if(state.records.length)matrixView='distribution';initializeBrand();renderMeta();$('method').value='matrix';renderScoreFields();updateVerifyState();bind();renderDashboard();
 })();
 </script>
 </body>
