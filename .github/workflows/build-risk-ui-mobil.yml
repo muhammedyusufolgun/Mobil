@@ -1,8 +1,8 @@
-name: Risk UI mobil Fine Kinney APK
+name: FMEA mobile Risk UI APK
 on:
   workflow_dispatch:
   push:
-    branches: [risk-ui-fine-kinney]
+    branches: [risk-ui-fmea]
     paths:
       - 'app/**'
       - 'build.gradle'
@@ -28,7 +28,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Render Risk Fine Kinney launcher icon
+      - name: Render FMEA Risk launcher icon
         run: |
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
@@ -36,7 +36,7 @@ jobs:
           from pathlib import Path
           out=Path('app/src/risk/res/drawable/ic_riskui.png')
           out.parent.mkdir(parents=True,exist_ok=True)
-          im=Image.new('RGBA',(512,512),'#dff3e5')
+          im=Image.new('RGBA',(512,512),'#e2f5e6')
           d=ImageDraw.Draw(im)
           d.rounded_rectangle((6,6,505,505),radius=76,outline='#2f855a',width=14)
           d.rounded_rectangle((30,30,482,482),radius=55,outline='#9dcdae',width=3)
@@ -50,9 +50,9 @@ jobs:
                   if w<=416 and h<=135:break
                   sz-=2
               d.text(((512-w)/2,cy-(bb[1]+bb[3])/2),text,font=font,fill='#143d2a')
-          put('Risk',156,130)
+          put('Risk',156,152)
           d.line((65,256,447,256),fill='#afd4bb',width=3)
-          put('Fine-Kinney',356,112)
+          put('FMEA',356,150)
           im.save(out)
           PY
       - name: Build installable APK with v2 signature
@@ -65,20 +65,20 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs --min-sdk-version 26 "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 12
       - name: Name APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk 'Fine_Kinney.apk'
+        run: cp app/build/outputs/apk/debug/app-debug.apk 'FMA.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: Risk_UI_mobil_Fine_Kinney_APK
-          path: 'Fine_Kinney.apk'
+          name: FMA_APK
+          path: 'FMA.apk'
           retention-days: 30
       - name: Publish APK to branch
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p release
-          cp 'Fine_Kinney.apk' 'release/Fine_Kinney.apk'
+          cp 'FMA.apk' 'release/FMA.apk'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add 'release/Fine_Kinney.apk'
+          git add 'release/FMA.apk'
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish installable Risk UI mobil Fine-Kinney APK [skip ci]'
-          git push origin HEAD:risk-ui-fine-kinney
+          git commit -m 'Publish installable FMA.apk [skip ci]'
+          git push origin HEAD:risk-ui-fmea
