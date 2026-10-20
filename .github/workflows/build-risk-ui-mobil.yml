@@ -1,8 +1,8 @@
-name: L Tipi Matris APK
+name: Risk UI mobil Fine Kinney APK
 on:
   workflow_dispatch:
   push:
-    branches: [risk-ui-mobil]
+    branches: [risk-ui-fine-kinney]
     paths:
       - 'app/**'
       - 'build.gradle'
@@ -28,7 +28,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Render Risk L Tipi launcher icon
+      - name: Render Risk Fine Kinney launcher icon
         run: |
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
@@ -52,7 +52,7 @@ jobs:
               d.text(((512-w)/2,cy-(bb[1]+bb[3])/2),text,font=font,fill='#143d2a')
           put('Risk',156,130)
           d.line((65,256,447,256),fill='#afd4bb',width=3)
-          put('L Tipi',356,108)
+          put('F-K',356,130)
           im.save(out)
           PY
       - name: Build installable APK with v2 signature
@@ -65,20 +65,20 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs --min-sdk-version 26 "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 12
       - name: Name APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk L_Tipi_Matris.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk Risk_UI_mobil_Fine_Kinney.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: L_Tipi_Matris_APK
-          path: L_Tipi_Matris.apk
+          name: Risk_UI_mobil_Fine_Kinney_APK
+          path: Risk_UI_mobil_Fine_Kinney.apk
           retention-days: 30
       - name: Publish APK to branch
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p release
-          cp L_Tipi_Matris.apk release/L_Tipi_Matris.apk
+          cp Risk_UI_mobil_Fine_Kinney.apk release/Risk_UI_mobil_Fine_Kinney.apk
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add release/L_Tipi_Matris.apk
+          git add release/Risk_UI_mobil_Fine_Kinney.apk
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish installable L Tipi Matris APK [skip ci]'
-          git push origin HEAD:risk-ui-mobil
+          git commit -m 'Publish installable Risk UI mobil Fine-Kinney APK [skip ci]'
+          git push origin HEAD:risk-ui-fine-kinney
