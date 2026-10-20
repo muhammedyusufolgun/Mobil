@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Base64;
 import android.os.Bundle;
 import android.print.PrintAttributes;
 import android.webkit.JavascriptInterface;
@@ -19,10 +20,11 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public final class MainActivity extends Activity {
-    private static final int PICK_FILE=2041, SAVE_JSON=2042;
+    private static final int PICK_FILE=2041, SAVE_JSON=2042, SAVE_BINARY=2043;
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
     private String pendingJson;
+    private byte[] pendingBinaryBytes;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,22 @@ public final class MainActivity extends Activity {
                 }
             });
         }
+        @JavascriptInterface public void saveFile(String base64,String filename,String mime) {
+            runOnUiThread(()->{
+                try {
+                    pendingBinaryBytes=Base64.decode(base64,Base64.DEFAULT);
+                    if(pendingBinaryBytes==null||pendingBinaryBytes.length==0)throw new IllegalArgumentException("Boş dosya");
+                    Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType((mime==null||mime.isEmpty())?"application/octet-stream":mime);
+                    intent.putExtra(Intent.EXTRA_TITLE,filename==null?"Risk_UI_Fine_Kinney.xlsx":filename);
+                    startActivityForResult(intent,SAVE_BINARY);
+                } catch(Exception ex) {
+                    pendingBinaryBytes=null;
+                    Toast.makeText(MainActivity.this,"Excel kaydetme ekranı açılamadı: "+ex.getMessage(),Toast.LENGTH_LONG).show();
+                }
+            });
+        }
         @JavascriptInterface public void printPdf() {
             runOnUiThread(()->web.postDelayed(()->{
                 try {
@@ -82,8 +100,8 @@ public final class MainActivity extends Activity {
                     PrintAttributes attributes=new PrintAttributes.Builder()
                         .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
                         .setColorMode(PrintAttributes.COLOR_MODE_COLOR).build();
-                    manager.print("Risk_UI_L_Tipi_Matris",
-                        web.createPrintDocumentAdapter("Risk_UI_L_Tipi_Matris"),attributes);
+                    manager.print("Risk_UI_mobil_Fine_Kinney",
+                        web.createPrintDocumentAdapter("Risk_UI_mobil_Fine_Kinney"),attributes);
                 } catch(Exception ex) {
                     Toast.makeText(MainActivity.this,"PDF yazdırma başlatılamadı",Toast.LENGTH_LONG).show();
                 }
@@ -110,6 +128,18 @@ public final class MainActivity extends Activity {
                 }
             }
             pendingJson=null;
+        } else if(requestCode==SAVE_BINARY) {
+            if(resultCode==RESULT_OK && data!=null && data.getData()!=null && pendingBinaryBytes!=null){
+                try (OutputStream out=getContentResolver().openOutputStream(data.getData())) {
+                    if(out==null)throw new IllegalStateException("Hedef dosya açılamadı");
+                    out.write(pendingBinaryBytes);
+                    out.flush();
+                    Toast.makeText(this,"Excel dosyası kaydedildi",Toast.LENGTH_SHORT).show();
+                } catch(Exception ex) {
+                    Toast.makeText(this,"Excel kaydı başarısız: "+ex.getMessage(),Toast.LENGTH_LONG).show();
+                }
+            }
+            pendingBinaryBytes=null;
         }
     }
     @Override public void onBackPressed() {
