@@ -222,7 +222,7 @@
 <div class="tablebox"><table aria-label="Fine-Kinney risk kayıtları"><thead><tr><th>No.</th><th>Bölüm / Faaliyet</th><th>Tehlike / Risk</th><th>Mevcut O×F×Ş</th><th>Hedef O×F×Ş</th><th>Tedbir / Aksiyon</th><th>Termin / Sorumlu</th><th>Durum</th><th>İşlemler</th></tr></thead><tbody id="riskRows"></tbody></table><div class="empty" id="emptyState">Henüz risk kaydı bulunmuyor. Yukarıdaki formdan risk ekleyebilirsiniz.</div></div>
 <div class="table-bottom"><button type="button" class="btn btn-danger btn-sm" id="clearBtn">Tüm Kayıtları Sil</button></div></section>
 </main>
-<div class="bottom-actions"><div class="bottom-panel" aria-label="Dosya ve yazdırma işlemleri"><button type="button" id="importBtn" class="btn btn-softblue">⬆ Excel İçeri Aktar</button><button type="button" id="exportBtn" class="btn btn-softgreen">⬇ Excel Dışarı Aktar</button><button type="button" id="pdfBtn" class="btn btn-softgray">▣ PDF / Yazdır</button><input id="importFile" type="file" class="sr-only" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div></div>
+<div class="bottom-actions"><div class="bottom-panel" aria-label="Dosya ve yazdırma işlemleri"><button type="button" id="importBtn" class="btn btn-softblue">⬆ JSON İçeri Aktar</button><button type="button" id="exportBtn" class="btn btn-softgreen">⬇ JSON Dışarı Aktar</button><button type="button" id="pdfBtn" class="btn btn-softgray">▣ PDF / Yazdır</button><input id="importFile" type="file" class="sr-only" accept=".json,application/json"></div></div>
 <footer class="risk-ui-footer" aria-label="Fine-Kinney yöntemi ve kullanım alanı"><div class="risk-ui-footer-line"><span id="footerProperty" class="risk-ui-footer-text">Temel özelliği: Olasılık × Frekans × Şiddet</span></div><div class="risk-ui-footer-line"><span id="footerUsage" class="risk-ui-footer-text">Kullanım alanı: Fabrikalar, atölyeler, üretim tesisleri</span></div></footer>
 <div class="risk-ui-scale-footer" aria-label="Fine-Kinney olasılık frekans şiddet puan ölçekleri"><span id="fineKinneyScaleSingleLine" class="risk-ui-scale-inline">(Olasılık: 0,1 – 0,2 – 0,5 – 1 – 3 – 6 – 10)   (Frekans: 0,5 – 1 – 2 – 3 – 6 – 10)   (Şiddet: 1 – 3 – 7 – 15 – 40 – 100)</span></div>
 </div>
@@ -302,66 +302,55 @@ function renderDashboard(){const q=$('searchInput').value.trim().toLocaleLowerCa
  const selected=state.records.filter(r=>(!filter||r.status===filter)&&(!q||[r.unit,r.activity,r.hazard,r.risk,r.existing,r.action,r.responsible,r.notes].some(v=>asText(v).toLocaleLowerCase('tr-TR').includes(q))));$('recordCount').textContent=`(${selected.length}/${state.records.length})`;$('emptyState').hidden=selected.length>0;
  $('riskRows').innerHTML=selected.map((r,i)=>{const v=score(r.before),n=score(r.after),b=bandFor(v),a=bandFor(n);return `<tr><td>${i+1}</td><td><b>${esc(r.unit)}</b><div class="cellsub">${esc(r.activity)}</div></td><td><b class="ellips">${esc(r.hazard)}</b><div class="cellsub ellips">${esc(r.risk)}</div></td><td>${fmt(r.before.p)}×${fmt(r.before.f)}×${fmt(r.before.s)} = <b>${fmt(v)}</b><br><span class="risk-tag risk-${b.key}">${b.label}</span></td><td>${fmt(r.after.p)}×${fmt(r.after.f)}×${fmt(r.after.s)} = <b>${fmt(n)}</b><br><span class="risk-tag risk-${a.key}">${esc(r.verified?'Doğrulandı · ':'Hedef · ')}${a.label}</span></td><td class="ellips">${esc(r.action)}</td><td>${esc(r.responsible||'—')}<div class="cellsub">${esc(r.deadline||'—')}</div></td><td>${esc(statusName[r.status])}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-sm" data-act="edit" data-id="${esc(r.id)}">Düzenle</button><button class="btn btn-sm" data-act="copy" data-id="${esc(r.id)}">Kopyala</button><button class="btn btn-sm btn-danger" data-act="delete" data-id="${esc(r.id)}">Sil</button></div></td></tr>`}).join('');renderBands()}
 function baseFilename(){return 'ISG_Fine_Kinney_Risk_Analizi_'+(state.meta.date||today())}
-function downloadBlob(blob,name){
- // Android WebView does not save browser blob: URLs reliably. Use the native
- // Storage Access Framework instead, preserving the original Excel bytes.
- if(window.RiskAndroid&&typeof window.RiskAndroid.saveFile==='function'){
-   const reader=new FileReader();
-   reader.onload=()=>{try{
-     const data=String(reader.result||''),base64=data.substring(data.indexOf(',')+1);
-     if(!base64)throw new Error('Boş Excel dosyası');
-     window.RiskAndroid.saveFile(base64,name,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-   }catch(err){alert('Excel dışarı aktarılamadı: '+err.message)}};
-   reader.onerror=()=>alert('Excel dosyası okunamadı.');
-   reader.readAsDataURL(blob);
+/* Fine-Kinney mobil: çevrimdışı JSON yedekleme ve geri yükleme.
+   Riskler yalnızca açık oturum belleğindedir; uygulama yeniden açılınca liste boştur. */
+const JSON_FORMAT='risk-ui-fine-kinney-json-v1';
+function baseJsonFileName(){return 'Fine_Kinney_Risk_Kayitlari_'+(state.meta.date||today())+'.json'}
+function exportJson(){
+ const payload=JSON.stringify({
+   format:JSON_FORMAT,version:1,method:'fine-kinney',
+   exportedAt:new Date().toISOString(),
+   meta:{...state.meta},records:state.records.map(r=>({...r,before:{...r.before},after:{...r.after}}))
+ },null,2);
+ const name=baseJsonFileName();
+ if(window.RiskAndroid&&typeof window.RiskAndroid.saveJson==='function'){
+   try{window.RiskAndroid.saveJson(payload,name);toast('JSON dosyasını kaydetmek için konum seçin.')}catch(e){alert('JSON kayıt ekranı açılamadı: '+e.message)}
    return;
  }
+ const blob=new Blob([payload],{type:'application/json;charset=utf-8'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download=name;document.body.append(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),3000)
+ setTimeout(()=>URL.revokeObjectURL(url),3000);
+ toast('JSON dışarı aktarıldı: '+state.records.length+' risk kaydı.');
 }
-function xmlEsc(v){return asText(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c])).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'')}
-function colLetter(num){let res='';for(let n=num;n>0;n=Math.floor((n-1)/26))res=String.fromCharCode(65+(n-1)%26)+res;return res}
-function sheetXml(rows,{width=18,autoFilter=true}={}){
- const maxCols=Math.max(1,...rows.map(r=>r.length));const cols=Array.from({length:maxCols},(_,i)=>{let w=width;if(i===0)w=17;if(i===5||i===6||i===8||i===9||i===26)w=42;if(i===3||i===4||i===10)w=24;return `<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`}).join('');
- const sheetRows=rows.map((row,i)=>`<row r="${i+1}">${row.map((value,j)=>{const c=colLetter(j+1)+(i+1),st=i===0?' s="1"':'';if(typeof value==='number'&&Number.isFinite(value))return `<c r="${c}"${st}><v>${value}</v></c>`;return `<c r="${c}" t="inlineStr"${st}><is><t xml:space="preserve">${xmlEsc(value)}</t></is></c>`}).join('')}</row>`).join('');
- return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="16"/><cols>${cols}</cols><sheetData>${sheetRows}</sheetData>${autoFilter?`<autoFilter ref="A1:${colLetter(maxCols)}${Math.max(1,rows.length)}"/>`:''}</worksheet>`
-}
-const CRC_TABLE=(()=>{const result=[];for(let i=0;i<256;i++){let x=i;for(let j=0;j<8;j++)x=(x&1)?(0xedb88320^(x>>>1)):(x>>>1);result[i]=x>>>0}return result})();
-function crc32(data){let crc=0xffffffff;for(const byte of data)crc=CRC_TABLE[(crc^byte)&255]^(crc>>>8);return (crc^0xffffffff)>>>0}
-function zipCreate(entries){
- const enc=new TextEncoder(),pieces=[],centers=[];let offset=0;
- const u16=(view,pos,val)=>view.setUint16(pos,val,true),u32=(view,pos,val)=>view.setUint32(pos,val>>>0,true);
- function append(piece){pieces.push(piece);offset+=piece.length}
- for(const [filename,text] of entries){const name=enc.encode(filename),data=enc.encode(text),crc=crc32(data),local=new Uint8Array(30+name.length),dv=new DataView(local.buffer),begin=offset;
-  u32(dv,0,0x04034b50);u16(dv,4,20);u16(dv,6,0x0800);u16(dv,8,0);u16(dv,10,0);u16(dv,12,0);u32(dv,14,crc);u32(dv,18,data.length);u32(dv,22,data.length);u16(dv,26,name.length);u16(dv,28,0);local.set(name,30);append(local);append(data);
-  const cent=new Uint8Array(46+name.length),cv=new DataView(cent.buffer);u32(cv,0,0x02014b50);u16(cv,4,20);u16(cv,6,20);u16(cv,8,0x0800);u16(cv,10,0);u16(cv,12,0);u16(cv,14,0);u32(cv,16,crc);u32(cv,20,data.length);u32(cv,24,data.length);u16(cv,28,name.length);u16(cv,30,0);u16(cv,32,0);u16(cv,34,0);u16(cv,36,0);u32(cv,38,0);u32(cv,42,begin);cent.set(name,46);centers.push(cent)
+async function readFineKinneyJson(file){
+ if(!file||!/.json$/i.test(file.name))throw new Error('Yalnızca .json uzantılı dosya seçin.');
+ if(file.size>10*1024*1024)throw new Error('JSON dosyası 10 MB sınırını aşıyor.');
+ let obj;
+ try{obj=JSON.parse(await file.text())}catch(e){throw new Error('JSON okunamadı veya geçersiz: '+e.message)}
+ if(!obj||typeof obj!=='object'||Array.isArray(obj)||obj.format!==JSON_FORMAT||obj.method!=='fine-kinney'||!Array.isArray(obj.records))
+   throw new Error('Dosya Fine-Kinney Risk UI JSON şablonuyla uyumlu değil.');
+ if(obj.records.length>15000)throw new Error('Bir dosyada en fazla 15.000 risk kaydı içeri alınabilir.');
+ const records=obj.records.map(recordNormalize);
+ if(records.some(r=>!r))throw new Error('Dosyada geçersiz Fine-Kinney faktörleri bulunan kayıtlar var.');
+ const seen=new Set();
+ for(const r of records){if(seen.has(r.id))r.id=randomId();seen.add(r.id)}
+ const meta=initMeta();
+ if(obj.meta&&typeof obj.meta==='object'&&!Array.isArray(obj.meta)){
+   for(const k of Object.keys(meta))if(obj.meta[k]!=null)meta[k]=asText(obj.meta[k]);
  }
- const start=offset;for(const c of centers)append(c);const end=new Uint8Array(22),e=new DataView(end.buffer);u32(e,0,0x06054b50);u16(e,4,0);u16(e,6,0);u16(e,8,centers.length);u16(e,10,centers.length);u32(e,12,offset-start);u32(e,16,start);u16(e,20,0);append(end);return new Blob(pieces,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
+ return {meta,records};
 }
-function workbookFiles(rows,summary){const types=`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`;
- const rels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
- const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Risk Kayıtları" sheetId="1" r:id="rId1"/><sheet name="Rapor Bilgileri" sheetId="2" r:id="rId2"/></sheets></workbook>`;
- const wbRels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
- const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="10"/><name val="Calibri"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0369A1"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
- return [['[Content_Types].xml',types],['_rels/.rels',rels],['xl/workbook.xml',workbook],['xl/_rels/workbook.xml.rels',wbRels],['xl/styles.xml',styles],['xl/worksheets/sheet1.xml',sheetXml(rows)],['xl/worksheets/sheet2.xml',sheetXml(summary,{width:36,autoFilter:false})]]}
-
-const EXCEL_COLUMNS=['Kayıt ID','Bölüm','Faaliyet','Tehlike','Olası Zarar / Risk','Etkilenenler','Mevcut Önlemler','Önce Olasılık','Önce Frekans','Önce Şiddet','Önce Risk Puanı','Önce Risk Seviyesi','Planlanan Tedbir','Sonra Olasılık','Sonra Frekans','Sonra Şiddet','Sonra Risk Puanı','Sonra Risk Seviyesi','Sorumlu','Hedef Tarih','Durum','Doğrulama','Notlar','Kayıt Tarihi'];
-function recordToExcelRow(r){return [r.id,r.unit,r.activity,r.hazard,r.risk,r.affected,r.existing,r.before.p,r.before.f,r.before.s,score(r.before),bandFor(score(r.before)).label,r.action,r.after.p,r.after.f,r.after.s,score(r.after),bandFor(score(r.after)).label,r.responsible,r.deadline,statusName[r.status],r.verified?'Evet':'Hayır',r.notes,r.created]}
-function exportXlsx(){const m=state.meta,rows=[EXCEL_COLUMNS,...state.records.map(recordToExcelRow)],summary=[['Alan','Değer'],['Yöntem','Fine-Kinney'],['İşyeri',m.company],['Tesis / Birim',m.facility],['Hazırlayan',m.prepared],['Değerlendirme Tarihi',m.date],['Revizyon',m.revision],['Toplam Risk',state.records.length],['Yüksek ve Çok Yüksek / Açık',state.records.filter(r=>!r.verified&&score(r.before)>=200).length],['Doğrulanan Risk',state.records.filter(r=>r.verified).length],['Risk Formülü','Olasılık × Frekans × Şiddet'],['Not','Risk eşikleri örnek uygulamadır; kurumun onaylı metodolojisi geçerlidir.']];downloadBlob(zipCreate(workbookFiles(rows,summary)),baseFilename()+'.xlsx');toast('Excel dışarı aktarıldı: '+state.records.length+' kayıt.')}
-async function unzipEntries(arrayBuffer){const bytes=new Uint8Array(arrayBuffer),view=new DataView(arrayBuffer);let end=-1;for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--)if(view.getUint32(i,true)===0x06054b50){end=i;break}if(end<0)throw new Error('Geçerli Excel ZIP yapısı bulunamadı.');const count=view.getUint16(end+10,true),base=view.getUint32(end+16,true),decoder=new TextDecoder(),entries={};let cursor=base;
- for(let i=0;i<count;i++){if(view.getUint32(cursor,true)!==0x02014b50)throw new Error('Excel dosyası merkezi dizini okunamadı.');const method=view.getUint16(cursor+10,true),compressed=view.getUint32(cursor+20,true),nameLength=view.getUint16(cursor+28,true),extra=view.getUint16(cursor+30,true),comment=view.getUint16(cursor+32,true),localOffset=view.getUint32(cursor+42,true),name=decoder.decode(bytes.subarray(cursor+46,cursor+46+nameLength));if(view.getUint32(localOffset,true)!==0x04034b50)throw new Error('Excel dosyası veri bölümü bozuk.');const start=localOffset+30+view.getUint16(localOffset+26,true)+view.getUint16(localOffset+28,true);const content=bytes.slice(start,start+compressed);if(method===0)entries[name]=decoder.decode(content);else if(method===8){if(typeof DecompressionStream!=='function')throw new Error('Bu tarayıcı sıkıştırılmış Excel içeri aktarmayı desteklemiyor. Güncel bir Chrome veya Edge tarayıcısı deneyin.');try{const stream=new Blob([content]).stream().pipeThrough(new DecompressionStream('deflate-raw'));entries[name]=decoder.decode(await new Response(stream).arrayBuffer())}catch(e){throw new Error('Excel sıkıştırması açılamadı: '+e.message)}}else throw new Error('Excel dosyasında desteklenmeyen sıkıştırma türü.');cursor+=46+nameLength+extra+comment;
- }return entries}
-function parseXml(source){const doc=new DOMParser().parseFromString(source,'application/xml');if(doc.querySelector('parsererror'))throw new Error('Excel XML içeriği okunamadı.');return doc}
-function parseXlsxSheet(source,shared=[]){if(!source)return [];const doc=parseXml(source),rows=[];for(const row of doc.getElementsByTagNameNS('*','row')){const cells=[];for(const c of row.getElementsByTagNameNS('*','c')){const ref=c.getAttribute('r')||'';let index=0;for(const letter of (ref.match(/^[A-Z]+/)||[''])[0])index=index*26+letter.charCodeAt(0)-64;index=Math.max(0,index-1);const type=c.getAttribute('t');let value='';if(type==='inlineStr')value=Array.from(c.getElementsByTagNameNS('*','t')).map(n=>n.textContent).join('');else{value=c.getElementsByTagNameNS('*','v')[0]?.textContent||'';if(type==='s')value=shared[Number(value)]||''}cells[index]=value}rows.push(cells)}return rows}
-
-function normalizeDate(value){const str=asText(value);if(/^\d{4}-\d{2}-\d{2}$/.test(str))return str;if(/^\d{2}\.\d{2}\.\d{4}$/.test(str)){const a=str.split('.');return a[2]+'-'+a[1]+'-'+a[0]}const n=Number(value);if(Number.isFinite(n)&&n>=1&&n<100000)return new Date(Date.UTC(1899,11,30)+Math.floor(n)*86400000).toISOString().slice(0,10);return ''}
-function fromExcelRow(row,idx){const read=k=>row[idx.get(k)]??'',statusRaw=read('Durum');const status=Object.keys(statusName).find(k=>statusName[k]===statusRaw)||(Object.hasOwn(statusName,statusRaw)?statusRaw:'open');return recordNormalize({id:read('Kayıt ID'),method:'fine-kinney',unit:read('Bölüm'),activity:read('Faaliyet'),hazard:read('Tehlike'),risk:read('Olası Zarar / Risk'),affected:read('Etkilenenler'),existing:read('Mevcut Önlemler'),action:read('Planlanan Tedbir'),responsible:read('Sorumlu'),deadline:normalizeDate(read('Hedef Tarih')),status,verified:read('Doğrulama')==='Evet',before:{p:read('Önce Olasılık'),f:read('Önce Frekans'),s:read('Önce Şiddet')},after:{p:read('Sonra Olasılık'),f:read('Sonra Frekans'),s:read('Sonra Şiddet')},notes:read('Notlar'),created:normalizeDate(read('Kayıt Tarihi'))||today()})}
-async function importData(file){if(!file.name.toLowerCase().endsWith('.xlsx'))throw new Error('Yalnızca .xlsx dosyası seçin.');const entries=await unzipEntries(await file.arrayBuffer());const strings=[];
- if(entries['xl/sharedStrings.xml']){const doc=parseXml(entries['xl/sharedStrings.xml']);for(const item of doc.getElementsByTagNameNS('*','si'))strings.push(Array.from(item.getElementsByTagNameNS('*','t')).map(t=>t.textContent).join(''))}
- const rows=parseXlsxSheet(entries['xl/worksheets/sheet1.xml'],strings);if(!rows.length)throw new Error('Excel risk kayıtları sayfası bulunamadı.');const headers=new Map(rows[0].map((v,i)=>[asText(v).trim(),i]));const required=['Kayıt ID','Tehlike','Bölüm','Faaliyet','Önce Olasılık','Önce Frekans','Önce Şiddet','Sonra Olasılık','Sonra Frekans','Sonra Şiddet'];if(!required.every(k=>headers.has(k)))throw new Error('Excel Fine-Kinney şablonuyla uyumsuz (O/F/Ş sütunları eksik).');
- const dataRows=rows.slice(1).filter(r=>r.some(v=>asText(v).trim()));const records=dataRows.map(r=>fromExcelRow(r,headers)).filter(Boolean);if(dataRows.length!==records.length)throw new Error('Excel içinde '+(dataRows.length-records.length)+' kayıt geçersiz: Olasılık/Frekans/Şiddet ölçeklerini kontrol edin.');const info=parseXlsxSheet(entries['xl/worksheets/sheet2.xml'],strings),infoMap=new Map(info.slice(1).map(r=>[r[0],r[1]]));const meta=initMeta();for(const [key,label] of Object.entries({company:'İşyeri',facility:'Tesis / Birim',prepared:'Hazırlayan',date:'Değerlendirme Tarihi',revision:'Revizyon'}))if(infoMap.has(label))meta[key]=asText(infoMap.get(label));return {meta,records}}
-async function performImport(file){if(!file)return;try{const incoming=await importData(file);if(!incoming.records.length)throw new Error('Dosyada risk kaydı bulunmuyor.');if(state.records.length&&!confirm('Mevcut '+state.records.length+' riskin yerine '+incoming.records.length+' kayıt yüklenecek. Önce Excel yedeği alın. Devam edilsin mi?'))return;state=incoming;renderMeta();clearForm();renderDashboard();setView('distribution');toast(incoming.records.length+' risk kaydı Excel’den yüklendi.')}catch(e){console.error(e);alert('Excel içeri aktarma başarısız: '+e.message)}finally{$('importFile').value=''}}
+async function performJsonImport(file){
+ if(!file)return;
+ try{
+   const incoming=await readFineKinneyJson(file);
+   if(state.records.length&&!confirm('Mevcut '+state.records.length+' risk kaydının yerine '+incoming.records.length+' JSON kaydı yüklenecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;
+   state=incoming;renderMeta();clearForm();renderDashboard();setView('distribution');
+   toast(incoming.records.length+' risk kaydı JSON dosyasından yüklendi.');
+ }catch(e){console.error(e);alert('JSON içeri aktarma başarısız: '+e.message)}
+ finally{$('importFile').value=''}
+}
 /* PDF/Yazdır: Ekrandaki iki Fine-Kinney grafiğinin SVG karşılığı; renkler PDF'de vektördür. */
 function renderPrintCharts(before,after){
  const counts=BANDS.map(()=>0);
@@ -411,8 +400,8 @@ function bind(){document.querySelectorAll('[data-meta]').forEach(el=>el.addEvent
  $('newBtn').addEventListener('click',()=>{clearForm();setView('single')});$('cancelBtn').addEventListener('click',()=>{clearForm();setView('single')});
  $('riskRows').addEventListener('click',e=>{const b=e.target.closest('button[data-act][data-id]');if(!b)return;const {act,id}=b.dataset;if(act==='edit')startEdit(id);if(act==='copy')copyRecord(id);if(act==='delete')deleteRecord(id)});
  for(const id of ['searchInput','statusFilter'])$(id).addEventListener('input',renderDashboard);
- $('clearBtn').addEventListener('click',()=>{if(!state.records.length)return toast('Silinecek kayıt bulunmuyor.');if(!confirm('Tüm '+state.records.length+' risk kaydı silinecek. Önce Excel yedeği alın. Devam edilsin mi?'))return;state.records=[];clearForm();renderDashboard();toast('Tüm risk kayıtları silindi.')});
- $('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>performImport(e.target.files?.[0]));$('exportBtn').addEventListener('click',exportXlsx);$('pdfBtn').addEventListener('click',()=>{renderPrint();if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function'){window.RiskAndroid.printPdf()}else{window.print()}});window.addEventListener('beforeprint',renderPrint)
+ $('clearBtn').addEventListener('click',()=>{if(!state.records.length)return toast('Silinecek kayıt bulunmuyor.');if(!confirm('Tüm '+state.records.length+' risk kaydı silinecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;state.records=[];clearForm();renderDashboard();toast('Tüm risk kayıtları silindi.')});
+ $('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>performJsonImport(e.target.files?.[0]));$('exportBtn').addEventListener('click',exportJson);$('pdfBtn').addEventListener('click',()=>{renderPrint();if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function'){window.RiskAndroid.printPdf()}else{window.print()}});window.addEventListener('beforeprint',renderPrint)
 }
 function resetSessionOnOpen(){resetData();$('riskForm').reset();$('searchInput').value='';$('statusFilter').value='';$('importFile').value='';document.querySelectorAll('[data-meta]').forEach(el=>el.value='');renderMeta();clearForm();renderDashboard()}
 initializeBrand();bind();resetSessionOnOpen();window.addEventListener('pageshow',e=>{if(e.persisted)resetSessionOnOpen()});
