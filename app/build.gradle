@@ -3,11 +3,11 @@ android {
   namespace 'tr.olgun.riskui'
   compileSdk 35
   defaultConfig {
-    applicationId 'tr.olgun.ltipimatris.mobile'
+    applicationId 'tr.olgun.riskui.finekinney'
     minSdk 26
     targetSdk 34
-    versionCode 4
-    versionName '2.2.0'
+    versionCode 1
+    versionName '1.0.0'
   }
   sourceSets {
     main {
