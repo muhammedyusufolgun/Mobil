@@ -1,436 +1,397 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#eaf7ee">
-<title>İSG Risk Analizi – Fine-Kinney | Risk UI mobil</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f8fafc">
+<title>İSG Risk Analizi - FMEA</title>
 <style>
-:root{--bg:#f8fafc;--surface:#fff;--ink:#17283b;--muted:#64748b;--line:#cbd5e1;--blue:#0284c7;--blue2:#0369a1;--light:#eaf5fc;--radius:6px}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#edf3f8;color:var(--ink);font:13px/1.42 'Segoe UI',Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}input,textarea,select{width:100%;border:1px solid #cbd5e1;background:#fff;border-radius:5px;min-height:35px;padding:7px 9px;outline:none;color:#1e293b}textarea{min-height:62px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:#0284c7;box-shadow:0 0 0 2px #0284c71c}label{display:block;font-size:11.5px;font-weight:650;color:#334155;margin:0 0 4px}.required:after{content:' *';color:#bd4046}.muted,.hint{font-size:11px;color:#64748b}.olgun-frame{margin:8px;border:2px solid #7f95a9;border-radius:7px;background:#f8fafc;min-height:calc(100vh - 16px);box-shadow:0 5px 19px #223d5511}.top-header{position:sticky;top:0;background:#fff;z-index:30;border-top:4px solid #0284c7;border-bottom:1px solid #bfd0de;border-radius:4px 4px 0 0}.headerinner{min-height:76px;display:flex;align-items:center;gap:13px;padding:9px 19px}.brand-logo{width:62px;height:55px;display:grid;place-items:center;flex:none;background:#f8fafc;border:1px solid #cbd5e1;border-radius:5px;padding:3px;font-weight:800;color:#075985;font-size:12px}.brand-logo img{width:100%;height:100%;object-fit:contain}.header-titles{min-width:0;flex:1}.header-titles h1{margin:0;font-size:18px;color:#075985;font-weight:750;line-height:1.2}.header-titles p{margin:4px 0 0;color:#475569;font-size:12px}.brand-org{max-width:40%;text-align:right;margin-left:auto;font-size:16px;font-weight:750;white-space:nowrap;color:#1e3a57;overflow:hidden;text-overflow:ellipsis}.top-header [contenteditable=true]{outline:2px dashed #0284c7;outline-offset:3px;white-space:normal}.wrap{padding:12px 17px 7px;display:grid;gap:10px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{background:#fff;border:1px solid #cbd5e1;border-top:3px solid var(--blue);border-radius:6px;padding:10px 13px}.metric small{font-size:10px;display:block;color:#64748b;font-weight:700}.metric b{display:block;margin-top:3px;color:#0f3652;font-size:24px;line-height:1.18}.card{background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 2px 8px #25425b08;min-width:0}.card-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;background:#eaf5fc;border-bottom:1px solid #b9d4e6;border-left:4px solid #0284c7;border-radius:5px 5px 0 0}.card-header h2{margin:0;display:flex;align-items:center;gap:7px;color:#084c71;font-size:14px}.sect{font-size:10px;background:#d2eafb;border-radius:4px;padding:3px 6px;color:#075985}.card-body{padding:11px 13px}.grid{display:grid;gap:10px}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.span2{grid-column:span 2}.span3{grid-column:span 3}.strip{margin:11px 0 8px;display:flex;align-items:center;gap:8px;color:#075985;font-size:12px;font-weight:800;border-bottom:1px solid #dcecf5;padding:0 0 6px}.strip:first-child{margin-top:0}.strip em{display:grid;place-items:center;font-style:normal;width:22px;height:22px;background:#eaf6fc;border:1px solid #b8daed;border-radius:4px;font-size:10px;color:#0369a1}.method-lock{min-height:35px;background:#eef8ff;border:1px solid #b9def7;border-radius:5px;color:#075985;font-weight:750;padding:8px 10px;font-size:12px;display:flex;justify-content:space-between;gap:5px}.method-lock span{font-size:10px;font-weight:500;color:#64748b}.assessment{display:grid;grid-template-columns: minmax(340px,0.88fr) minmax(480px,1.12fr);gap:12px}.score-stack{display:grid;grid-template-columns:1fr;gap:8px}.score-panel{border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;background:#fff;min-width:0}.score-panel[data-side=before]{border-top:3px solid #125ba9}.score-panel[data-side=after]{border-top:3px solid #8651b4}.score-head{background:#f2f7fb;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e3eaf0;font-size:12px}.score-head i{display:inline-block;width:9px;height:9px;background:#125ba9;margin-right:5px;border-radius:50%}.score-panel[data-side=after] .score-head i{background:#8651b4;border-radius:2px}.factor-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px}.score-result{border-top:1px solid #e8edf1;background:#f7fafc;display:flex;align-items:center;justify-content:space-between;gap:5px;padding:6px 9px}.score-result b{font-size:20px;line-height:1.1}.score-result small{display:block;font-size:10px;color:#64748b}.risk-tag{display:inline-block;font-size:10px;font-weight:800;padding:4px 7px;border-radius:4px;border:1px solid transparent;text-align:center}.risk-low{background:#ddf7e4;border-color:#a7e0bc;color:#166534}.risk-possible{background:#fff8df;border-color:#edd994;color:#805b14}.risk-important{background:#ffedbd;border-color:#ebc367;color:#865408}.risk-high{background:#ffe0c5;border-color:#e5a074;color:#9e4512}.risk-critical{background:#ffdee2;border-color:#ec9eaa;color:#a51d30}.risk-na{background:#edf2f7;border-color:#ced6e0;color:#64748b}.guide{background:#fff;border:1px solid #aac6d7;border-radius:6px;overflow:hidden;min-width:0}.guide-head{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:9px 11px;background:#e9f4fc;border-bottom:1px solid #cbdde8}.guide-head strong{font-size:12px;color:#0b4669}.mode-tabs{display:flex;gap:5px;flex-wrap:wrap}.mode-btn{border:1px solid #bfd6e7;background:#fff;color:#315d76;padding:5px 8px;border-radius:5px;min-height:30px;font-weight:750;font-size:11px}.mode-btn.active{background:#dcedfb;color:#075985;border-color:#73acd0}.guide-body{padding:11px 12px}.bands{display:grid;gap:6px}.band{display:grid;grid-template-columns:100px minmax(30px,1fr) 102px;align-items:center;gap:7px}.band-name{font-weight:700;font-size:11px;white-space:nowrap}.band-bar{background:#f0f4f8;border:1px solid #dfe7ee;border-radius:5px;height:26px;position:relative;overflow:hidden}.band-fill{height:100%;border-radius:3px;width:100%;opacity:.88;transition:width .18s}.band[data-band=low] .band-fill{background:#73cf93}.band[data-band=possible] .band-fill{background:#eed572}.band[data-band=important] .band-fill{background:#f7b359}.band[data-band=high] .band-fill{background:#f28b59}.band[data-band=critical] .band-fill{background:#e97575}.band-count{font-weight:750;color:#334155;font-size:11px;text-align:right;white-space:nowrap}.band[data-current=yes] .band-bar{outline:2px solid #125ba9;outline-offset:1px}.band[data-target=yes] .band-bar{box-shadow:0 0 0 3px #a763c1 inset}.guide-summary{margin-top:10px;padding:8px 9px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;color:#475569;font-size:11px;min-height:32px}.legend{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.legend span{font-size:10px;color:#475569}.legend b{font-size:10px;color:#334155}.instruction{color:#536b7d;font-size:11px;margin-top:8px}.verifiedbox{margin-top:10px;background:#f7fbfd;border:1px solid #d9e7ef;padding:9px 10px;border-radius:5px}.checkline{display:flex;gap:8px;align-items:center;font-size:11.5px;color:#334155}.checkline input{width:16px;min-height:0;height:16px;accent-color:#0284c7}.actionbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.spacer{flex:1}.btn{border:1px solid #cbd5e1;border-radius:5px;padding:7px 10px;min-height:34px;background:#fff;color:#334155;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-weight:650;white-space:nowrap}.btn:hover{background:#f1f5f9}.btn-primary{background:#0284c7;color:#fff;border-color:#0284c7}.btn-primary:hover{background:#0369a1}.btn-sm{min-height:27px;padding:4px 7px;font-size:11px}.btn-danger{color:#b42332;border-color:#f0bac3}.btn-softblue{background:#e8f4ff;border-color:#b7d8fb;color:#075985}.btn-softgreen{background:#eaf8ef;border-color:#b9e2c6;color:#166534}.btn-softgray{background:#f1f3f5;border-color:#d6dbe1;color:#334155}.filters{display:flex;gap:7px;flex-wrap:wrap}.filters input{width:190px}.filters select{width:155px}.tablebox{overflow-x:auto}.tablebox table{border-collapse:collapse;width:100%;min-width:1120px}.tablebox th{background:#eef5f9;color:#475569;font-weight:750;font-size:11px;text-align:left;padding:8px 7px;border-bottom:1px solid #d6e2ea;white-space:nowrap}.tablebox td{font-size:11px;padding:8px 7px;border-bottom:1px solid #e9eff4;vertical-align:top;overflow-wrap:anywhere}.tablebox tbody tr:hover{background:#f7fbfe}.cellsub{font-size:10px;color:#64748b;margin-top:3px}.ellips{max-width:235px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.empty{text-align:center;padding:21px 10px;color:#64748b;font-size:12px}.table-bottom{padding:8px 12px}.bottom-actions{padding:4px 17px 5px;display:flex}.bottom-panel{display:flex;gap:9px;flex-wrap:wrap;background:#fff;border:1px solid #b9cbd9;padding:9px 11px;border-radius:6px}.risk-ui-footer{margin:0 17px 10px;padding:7px 0 5px;border-top:1px solid #dbe3eb;color:#475569;font-size:11px;white-space:nowrap;overflow:auto}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.notice{position:fixed;bottom:18px;right:18px;z-index:80;background:#143d54;color:white;padding:10px 13px;border-radius:6px;max-width:420px;box-shadow:0 5px 18px #12374c30;font-size:12px;opacity:0;pointer-events:none;transition:opacity .15s}.notice.show{opacity:1}#printPages,#printPageFrame{display:none}
-@media(max-width:1080px){.assessment{grid-template-columns:1fr}.score-stack{grid-template-columns:repeat(2,minmax(0,1fr))}.g5{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:720px){.olgun-frame{margin:3px}.headerinner{padding:8px 10px;flex-wrap:wrap}.brand-logo{width:49px;height:49px}.header-titles h1{font-size:15px}.header-titles p{font-size:10px}.brand-org{max-width:100%;width:100%;font-size:11px;white-space:normal}.wrap{padding:9px;gap:9px}.card-header{flex-wrap:wrap}.g5,.g4,.g3,.g2{grid-template-columns:1fr}.span2,.span3{grid-column:auto}.score-stack{grid-template-columns:1fr}.factor-fields{grid-template-columns:1fr 1fr 1fr}.band{grid-template-columns:83px 1fr 75px}.mode-btn{font-size:10px}.filters{width:100%}.filters input,.filters select{flex:1;width:100%;min-width:120px}.bottom-actions{padding:6px 9px}.bottom-panel{width:100%;gap:5px}.bottom-panel .btn{flex:1 1 120px;white-space:normal}.risk-ui-footer{margin:0 9px 8px;font-size:10px}}
-@media(max-width:420px){.factor-fields{grid-template-columns:1fr}.band{grid-template-columns:87px 1fr 65px}.band-name,.band-count{font-size:10px}}
+:root{--bg:#f8fafc;--card:#fff;--line:#cbd5e1;--text:#17283b;--muted:#63758a;--blue:#0284c7;--deep:#075985;--green:#166534}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#edf3f8;color:var(--text);font:13px/1.42 'Segoe UI',Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+input,select,textarea{width:100%;min-height:35px;padding:7px 9px;color:#20344c;border:1px solid #cbd5e1;border-radius:5px;background:#fff;outline:none}
+textarea{resize:vertical;min-height:60px}
+input:focus,textarea:focus,select:focus{border-color:#0284c7;box-shadow:0 0 0 2px #0284c71a}
+label{display:block;margin:0 0 4px;color:#334155;font-size:11.5px;font-weight:700}
+label.required:after{content:' *';color:#b91c1c}
+small,.hint{font-size:10.5px;color:var(--muted)}
+.olgun-frame{margin:8px;border:2px solid #8196a9;border-radius:7px;background:#f8fafc;min-height:calc(100vh - 16px);box-shadow:0 5px 19px #223d5511}
+.top-header{position:sticky;top:0;z-index:20;background:#fff;border-top:4px solid var(--blue);border-bottom:1px solid #bdd0dd;border-radius:4px 4px 0 0}
+.header-inner{min-height:78px;padding:9px 18px;display:flex;align-items:center;gap:13px}
+.brand-logo{flex:0 0 64px;height:57px;display:grid;place-items:center;border:1px solid #ccd5df;border-radius:5px;background:#f8fafc;color:var(--deep);font-weight:800;font-size:12px;padding:3px}
+.brand-logo img{height:100%;width:100%;object-fit:contain}
+.brand-titles{min-width:0;flex:1}
+.brand-titles h1{margin:0;font-size:19px;color:var(--deep);line-height:1.2}
+.brand-titles p{margin:3px 0 0;font-size:12px;color:#475569}
+.brand-org{max-width:40%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#21425d;font-size:16px;font-weight:800;text-align:right;margin-left:auto}
+.top-header [contenteditable=true]{outline:2px dashed var(--blue);outline-offset:2px}
+.wrap{padding:12px 17px 5px;display:grid;gap:10px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.metric{background:#fff;border:1px solid var(--line);border-top:3px solid var(--blue);border-radius:6px;padding:9px 12px}
+.metric small{display:block;color:#64748b;font-size:10px;font-weight:800}
+.metric b{display:block;font-size:23px;color:#0c4265;line-height:1.1;margin-top:4px}
+.card{min-width:0;border:1px solid var(--line);border-radius:6px;background:#fff;box-shadow:0 2px 8px #25425b08}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;background:#eaf5fc;border-left:4px solid var(--blue);border-bottom:1px solid #b9d4e6;border-radius:5px 5px 0 0}
+.card-head h2{margin:0;display:flex;align-items:center;gap:8px;color:#075985;font-size:14px}
+.index{display:inline-grid;place-items:center;font-size:10px;color:#075985;background:#d2eafb;padding:4px 6px;border-radius:3px}
+.card-body{padding:11px 13px}
+.grid{display:grid;gap:9px}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.span2{grid-column:span 2}.span3{grid-column:span 3}
+.strip{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:#075985;margin:12px 0 8px;padding:0 0 5px;border-bottom:1px solid #dcecf5}
+.strip:first-child{margin-top:0}
+.strip em{font-style:normal;font-size:10px;display:inline-grid;place-items:center;height:22px;width:22px;border:1px solid #b8daed;background:#eaf6fc;border-radius:4px}
+.method-lock{min-height:35px;background:#eef8ff;border:1px solid #b9def7;border-radius:5px;color:#075985;font-weight:800;padding:8px 10px}
+.assessment{display:grid;grid-template-columns:minmax(350px,.87fr) minmax(470px,1.13fr);gap:12px}
+.score-stack{display:grid;gap:8px}
+.score-card{min-width:0;border:1px solid #cbd5e1;border-top:3px solid #125ba9;border-radius:6px;overflow:hidden}
+.score-card.after{border-top-color:#8651b4}
+.score-head{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f3f8fb;border-bottom:1px solid #e0e9f1}
+.score-head strong{font-size:12px}.score-head span{font-size:10px;color:#64748b}
+.factors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px}
+.score-result{display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#f7fafc;border-top:1px solid #e8edf1}
+.score-result small{display:block;font-size:10px}.score-result b{font-size:20px;line-height:1.12}
+.tag{display:inline-block;padding:3px 6px;border-radius:4px;font-size:10px;font-weight:800;text-align:center;border:1px solid #cbd5e1;background:#e2e8f0;color:#475569}
+.tag.izleme{color:#166534;background:#ddf7e4;border-color:#a7e0bc}.tag.dikkat{color:#805b14;background:#fff5d2;border-color:#e5cc79}
+.tag.oncelikli{color:#9e4512;background:#ffe0c5;border-color:#e5a074}.tag.kritik{color:#a51d30;background:#ffdee2;border-color:#ec9eaa}
+.graph-card{border:1px solid #acc5d7;border-radius:6px;min-width:0;overflow:hidden}
+.graph-head{background:#e9f4fc;border-bottom:1px solid #cbdde8;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.graph-head strong{font-size:12px;color:#0b4669}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{padding:5px 7px;border:1px solid #bfd6e7;border-radius:4px;background:white;font-size:11px;font-weight:700;color:#315d76}
+.tabs button.active{background:#dcedfb;color:#075985;border-color:#73acd0}
+.graph-body{padding:9px 10px}
+.graph-body svg{width:100%;height:auto;display:block;max-height:225px}
+.graph-summary{background:#f7fafc;border:1px solid #e2e8f0;padding:5px 7px;border-radius:4px;font-size:11px;color:#475569}
+.guidance{font-size:10.5px;color:#6b5b37;background:#fff9e9;border:1px solid #ebdbac;padding:7px 9px;border-radius:5px}
+.rubric{border:1px solid #d7e3ec;border-radius:5px;background:#f8fafc;margin-top:9px}
+.rubric summary{padding:7px 9px;font-size:11px;color:#075985;font-weight:800;cursor:pointer}
+.rubric .inner{padding:1px 10px 9px;font-size:11px;color:#485f73}
+.rubric table{border-collapse:collapse;width:100%}.rubric th,.rubric td{border:1px solid #dae5ee;padding:5px;text-align:left;vertical-align:top}.rubric th{background:#eaf5fc;color:#075985}
+.checkbox-label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650;color:#334155}
+.checkline{border:1px solid #d9e7ef;background:#f7fbfd;border-radius:5px;padding:9px 10px;margin-top:9px}
+.checkline input{width:17px;height:17px;min-height:0;accent-color:#0284c7}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:11px}
+.grow{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:34px;padding:7px 10px;background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:5px;font-weight:700;white-space:nowrap}
+.btn:hover{background:#f1f5f9}
+.btn-primary{background:#0284c7;border-color:#0284c7;color:#fff}.btn-primary:hover{background:#0369a1}
+.btn-sm{min-height:27px;padding:4px 7px;font-size:11px}
+.btn-blue{background:#e8f4ff;border-color:#b7d8fb;color:#075985}.btn-green{background:#eaf8ef;border-color:#b9e2c6;color:#166534}.btn-grey{background:#f1f3f5;border-color:#d6dbe1}
+.btn-red{color:#b42332;border-color:#f0bac3}
+.filters{display:flex;gap:7px;flex-wrap:wrap}.filters input{max-width:190px}.filters select{max-width:156px}
+.tablebox{overflow-x:auto}.tablebox table{border-collapse:collapse;width:100%;min-width:1200px}
+.tablebox th{white-space:nowrap;background:#eef5f9;color:#475569;border-bottom:1px solid #d6e2ea;padding:7px;text-align:left;font-size:10.5px}
+.tablebox td{padding:7px;border-bottom:1px solid #e9eff4;vertical-align:top;font-size:10.5px;overflow-wrap:anywhere}
+.tablebox tr:hover{background:#f7fbfe}.sub{color:#64748b;font-size:10px;margin-top:2px}
+.empty{text-align:center;padding:20px;color:#64748b}.table-bottom{padding:8px 12px}
+.bottom-actions{padding:3px 17px}.bottom-panel{display:flex;gap:9px;flex-wrap:wrap;width:max-content;max-width:100%;background:#fff;border:1px solid #b9cbd9;border-radius:6px;padding:8px 10px}
+.risk-footer{margin:3px 17px 0;border-top:1px solid #dbe3eb;padding:5px 0;white-space:nowrap;overflow-x:auto;color:#475569;font-size:10.5px}
+.toast{position:fixed;bottom:18px;right:18px;background:#143d54;color:#fff;z-index:99;opacity:0;pointer-events:none;padding:10px 12px;border-radius:6px;transition:opacity .2s}
+.toast.show{opacity:1}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+#printPages,#printFrame{display:none}
+@media(max-width:1080px){.assessment{grid-template-columns:1fr}.g5{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.score-stack{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.olgun-frame{margin:3px}.header-inner{padding:8px 10px;flex-wrap:wrap}.brand-logo{flex-basis:50px;height:50px}.brand-titles h1{font-size:15px}.brand-titles p{font-size:10px}.brand-org{max-width:100%;width:100%;font-size:11px;white-space:normal}.wrap{padding:9px}.g5,.g4,.g3,.g2{grid-template-columns:1fr}.span2,.span3{grid-column:auto}.score-stack{grid-template-columns:1fr}.factors{grid-template-columns:1fr 1fr 1fr}.filters input,.filters select{max-width:none;flex:1}.bottom-actions{padding:3px 9px}.bottom-panel{width:100%}.bottom-panel .btn{flex:1 1 125px;white-space:normal}.risk-footer{margin:2px 9px 0;font-size:10px}}
+@media(max-width:420px){.factors{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.metric b{font-size:19px}}
 @page{size:A4 landscape;margin:9mm 9mm 16mm 9mm;@bottom-right{content:'Sayfa ' counter(page) ' / ' counter(pages);font:9pt Arial;color:#34495c}}
 @media print{
- html,body{margin:0!important;padding:0!important;background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;font-size:9px!important}
- #olgunFrame,#toast{display:none!important}
- #printPages{display:table!important;width:100%!important;border:0!important;border-spacing:0;table-layout:fixed;border-collapse:separate}
- #printPages>thead{display:table-header-group!important}
- #printPages>tbody{display:table-row-group!important}
- #printPages>thead>tr>td{padding:0 0 8px;border:0}
- #printPages>tbody>tr>td{padding:0 10px 8px;border:0}
- #printPageFrame{display:block!important;position:fixed;inset:0;border:1.5px solid #7f95a9;pointer-events:none;z-index:50}
- .print-header{display:flex;align-items:center;gap:10px;padding:6px 12px;border-top:4px solid #0284c7;border-bottom:1.5px solid #7f95a9;background:white;height:65px}
- .print-header img{width:50px;height:47px;object-fit:contain}
- .print-header h1{font-size:17px;color:#075985;margin:0}.print-header p{font-size:10px;color:#475569;margin:3px 0 0}
- .print-header .print-org{margin-left:auto;font-size:14px;color:#1e3a57;font-weight:700;text-align:right}
- .print-section{border:1px solid #b5c9d8;border-radius:4px;margin-bottom:8px;break-inside:auto}
- .print-section h3{font-size:11px;background:#eaf5fc;border-left:4px solid #0284c7;color:#075985;margin:0;padding:5px 8px;break-after:avoid}
- .print-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:7px}
- .print-summary div{border:1px solid #dbe3eb;padding:5px;font-size:9px}
- .print-summary b{display:block;color:#075985;font-size:13px}
- .print-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px}
- .print-field{border:1px solid #dbe3eb;border-radius:3px;min-height:23px;padding:4px 6px;overflow-wrap:anywhere;white-space:pre-wrap;font-size:9px}
- .print-field b{display:block;font-size:8px;color:#64748b;font-weight:600;margin-bottom:2px}
- .print-table{border-collapse:collapse;width:100%;table-layout:fixed}.print-table th,.print-table td{border:1px solid #dbe3eb;padding:4px 5px;font-size:8px;vertical-align:top;overflow-wrap:anywhere}.print-table th{background:#eaf5fc;color:#075985}.print-table thead{display:table-header-group}.print-table tr{break-inside:avoid}.print-note{font-size:9px;color:#64748b;padding:6px 8px}.print-no-break{break-inside:avoid}
+ html,body{margin:0!important;padding:0!important;background:#fff!important;font-size:9px!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ #olgunFrame,.toast{display:none!important}
+ #printPages{display:table!important;width:100%!important;table-layout:fixed;border-collapse:separate;border-spacing:0}
+ #printPages>thead{display:table-header-group!important}#printPages>tbody{display:table-row-group!important}
+ #printPages>thead>tr>td{padding:0 0 8px}#printPages>tbody>tr>td{padding:0 8px 8px}
+ #printFrame{display:block!important;position:fixed;inset:0;border:1.4px solid #7f95a9;pointer-events:none}
+ .print-header{display:flex;align-items:center;gap:10px;background:#fff;border-top:4px solid #0284c7;border-bottom:1px solid #9fb2c2;min-height:65px;padding:6px 12px}
+ .print-header img{width:52px;height:49px;object-fit:contain;flex:none}
+ .print-header h1{font-size:17px;color:#075985;margin:0}.print-header p{font-size:10px;color:#475569;margin:2px 0 0}
+ .print-org{margin-left:auto;font-size:13px;font-weight:800;color:#1e3a57;text-align:right}
+ .print-section{border:1px solid #b5c9d8;margin-bottom:8px;border-radius:4px;break-inside:auto}
+ .print-section h3{font-size:11px;padding:5px 8px;margin:0;border-left:4px solid #0284c7;background:#eaf5fc;color:#075985;break-after:avoid}
+ .print-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:8px}
+ .print-field{border:1px solid #dbe3eb;border-radius:3px;padding:3px 5px;min-height:25px;font-size:9px;overflow-wrap:anywhere}
+ .print-field b{display:block;font-size:8px;color:#64748b;margin-bottom:2px}
+ .print-charts{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:8px;break-inside:avoid!important}
+ .print-chart{border:1px solid #cbd5e1;border-radius:4px;padding:7px;background:white}
+ .print-chart h4{margin:0 0 2px;color:#075985;font-size:10px}.print-chart svg{width:100%;height:auto;max-height:125px;display:block}
+ .print-table{width:100%;table-layout:fixed;border-collapse:collapse}.print-table th,.print-table td{font-size:8px;border:1px solid #dbe3eb;padding:5px 5px;vertical-align:top;overflow-wrap:anywhere}
+ .print-table th{background:#eaf5fc;color:#075985}.print-table thead{display:table-header-group}.print-table tr{break-inside:avoid}
+ .print-detail{padding:5px 7px;border-bottom:1px solid #dce8f1;break-inside:avoid}.print-detail:last-child{border-bottom:0}
+ .print-detail-head{display:flex;justify-content:space-between;gap:10px;color:#075985;font-weight:800;font-size:10px;padding:3px 0 5px}
+ .print-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+ .print-note{font-size:8.5px;color:#475569;padding:6px 8px}
+ .print-charts,.print-charts *{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}
 }
 
-/* RISK UI - yazdırılabilir, gerçek SVG vektör grafikler. Zemin grafiği tercihi gerektirmez. */
-@media print {
- .print-chart-section{break-inside:avoid!important;page-break-inside:avoid!important}
- .print-chart-layout{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important;padding:8px!important;align-items:start!important}
- .print-chart-box{min-width:0;border:1px solid #cbd5e1;border-radius:4px;padding:5px 7px 7px;break-inside:avoid!important;page-break-inside:avoid!important;background:white!important}
- .print-chart-box h4{margin:0 0 3px;font-size:10px;color:#075985}
- .print-chart-box svg{display:block;width:100%;height:auto;max-height:132px;overflow:visible}
- .print-chart-foot{font-size:9px;color:#425567;line-height:1.35;min-height:16px;margin:2px 2px 0}
- .print-chart-key{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;color:#334155;font-size:8.5px}
- .print-chart-key span{display:inline-flex;gap:3px;align-items:center}
- .print-chart-key .mark{display:inline-block;width:9px;height:9px;border:2px solid #125ba9}
- .print-chart-key .mark.target{border:2px dashed #8651b4}
- .print-chart-section,.print-chart-section *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-}
-
-
-/* Risk UI mobil: light green palette. Kept out of printing to protect paper output. */
+/* FMEA mobil: açık yeşil arka plan ve kompakt görünüm */
 @media screen {
  html,body{background:#eaf7ee!important}
- .olgun-frame{background:#f3faf5!important;border-color:#9bbea6!important}
+ .olgun-frame{background:#f0faf3!important;border-color:#95bea0!important}
  .top-header{border-top-color:#2f855a!important}
- .card-header{background:#eaf8ee!important;border-left-color:#2f855a!important;border-bottom-color:#c9dfd0!important}
- .card-header h2{color:#1f5a3d!important}
- .section-number{background:#dcf3e4!important;color:#246342!important}
- .brand-logo{background:#f1faf3!important;border-color:#b4d6c0!important;color:#1d6a42!important}
- .brand-org{color:#1e6440!important}
- .btn-primary{background:#2f855a!important;border-color:#2f855a!important}
- .risk-ui-footer{border-top-color:#b6d7c2!important}
+ .card-head{background:#e7f5ea!important;border-left-color:#2f855a!important}
+ .card-head h2,.brand-titles h1{color:#19623b!important}
+ .risk-footer{color:#345e45}
 }
-@media(max-width:720px){.headerinner{align-items:center}.action-panel,.bottom-tools{flex-wrap:wrap}.matrix-mode-controls{flex-wrap:wrap}}
-@media print{html,body{background:#fff!important}}
-
-/* FINE-KINNEY · tek satır puan ölçeği · Risk UI ve Risk UI mobil */
-.risk-ui-scale-footer{display:block;margin:-5px 17px 12px;padding:5px 0 2px;color:#475569;font:600 11px/1.55 "Segoe UI",Arial,sans-serif;text-align:left;white-space:nowrap;overflow-x:auto;overflow-y:hidden;max-width:calc(100% - 34px);box-sizing:border-box;scrollbar-width:thin}
-@media(max-width:720px){.risk-ui-scale-footer{margin:-4px 9px 9px;max-width:calc(100% - 18px);font-size:10px}}
-@media print{.risk-ui-scale-footer{display:none!important}}
-
-/* Risk UI mobil Fine-Kinney: aydınlık açık yeşil uygulama zemini */
-@media screen{
-  html, body{background:#eaf7ee!important;}
-  .olgun-frame{background:#f2faf4!important;border-color:#91bea0!important}
-  #olgunFrame{background:#f2faf4!important}
-  .header{border-top-color:#2f855a!important}
-  .card-header{background:#e9f6ed!important;border-bottom-color:#cee6d6!important;border-left-color:#2f855a!important}
-  .section-number{background:#d9f0e0!important;color:#1b693f!important}
-  .risk-ui-footer,.risk-ui-scale-footer{color:#345e45!important}
+@media screen and (max-width:720px){
+ .olgun-frame{margin:3px!important;margin-bottom:0!important;min-height:0!important;padding-bottom:0!important}
+ .factors{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px}
+ .factors select{padding:5px 2px!important;min-width:0}
+ .risk-footer{white-space:nowrap!important;overflow:hidden!important;margin:2px 9px 0!important;padding:3px 0 0!important;font-size:9px!important}
+ .risk-footer div{margin:0;padding:0;line-height:1.4}
 }
-@media print{html,body{background:#fff!important} .olgun-frame,#olgunFrame{background:#fff!important}}
-
-
-/* Risk UI mobil: 3 Fine-Kinney ölçeğini yatay kaydırmasız tek ekran satırına sığdır. */
-@media screen {
-  .risk-ui-scale-footer {overflow:hidden!important;overflow-x:hidden!important;white-space:nowrap!important;width:calc(100% - 34px)!important;max-width:calc(100% - 34px)!important;}
-  .risk-ui-scale-inline {display:inline-block!important;width:max-content!important;max-width:none!important;white-space:pre!important;transform-origin:left center;vertical-align:middle;letter-spacing:-0.12px;font-family:"Arial Narrow","Segoe UI",Arial,sans-serif}
-}
-@media screen and (max-width:720px) {
-  .risk-ui-scale-footer {width:calc(100% - 18px)!important;max-width:calc(100% - 18px)!important;font-size:11px!important;line-height:1.7!important;}
-}
-
-/* Risk UI mobil Fine-Kinney: Alt bölüm TAM üç satırdır; yatay kaydırma ve son boşluk yok. */
-@media screen {
-  #olgunFrame.olgun-frame {
-    margin-bottom:0!important;
-    padding-bottom:0!important;
-    min-height:0!important;
-  }
-  .risk-ui-footer {
-    display:block!important;
-    box-sizing:border-box!important;
-    margin:2px 9px 0!important;
-    padding:4px 0 0!important;
-    width:calc(100% - 18px)!important;
-    max-width:calc(100% - 18px)!important;
-    border-top:1px solid #c4ddce!important;
-    color:#345e45!important;
-    white-space:normal!important;
-    overflow:visible!important;
-    line-height:1.3!important;
-    font-size:11px!important;
-  }
-  .risk-ui-footer-line {
-    display:block!important;
-    margin:0!important;
-    padding:0!important;
-    width:100%!important;
-    max-width:100%!important;
-    overflow:hidden!important;
-    white-space:nowrap!important;
-    line-height:1.35!important;
-  }
-  .risk-ui-footer-text {
-    display:inline-block!important;
-    width:max-content!important;
-    max-width:none!important;
-    transform-origin:left center!important;
-    white-space:nowrap!important;
-    vertical-align:middle!important;
-  }
-  .risk-ui-scale-footer {
-    display:block!important;
-    margin:0 9px 0!important;
-    padding:0!important;
-    width:calc(100% - 18px)!important;
-    max-width:calc(100% - 18px)!important;
-    overflow:hidden!important;
-    overflow-x:hidden!important;
-    overflow-y:hidden!important;
-    white-space:nowrap!important;
-    line-height:1.35!important;
-    font-size:11px!important;
-    box-sizing:border-box!important;
-  }
-  .risk-ui-scale-inline {
-    display:inline-block!important;
-    width:max-content!important;
-    max-width:none!important;
-    transform-origin:left center!important;
-    white-space:pre!important;
-    vertical-align:middle!important;
-    font-family:"Arial Narrow","Segoe UI",Arial,sans-serif!important;
-    letter-spacing:-0.12px!important;
-  }
-}
-@media print { .risk-ui-footer,.risk-ui-scale-footer {display:none!important;} }
 </style>
 </head>
 <body>
 <div id="olgunFrame" class="olgun-frame">
-<header class="top-header"><div class="headerinner">
-<button id="logoTrigger" class="brand-logo" type="button" title="Logoyu değiştirmek için art arda 5 kez tıklayın"><img id="brandLogo" alt="Kurum logosu" hidden><span id="logoFallback">LOGO</span></button>
-<div class="header-titles"><h1 id="brandTitle" title="Düzenlemek için 5 kez tıklayın">İSG RİSK ANALİZİ – FINE-KINNEY</h1><p id="brandSubtitle" title="Düzenlemek için 5 kez tıklayın">(Olasılık × Frekans × Şiddet · Risk Değerlendirme ve Aksiyon Takip Formu)</p></div>
-<div id="brandOrg" class="brand-org" title="Düzenlemek için 5 kez tıklayın">OLGUN BAŞKANLIĞI</div>
-</div><input id="logoChooser" type="file" class="sr-only" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"></header>
-<main class="wrap" id="app">
-<section class="metrics" aria-label="Risk özetleri">
-<div class="metric"><small>TOPLAM RİSK KAYDI</small><b id="statTotal">0</b></div>
-<div class="metric"><small>YÜKSEK / ÇOK YÜKSEK · AÇIK</small><b id="statHigh">0</b></div>
-<div class="metric"><small>HEDEF TARİHİ GEÇEN</small><b id="statOverdue">0</b></div>
-<div class="metric"><small>ÖNLEMİ DOĞRULANAN</small><b id="statVerified">0</b></div>
-</section>
-<section class="card" aria-labelledby="metaTitle"><div class="card-header"><h2 id="metaTitle"><span class="sect">01</span> İşyeri ve Değerlendirme Bilgileri</h2><span class="hint">Giriş alanları her yeni açılışta boş başlar.</span></div>
-<div class="card-body grid g5">
-<div><label for="metaCompany">İşyeri / Firma</label><input data-meta="company" id="metaCompany" placeholder="Örn. ABC Metal Sanayi"></div>
-<div><label for="metaFacility">Tesis / Birim</label><input data-meta="facility" id="metaFacility" placeholder="Örn. Üretim Tesisi"></div>
-<div><label for="metaPrepared">Hazırlayan / Ekip</label><input data-meta="prepared" id="metaPrepared" placeholder="Risk değerlendirme ekibi"></div>
-<div><label for="metaDate">Değerlendirme Tarihi</label><input data-meta="date" id="metaDate" type="date"></div>
-<div><label for="metaRevision">Revizyon / Belge No.</label><input data-meta="revision" id="metaRevision" placeholder="Örn. FK-2026 / Rev.00"></div>
-</div></section>
-<section class="card" aria-labelledby="formTitle"><div class="card-header"><h2 id="formTitle"><span class="sect">02</span> <span id="formTitleText">Yeni Risk Kaydı</span></h2><button class="btn btn-sm" id="newBtn" type="button">＋ Yeni Kayıt</button></div>
-<div class="card-body"><form id="riskForm" novalidate autocomplete="off">
-<div class="strip"><em>01</em> Riskin Tanımlanması</div>
-<div class="grid g4">
-<div><label>Değerlendirme Yöntemi</label><div class="method-lock">Fine-Kinney <span>O × F × Ş</span></div></div>
-<div><label for="unit" class="required">Bölüm / Alan</label><input id="unit" required placeholder="Örn. Pres Atölyesi"></div>
-<div><label for="activity" class="required">Faaliyet / İş Adımı</label><input id="activity" required placeholder="Örn. Pres kalıbı değişimi"></div>
-<div><label for="affected">Etkilenebilecek Kişiler</label><input id="affected" placeholder="Operatör, bakım personeli..."></div>
-</div>
-<div class="grid g3" style="margin-top:9px">
-<div><label class="required" for="hazard">Tehlike Kaynağı</label><textarea required id="hazard" placeholder="Korumasız hareketli parçalar"></textarea></div>
-<div><label class="required" for="risk">Risk / Olası Zarar</label><textarea required id="risk" placeholder="Sıkışma, uzuv yaralanması"></textarea></div>
-<div><label for="existing">Mevcut Kontroller / Önlemler</label><textarea id="existing" placeholder="Mevcut makine koruyucuları, talimatlar..."></textarea></div>
-</div>
-<div class="strip"><em>02</em> Fine-Kinney Risk Puanlaması – Olasılık × Frekans × Şiddet</div>
-<div class="assessment">
-<div class="score-stack">
-<section class="score-panel" data-side="before"><div class="score-head"><strong><i></i> MEVCUT RİSK</strong><span class="hint">Tedbir öncesi</span></div><div class="factor-fields" id="beforeFields"></div><div class="score-result"><div><small>Mevcut risk puanı</small><b id="beforeScore">—</b></div><span class="risk-tag risk-na" id="beforeLevel">Değerlendirilmedi</span></div></section>
-<section class="score-panel" data-side="after"><div class="score-head"><strong><i></i> HEDEF RİSK</strong><span class="hint" id="afterTitle">Planlanan seviye</span></div><div class="factor-fields" id="afterFields"></div><div class="score-result"><div><small>Hedef / kalan risk puanı</small><b id="afterScore">—</b></div><span class="risk-tag risk-na" id="afterLevel">Değerlendirilmedi</span></div></section>
-</div>
-<section class="guide" aria-labelledby="guideTitle"><div class="guide-head"><strong id="guideTitle">▦ Fine-Kinney Risk Ölçeği</strong><div class="mode-tabs" role="group" aria-label="Risk görünümü"><button type="button" id="modeSingle" class="mode-btn active" aria-pressed="true">Tekil Risk</button><button type="button" id="modeDistribution" class="mode-btn" aria-pressed="false">Genel Risk Dağılımı</button></div></div>
-<div class="guide-body"><div id="bandVisual" class="bands" aria-label="Fine Kinney risk düzeyleri"></div><div id="guideSummary" class="guide-summary" aria-live="polite">Olasılık, frekans ve şiddet seçildiğinde sonuç burada görüntülenir.</div><div class="legend"><span><b style="color:#125ba9">●</b> Mevcut risk</span><span><b style="color:#8651b4">◆</b> Hedef risk</span></div><div class="instruction">Risk sınırları: 20, 70, 200 ve 400 puan. Sınır değerleri için sırasıyla üst kategori kullanılır; 400 puan yüksek risk kapsamındadır. Farklı kurumsal sınıflamalar bulunabilir.</div></div></section>
-</div>
-<div class="strip"><em>03</em> Tedbirler ve Aksiyon Takibi</div>
-<div class="grid g4">
-<div class="span2"><label for="action" class="required">Alınacak Tedbirler / Düzeltici Faaliyet</label><textarea id="action" required placeholder="Tehlikeyi ortadan kaldırma, mühendislik kontrolü..."></textarea></div>
-<div><label for="responsible">Sorumlu Kişi / Birim</label><input id="responsible" placeholder="Örn. Bakım Müdürü"></div>
-<div><label for="deadline">Hedef Tamamlanma Tarihi</label><input id="deadline" type="date"></div>
-<div><label for="status">Aksiyon Durumu</label><select id="status"><option value="">Seçiniz</option><option value="open">Açık</option><option value="inprogress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div>
-<div class="span3"><label for="notes">Ek Açıklamalar / Doğrulama Kanıtı</label><input id="notes" placeholder="Ölçüm, fotoğraf veya kontrol tutanağı açıklaması..."></div>
-</div>
-<div class="verifiedbox"><label class="checkline"><input id="verified" type="checkbox"> Önlem uygulandı, etkinliği kontrol edildi ve <b>kalan risk doğrulandı</b></label><div class="hint">Yalnızca “Tamamlandı” durumunda kullanılabilir. İşaretli değilse hedef puan gerçekleşmiş sonuç değildir.</div></div>
-<div class="actionbar"><button type="submit" id="saveBtn" class="btn btn-primary">＋ Riski Kaydet</button><button type="button" id="cancelBtn" class="btn">Vazgeç / Yeni Kayıt</button><span class="spacer"></span><span class="hint" id="formInfo">Yeni kayıt oluşturuluyor.</span></div>
-</form></div></section>
-<section class="card" aria-labelledby="tableTitle"><div class="card-header"><h2 id="tableTitle"><span class="sect">03</span> Risk Kayıtları ve Aksiyon Takibi <span id="recordCount" class="hint">(0)</span></h2>
-<div class="filters"><input type="search" id="searchInput" autocomplete="off" placeholder="Kayıtlarda ara..." aria-label="Kayıtlarda ara"><select id="statusFilter" aria-label="Duruma göre filtrele"><option value="">Tüm durumlar</option><option value="open">Açık</option><option value="inprogress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div></div>
-<div class="tablebox"><table aria-label="Fine-Kinney risk kayıtları"><thead><tr><th>No.</th><th>Bölüm / Faaliyet</th><th>Tehlike / Risk</th><th>Mevcut O×F×Ş</th><th>Hedef O×F×Ş</th><th>Tedbir / Aksiyon</th><th>Termin / Sorumlu</th><th>Durum</th><th>İşlemler</th></tr></thead><tbody id="riskRows"></tbody></table><div class="empty" id="emptyState">Henüz risk kaydı bulunmuyor. Yukarıdaki formdan risk ekleyebilirsiniz.</div></div>
-<div class="table-bottom"><button type="button" class="btn btn-danger btn-sm" id="clearBtn">Tüm Kayıtları Sil</button></div></section>
+<header class="top-header"><div class="header-inner">
+ <button id="logoTrigger" type="button" class="brand-logo" title="Logo değiştirmek için 5 kez tıklayın"><img id="brandLogo" alt="Kurum logosu" hidden><span id="logoFallback">LOGO</span></button>
+ <div class="brand-titles"><h1 id="brandTitle" title="Düzenlemek için 5 kez tıklayın">İSG RİSK ANALİZİ – FMEA</h1><p id="brandSubtitle" title="Düzenlemek için 5 kez tıklayın">(Hata Türleri ve Etkileri Analizi · Makine, Ekipman ve Üretim Süreçleri)</p></div>
+ <div id="brandOrg" class="brand-org" title="Düzenlemek için 5 kez tıklayın">OLGUN BAŞKANLIĞI</div>
+</div><input id="logoChooser" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="sr-only"></header>
+<main class="wrap">
+ <section class="metrics" aria-label="FMEA risk özeti">
+  <div class="metric"><small>TOPLAM HATA KAYDI</small><b id="mTotal">0</b></div>
+  <div class="metric"><small>ÖNCELİKLİ / KRİTİK · AÇIK</small><b id="mHigh">0</b></div>
+  <div class="metric"><small>HEDEF TARİHİ GEÇEN</small><b id="mOverdue">0</b></div>
+  <div class="metric"><small>ÖNLEMİ DOĞRULANAN</small><b id="mVerified">0</b></div>
+ </section>
+ <section class="card"><div class="card-head"><h2><span class="index">01</span>İşyeri ve Değerlendirme Bilgileri</h2><span class="hint">Form alanları her yeni açılışta boş başlar.</span></div>
+  <div class="card-body grid g5">
+   <div><label for="company">İşyeri / Firma</label><input id="company" data-meta="company" placeholder="Örn. ABC Makine Sanayi"></div>
+   <div><label for="facility">Tesis / Üretim Alanı</label><input id="facility" data-meta="facility" placeholder="Örn. Montaj Hattı"></div>
+   <div><label for="prepared">Hazırlayan / Ekip</label><input id="prepared" data-meta="prepared" placeholder="FMEA çalışma ekibi"></div>
+   <div><label for="assessDate">Değerlendirme Tarihi</label><input id="assessDate" data-meta="date" type="date"></div>
+   <div><label for="revision">Revizyon / Belge No.</label><input id="revision" data-meta="revision" placeholder="Örn. FMEA-2026 / Rev.00"></div>
+  </div>
+ </section>
+ <section class="card"><div class="card-head"><h2><span class="index">02</span><span id="formHeading">Yeni FMEA Hata Kaydı</span></h2><button type="button" id="newBtn" class="btn btn-sm">＋ Yeni Kayıt</button></div>
+  <div class="card-body"><form id="fmeaForm" novalidate autocomplete="off">
+   <div class="strip"><em>01</em> Süreç ve Hata Türü</div>
+   <div class="grid g4">
+    <div><label>Değerlendirme Yöntemi</label><div class="method-lock">FMEA &nbsp;·&nbsp; Ş × O × T</div></div>
+    <div><label for="process" class="required">Bölüm / Süreç</label><input id="process" required placeholder="Örn. Talaşlı İmalat"></div>
+    <div><label for="equipment">Makine / Ekipman</label><input id="equipment" placeholder="Örn. CNC-05"></div>
+    <div><label for="function" class="required">Faaliyet / Fonksiyon</label><input id="function" required placeholder="Örn. Mil tornalama"></div>
+   </div>
+   <div class="grid g3" style="margin-top:9px">
+    <div><label for="failure" class="required">Potansiyel Hata Türü</label><textarea id="failure" required placeholder="Örn. Mil çapının tolerans dışına çıkması"></textarea></div>
+    <div><label for="effect" class="required">Hatanın Potansiyel Etkisi</label><textarea id="effect" required placeholder="Örn. Montaj uygunsuzluğu, parça reddi"></textarea></div>
+    <div><label for="cause" class="required">Hatanın Potansiyel Nedeni</label><textarea id="cause" required placeholder="Örn. Takım aşınması, yanlış ofset"></textarea></div>
+   </div>
+   <div class="grid g2" style="margin-top:9px">
+    <div><label for="prevention">Mevcut Önleme Kontrolleri</label><textarea id="prevention" placeholder="Örn. Takım ömrü limiti, operatör eğitimi"></textarea></div>
+    <div><label for="detection">Mevcut Tespit Kontrolleri</label><textarea id="detection" placeholder="Örn. İlk parça onayı, periyodik ölçüm"></textarea></div>
+   </div>
+   <div class="strip"><em>02</em> FMEA Risk Öncelik Sayısı (RÖS / RPN)</div>
+   <div class="assessment">
+    <div class="score-stack">
+     <section class="score-card"><div class="score-head"><strong>● MEVCUT DEĞERLENDİRME</strong><span>Önlem öncesi</span></div><div class="factors" id="beforeFactors"></div><div class="score-result"><div><small>Mevcut RÖS</small><b id="beforeScore">—</b></div><span id="beforeLevel" class="tag">Değerlendirilmedi</span></div></section>
+     <section class="score-card after"><div class="score-head"><strong>◆ HEDEF / KALAN RİSK</strong><span id="afterCaption">Planlanan seviye · isteğe bağlı</span></div><div class="factors" id="afterFactors"></div><div class="score-result"><div><small>Hedef / kalan RÖS</small><b id="afterScore">—</b></div><span id="afterLevel" class="tag">Değerlendirilmedi</span></div></section>
+    </div>
+    <section class="graph-card"><div class="graph-head"><strong>▦ FMEA Risk Analizi Grafiği</strong><div class="tabs"><button type="button" id="tabSingle" class="active">Tekil FMEA</button><button type="button" id="tabDist">Genel RÖS Dağılımı</button></div></div>
+     <div class="graph-body"><div id="chart" aria-label="FMEA risk grafiği"></div><div id="chartSummary" class="graph-summary"></div></div></section>
+   </div>
+   <div class="guidance" style="margin-top:9px"><b>Önemli:</b> RÖS = Şiddet × Oluşma × Tespit Edilebilirlik. Tespit puanında 1 = kolay ve güvenilir tespit, 10 = tespit edilmesi çok güç. Aşağıdaki risk grupları örnek eşiklerdir; resmî/evrensel FMEA eşiği değildir. <b>Şiddeti yüksek hatalar RÖS düşük olsa da öncelikle ele alınmalıdır.</b></div>
+   <details class="rubric"><summary>Ş, O ve T puanları nasıl seçilir? (1–10 değerlendirme kılavuzu)</summary><div class="inner"><table><thead><tr><th>Puan</th><th>Şiddet (Ş)</th><th>Oluşma Olasılığı (O)</th><th>Tespit Edilebilirlik (T)</th></tr></thead><tbody>
+    <tr><td>1–2</td><td>İhmal edilebilir / düşük etki</td><td>Çok seyrek hata</td><td>Otomatik veya çok yüksek güvenilirlikte tespit</td></tr>
+    <tr><td>3–4</td><td>Hafif / sınırlı etki</td><td>Seyrek hata</td><td>İyi tespit olanağı</td></tr>
+    <tr><td>5–6</td><td>Orta düzeyde kalite, duruş veya iş etkisi</td><td>Orta olasılık</td><td>Orta düzey tespit yeteneği</td></tr>
+    <tr><td>7–8</td><td>Ciddi kalite, üretim veya güvenlik etkisi</td><td>Sık / yüksek olasılık</td><td>Zayıf tespit yeteneği</td></tr>
+    <tr><td>9–10</td><td>Çok ağır sonuç / tehlikeli etki</td><td>Çok sık / neredeyse kaçınılmaz</td><td>Çok zor veya pratikte tespit edilemeyen hata</td></tr>
+   </tbody></table><div class="hint" style="margin-top:5px">Bu puan açıklamaları yönlendiricidir. Kurumun/ürünün onaylı FMEA puanlama tabloları esas alınmalıdır. AIAG-VDA Action Priority bu örnek RÖS gruplarıyla eşdeğer değildir.</div></div></details>
+   <div class="strip"><em>03</em> İyileştirme ve Aksiyon Takibi</div>
+   <div class="grid g4">
+    <div class="span2"><label for="action">Önerilen / Alınacak Önlem</label><textarea id="action" placeholder="Örn. Otomatik takım aşınma uyarısı, proses içi ölçüm"></textarea></div>
+    <div><label for="owner">Sorumlu Kişi / Birim</label><input id="owner" placeholder="Örn. Üretim Mühendisi"></div>
+    <div><label for="due">Hedef Tamamlanma Tarihi</label><input id="due" type="date"></div>
+    <div><label for="status">Aksiyon Durumu</label><select id="status"><option value="">Seçiniz</option><option value="open">Açık</option><option value="progress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div>
+    <div class="span3"><label for="evidence">Doğrulama Kanıtı / Ek Açıklama</label><input id="evidence" placeholder="Örn. Yeni ölçüm raporu, bakım kaydı, test sonucu"></div>
+   </div>
+   <div class="checkline"><label class="checkbox-label"><input id="verified" type="checkbox"> Önlem uygulandı, etkinliği kontrol edildi ve <b>kalan risk doğrulandı</b></label><small>İşaretlemek için durum “Tamamlandı” ve hedef Ş/O/T puanları dolu olmalıdır.</small></div>
+   <div class="actions"><button id="saveBtn" type="submit" class="btn btn-primary">＋ FMEA Kaydı Ekle</button><button id="cancelBtn" type="button" class="btn">Vazgeç / Yeni Kayıt</button><span class="grow"></span><span id="formInfo" class="hint">Yeni kayıt oluşturuluyor.</span></div>
+  </form></div>
+ </section>
+ <section class="card"><div class="card-head"><h2><span class="index">03</span>FMEA Hata Kayıtları ve Aksiyon Takibi <span id="recordCount" class="hint">(0)</span></h2>
+  <div class="filters"><input id="search" type="search" placeholder="Hata kayıtlarında ara..." aria-label="Hata kayıtlarında ara"><select id="filter" aria-label="Aksiyon durumuna göre filtrele"><option value="">Tüm durumlar</option><option value="open">Açık</option><option value="progress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div></div>
+  <div class="tablebox"><table><thead><tr><th>No.</th><th>Süreç / Makine</th><th>Hata Türü / Etki</th><th>Hata Nedeni</th><th>Mevcut Ş×O×T / RÖS</th><th>Hedef Ş×O×T / RÖS</th><th>Önerilen Önlem</th><th>Sorumlu / Hedef</th><th>Durum</th><th>İşlemler</th></tr></thead><tbody id="recordRows"></tbody></table><div id="empty" class="empty">Henüz FMEA hata kaydı bulunmuyor.</div></div>
+  <div class="table-bottom"><button type="button" id="clearBtn" class="btn btn-sm btn-red">Tüm Kayıtları Sil</button></div>
+ </section>
 </main>
-<div class="bottom-actions"><div class="bottom-panel" aria-label="Dosya ve yazdırma işlemleri"><button type="button" id="importBtn" class="btn btn-softblue">⬆ JSON İçeri Aktar</button><button type="button" id="exportBtn" class="btn btn-softgreen">⬇ JSON Dışarı Aktar</button><button type="button" id="pdfBtn" class="btn btn-softgray">▣ PDF / Yazdır</button><input id="importFile" type="file" class="sr-only" accept=".json,application/json"></div></div>
-<footer class="risk-ui-footer" aria-label="Fine-Kinney yöntemi ve kullanım alanı"><div class="risk-ui-footer-line"><span id="footerProperty" class="risk-ui-footer-text">Temel özelliği: Olasılık × Frekans × Şiddet</span></div><div class="risk-ui-footer-line"><span id="footerUsage" class="risk-ui-footer-text">Kullanım alanı: Fabrikalar, atölyeler, üretim tesisleri</span></div></footer>
-<div class="risk-ui-scale-footer" aria-label="Fine-Kinney olasılık frekans şiddet puan ölçekleri"><span id="fineKinneyScaleSingleLine" class="risk-ui-scale-inline">(Olasılık: 0,1 – 0,2 – 0,5 – 1 – 3 – 6 – 10)   (Frekans: 0,5 – 1 – 2 – 3 – 6 – 10)   (Şiddet: 1 – 3 – 7 – 15 – 40 – 100)</span></div>
+<div class="bottom-actions"><div class="bottom-panel" aria-label="Dosya ve yazdırma işlemleri">
+ <button id="importBtn" type="button" class="btn btn-blue">⬆ JSON İçeri Aktar</button>
+ <button id="exportBtn" type="button" class="btn btn-green">⬇ JSON Dışarı Aktar</button>
+ <button id="printBtn" type="button" class="btn btn-grey">▣ PDF / Yazdır</button>
+ <input id="importFile" type="file" accept=".json,application/json" class="sr-only">
+</div></div>
+<footer class="risk-footer">Temel özelliği: Hata Türleri ve Etkileri Analizi (FMEA)<div>Kullanım alanı: Makine, ekipman ve üretim süreçleri</div><div>RÖS = Şiddet × Oluşma × Tespit · Ş/O/T ölçeği: 1–10</div></footer>
 </div>
-<table id="printPages" role="presentation"><thead><tr><td><div id="printHeader"></div></td></tr></thead><tbody><tr><td><div id="printReport"></div></td></tr></tbody></table><div id="printPageFrame"></div>
-<div id="toast" class="notice" role="status" aria-live="polite"></div>
+<table id="printPages" role="presentation"><thead><tr><td><div id="printHeader"></div></td></tr></thead><tbody><tr><td><div id="printReport"></div></td></tr></tbody></table><div id="printFrame"></div>
+<div id="toast" class="toast" aria-live="polite"></div>
 <script>
 'use strict';
 (()=>{
 const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
+const text=v=>String(v??'');
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
-const asText=v=>v===null||v===undefined?'':String(v);
-const esc=v=>asText(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const randomId=()=>('FK'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)).toUpperCase();
-const BANDS=[{key:'low',min:0,max:20,label:'Kabul Edilebilir',short:'< 20',action:'Mevcut tedbirleri sürdür, izlemeyi devam ettir.'},{key:'possible',min:20,max:70,label:'Olası Risk',short:'20 – <70',action:'İzle ve gerekiyorsa eylem planına al.'},{key:'important',min:70,max:200,label:'Önemli Risk',short:'70 – <200',action:'İyileştirici önlem planla ve takip et.'},{key:'high',min:200,max:400.00001,label:'Yüksek Risk',short:'200 – 400',action:'Kısa vadede önlem al; işin devamını değerlendir.'},{key:'critical',min:400.00001,max:100000,label:'Çok Yüksek Risk',short:'> 400',action:'Acil tedbir al; faaliyetin durdurulmasını değerlendir.'}];
-const OPTS={p:[[0.1,'0,1 · Neredeyse imkânsız'],[0.2,'0,2 · Pratikte beklenmez'],[0.5,'0,5 · Zayıf ihtimal'],[1,'1 · Düşük ihtimal'],[3,'3 · Nadir ama mümkün'],[6,'6 · Kuvvetle muhtemel'],[10,'10 · Beklenen']],f:[[0.5,'0,5 · Çok seyrek / yılda bir'],[1,'1 · Seyrek / yılda birkaç kez'],[2,'2 · Ara sıra / ayda bir'],[3,'3 · Zaman zaman / haftada bir'],[6,'6 · Sık / günde bir veya birkaç'],[10,'10 · Sürekli / saatlik veya daha sık']],s:[[1,'1 · Önemsiz sonuç'],[3,'3 · Küçük hasar / ilk yardım'],[7,'7 · Önemli yaralanma'],[15,'15 · Çok ciddi yaralanma'],[40,'40 · Ölüm / ağır kayıp'],[100,'100 · Birden çok ölüm / felaket']]};
-const LABELS={p:'Olasılık (O)',f:'Frekans (F)',s:'Şiddet (Ş)'};
-const statusName={open:'Açık',inprogress:'Devam Ediyor',done:'Tamamlandı'};
-const initMeta=()=>({company:'',facility:'',prepared:'',date:'',revision:''});
-const emptyFactors=()=>({p:null,f:null,s:null});
-let state={meta:initMeta(),records:[]};let working={before:emptyFactors(),after:emptyFactors()};let editingId=null;let viewMode='single';let toastHandle;
-const valid=(key,v)=>OPTS[key].some(x=>x[0]===Number(v));
-const factorsValid=o=>o&&['p','f','s'].every(k=>valid(k,o[k]));
-const score=o=>factorsValid(o)?Math.round(Number(o.p)*Number(o.f)*Number(o.s)*1000)/1000:null;
-const bandFor=n=>n===null?null:n<20?BANDS[0]:n<70?BANDS[1]:n<200?BANDS[2]:n<=400?BANDS[3]:BANDS[4];
-const fmt=n=>n===null?'—':Number(n).toLocaleString('tr-TR',{maximumFractionDigits:3});
-const isEmptyString=v=>asText(v).trim()==='';
-function recordNormalize(raw){if(!raw||typeof raw!=='object'||(raw.method&&raw.method!=='fine-kinney'))return null;
- const pick=side=>{const src=raw[side]||{};const out={};for(const k of ['p','f','s'])out[k]=isEmptyString(src[k])?null:(valid(k,src[k])?Number(src[k]):null);return out};
- const result={id:asText(raw.id)||randomId(),method:'fine-kinney',unit:asText(raw.unit),activity:asText(raw.activity),hazard:asText(raw.hazard),risk:asText(raw.risk),affected:asText(raw.affected),existing:asText(raw.existing),action:asText(raw.action),responsible:asText(raw.responsible),deadline:asText(raw.deadline),status:statusName[raw.status]?raw.status:'open',verified:Boolean(raw.verified)&&raw.status==='done',notes:asText(raw.notes),created:asText(raw.created)||today(),before:pick('before'),after:pick('after')};
- if(!factorsValid(result.before)||!factorsValid(result.after))return null;return result;
+const uid=()=>('FMEA'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)).toUpperCase();
+const META_KEYS=['company','facility','prepared','date','revision'];
+const fields=['process','equipment','function','failure','effect','cause','prevention','detection','action','owner','due','status','evidence'];
+const groups=[{key:'izleme',min:1,short:'1–39',title:'İzleme',color:'#73cf93'}, {key:'dikkat',min:40,short:'40–99',title:'Dikkat',color:'#eed572'}, {key:'oncelikli',min:100,short:'100–199',title:'Öncelikli',color:'#f7b359'}, {key:'kritik',min:200,short:'200–1000',title:'Kritik',color:'#e97575'}];
+const statusText={open:'Açık',progress:'Devam Ediyor',done:'Tamamlandı'};
+const factorLabel={s:'Şiddet (Ş)',o:'Oluşma (O)',d:'Tespit (T)'};
+const emptyFactor=()=>({s:null,o:null,d:null});
+const initialMeta=()=>({company:'',facility:'',prepared:'',date:'',revision:''});
+let data={meta:initialMeta(),records:[]},working={before:emptyFactor(),after:emptyFactor()},editingId=null,mode='single',toastTimer;
+const chosen=(k,v)=>v!==''&&v!==null&&v!==undefined&&Number.isInteger(Number(v))&&Number(v)>=1&&Number(v)<=10;
+const complete=o=>o&&['s','o','d'].every(k=>chosen(k,o[k]));
+const anyFactor=o=>o&&['s','o','d'].some(k=>o[k]!==null&&o[k]!==undefined&&o[k]!=='');
+const rpn=o=>complete(o)?Number(o.s)*Number(o.o)*Number(o.d):null;
+const groupOf=n=>n===null?null:groups[n<40?0:n<100?1:n<200?2:3];
+const fmt=n=>n===null?'—':Number(n).toLocaleString('tr-TR');
+function message(t){clearTimeout(toastTimer);$('toast').textContent=t;$('toast').classList.add('show');toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3400)}
+function normFactor(raw,optional=false){const v=raw&&typeof raw==='object'?raw:{};const out={s:null,o:null,d:null};for(const k of ['s','o','d'])if(v[k]!==null&&v[k]!==undefined&&v[k]!=='')out[k]=chosen(k,v[k])?Number(v[k]):NaN;return complete(out)?out:(optional&&!anyFactor(out)?emptyFactor():null)}
+function normalizeRecord(raw){if(!raw||typeof raw!=='object'||Array.isArray(raw))return null;
+ const before=normFactor(raw.before),after=normFactor(raw.after,true);
+ if(!before||!after)return null;
+ const record={id:text(raw.id)||uid(),method:'FMEA',before,after};
+ for(const k of fields)record[k]=text(raw[k]);
+ record.status=statusText[record.status]?record.status:'open';record.verified=Boolean(raw.verified)&&record.status==='done'&&complete(after);
+ record.created=text(raw.created)||today();return record;
 }
-function resetData(){state={meta:initMeta(),records:[]};working={before:emptyFactors(),after:emptyFactors()};editingId=null;viewMode='single';}
-function toast(msg){clearTimeout(toastHandle);$('toast').textContent=msg;$('toast').classList.add('show');toastHandle=setTimeout(()=>$('toast').classList.remove('show'),3700)}
-/* Risk UI: yalnızca logo ve başlık tercihi kalıcıdır; form ve kayıtlar yenilenince boş kalır. */
-const BRAND_KEY='riskui-finekinney-brand-v1';
-const BRAND_DEFAULT={title:'İSG RİSK ANALİZİ – FINE-KINNEY',subtitle:'(Olasılık × Frekans × Şiddet · Risk Değerlendirme ve Aksiyon Takip Formu)',org:'OLGUN BAŞKANLIĞI',logo:''};
+/* Yalnızca Olgun UI logo ve başlık seçimleri kalıcıdır; risk kayıtları her açılışta sıfırdır. */
+const BRAND_KEY='risk-ui-fmea-desktop-brand-v1';
+const BRAND_DEFAULT={title:'İSG RİSK ANALİZİ – FMEA',subtitle:'(Hata Türleri ve Etkileri Analizi · Makine, Ekipman ve Üretim Süreçleri)',org:'OLGUN BAŞKANLIĞI',logo:''};
 let brand={...BRAND_DEFAULT};
-function storeBrand(){try{localStorage.setItem(BRAND_KEY,JSON.stringify(brand))}catch(e){toast('Başlık bilgileri bu tarayıcıda saklanamadı.')}}
-function initializeBrand(){try{const old=JSON.parse(localStorage.getItem(BRAND_KEY)||'null');if(old&&typeof old==='object')for(const k of Object.keys(BRAND_DEFAULT))if(typeof old[k]==='string')brand[k]=old[k]}catch(e){}
- $('brandTitle').textContent=brand.title;$('brandSubtitle').textContent=brand.subtitle;$('brandOrg').textContent=brand.org;setLogo(brand.logo);
- setupFive($('logoTrigger'),()=>$('logoChooser').click());for(const [id,key] of [['brandTitle','title'],['brandSubtitle','subtitle'],['brandOrg','org']])setupFive($(id),()=>editBrand($(id),key));
- $('logoChooser').addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith('image/')||file.size>1200000){alert('1,2 MB altında bir görsel seçin.');e.target.value='';return}const reader=new FileReader();reader.onload=()=>{brand.logo=String(reader.result||'');setLogo(brand.logo);storeBrand();toast('Kurum logosu kaydedildi.')};reader.readAsDataURL(file);e.target.value=''})
+function saveBrand(){try{localStorage.setItem(BRAND_KEY,JSON.stringify(brand))}catch(e){message('Başlık bilgileri bu tarayıcıda saklanamadı.')}}
+function setLogo(src){const img=$('brandLogo'),fallback=$('logoFallback');img.onload=()=>{img.hidden=false;fallback.hidden=true;};img.onerror=()=>{img.hidden=true;fallback.hidden=false;};img.src=(src&&/^data:image\//.test(src))?src:'logo.jpg';}
+function setFive(el,callback){let count=0,last=0;el.addEventListener('click',()=>{if(el.isContentEditable)return;const n=Date.now();count=n-last>1150?1:count+1;last=n;if(count>=5){count=0;callback()}})}
+function setEditable(el,key){el.contentEditable='true';el.focus();const selection=window.getSelection(),range=document.createRange();range.selectNodeContents(el);selection.removeAllRanges();selection.addRange(range);
+ let done=false;const cleanup=()=>{if(done)return;done=true;el.contentEditable='false';brand[key]=el.textContent.trim()||BRAND_DEFAULT[key];el.textContent=brand[key];saveBrand();el.removeEventListener('blur',cleanup);el.removeEventListener('keydown',keyHandler)};
+ const keyHandler=e=>{if(e.key==='Enter'){e.preventDefault();el.blur()}if(e.key==='Escape'){el.textContent=brand[key];el.blur()}};
+ el.addEventListener('blur',cleanup);el.addEventListener('keydown',keyHandler);
 }
-function setLogo(data){
- const img=$('brandLogo'),fallback=$('logoFallback');
- img.onload=()=>{img.hidden=false;fallback.hidden=true};
- img.onerror=()=>{img.hidden=true;fallback.hidden=false};
- // Olgun UI: Aynı klasörde logo.jpg varsa kendiliğinden kullanılır.
- // Kullanıcının daha önce seçtiği logo bunun önüne geçer.
- img.src=(data&&/^data:image\//.test(data))?data:'logo.jpg';
+function initializeBrand(){try{const st=JSON.parse(localStorage.getItem(BRAND_KEY)||'null');if(st&&typeof st==='object')for(const k of Object.keys(BRAND_DEFAULT))if(typeof st[k]==='string')brand[k]=st[k]}catch(e){}
+ for(const [id,key] of [['brandTitle','title'],['brandSubtitle','subtitle'],['brandOrg','org']]){$(id).textContent=brand[key];setFive($(id),()=>setEditable($(id),key))}
+ setLogo(brand.logo);setFive($('logoTrigger'),()=>$('logoChooser').click());
+ $('logoChooser').addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith('image/')||file.size>1250000){alert('Lütfen 1,25 MB altında bir PNG/JPG/WebP/GIF seçin.');e.target.value='';return}const fr=new FileReader();fr.onload=()=>{brand.logo=String(fr.result||'');setLogo(brand.logo);saveBrand();message('Kurum logosu kaydedildi.')};fr.readAsDataURL(file);e.target.value=''});
 }
-function setupFive(el,cb){let clicks=0,last=0;el.addEventListener('click',()=>{if(el.isContentEditable)return;const now=Date.now();clicks=now-last>1150?1:clicks+1;last=now;if(clicks>=5){clicks=0;cb()}})}
-function editBrand(el,key){el.contentEditable='true';el.focus();const r=document.createRange(),s=window.getSelection();r.selectNodeContents(el);s.removeAllRanges();s.addRange(r);let closed=false;
- const save=()=>{if(closed)return;closed=true;el.contentEditable='false';brand[key]=el.textContent.trim()||BRAND_DEFAULT[key];el.textContent=brand[key];storeBrand();el.removeEventListener('blur',save);el.removeEventListener('keydown',onKey)};
- const onKey=e=>{if(e.key==='Enter'){e.preventDefault();el.blur()}else if(e.key==='Escape'){e.preventDefault();el.textContent=brand[key];el.blur()}};el.addEventListener('blur',save);el.addEventListener('keydown',onKey)
+function renderMeta(){for(const el of document.querySelectorAll('[data-meta]'))el.value=data.meta[el.dataset.meta]||''}
+function factorMarkup(side){return ['s','o','d'].map(k=>`<div><label for="f-${side}-${k}">${factorLabel[k]}</label><select id="f-${side}-${k}" data-side="${side}" data-factor="${k}" ${side==='before'?'required':''}><option value="">Seçiniz</option>${Array.from({length:10},(_,i)=>{const v=i+1;const extra=k==='d'?(v===1?' · Çok kolay tespit':v===10?' · Çok zor tespit':''):k==='s'?(v===1?' · Çok hafif':v===10?' · Çok ağır':''):(v===1?' · Çok seyrek':v===10?' · Çok sık':'');return `<option value="${v}" ${working[side][k]===v?'selected':''}>${v}${extra}</option>`}).join('')}</select></div>`).join('')}
+function showFactors(){$('beforeFactors').innerHTML=factorMarkup('before');$('afterFactors').innerHTML=factorMarkup('after');showScore()}
+function showScore(){for(const side of ['before','after']){const v=rpn(working[side]),group=groupOf(v);$(side+'Score').textContent=fmt(v);$(side+'Level').textContent=group?group.title:'Değerlendirilmedi';$(side+'Level').className='tag '+(group?group.key:'')}
+ $('afterCaption').textContent=$('verified').checked&&$('status').value==='done'?'Kalan risk doğrulandı':'Planlanan seviye · isteğe bağlı';drawChart();}
+function chartSingleSvg(before,after){const current=rpn(before),target=rpn(after),max=Math.max(100,current||0,target||0),W=620;
+ const bars=[{name:'Mevcut RÖS',value:current,color:'#125ba9',y:49},{name:'Hedef RÖS',value:target,color:'#8651b4',y:115}];
+ const base=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 205" role="img" aria-label="Mevcut ve hedef RÖS karşılaştırması" style="font-family:Segoe UI,Arial,sans-serif"><text x="8" y="18" font-size="12" font-weight="700" fill="#27425d">Mevcut / Hedef Risk Öncelik Sayısı (RÖS)</text>`;
+ const items=bars.map(b=>{const width=b.value===null?0:Math.round(b.value/max*380);return `<text x="8" y="${b.y+15}" font-size="12" fill="#334155">${b.name}</text><rect x="132" y="${b.y}" width="380" height="25" rx="3" fill="#edf2f7" stroke="#dce5ee"/><rect x="132" y="${b.y}" width="${width}" height="25" rx="3" fill="${b.color}"/><text x="525" y="${b.y+17}" font-size="15" font-weight="800" fill="#1f3651">${b.value===null?'—':b.value}</text>`}).join('');
+ const footer=`<text x="132" y="180" font-size="11" fill="#475569">Ş / O / T · Mevcut: ${complete(before)?before.s+' / '+before.o+' / '+before.d:'—'} · Hedef: ${complete(after)?after.s+' / '+after.o+' / '+after.d:'—'}</text><text x="132" y="199" font-size="9.5" fill="#64748b">Çubukların ölçeği: 0–${max} puan (RÖS aralığı 1–1000)</text></svg>`;
+ return base+items+footer;
 }
-function renderMeta(){for(const el of document.querySelectorAll('[data-meta]'))el.value=state.meta[el.dataset.meta]||''}
-function factorHTML(side){return ['p','f','s'].map(key=>`<div><label for="factor-${side}-${key}">${LABELS[key]}</label><select data-side="${side}" data-factor="${key}" id="factor-${side}-${key}" required><option value="">Seçiniz</option>${OPTS[key].map(([v,label])=>`<option value="${v}" ${working[side][key]===v?'selected':''}>${esc(label)}</option>`).join('')}</select></div>`).join('')}
-function renderFactors(){$('beforeFields').innerHTML=factorHTML('before');$('afterFields').innerHTML=factorHTML('after');renderScore()}
-function renderScore(){for(const side of ['before','after']){const v=score(working[side]),b=bandFor(v);$(''+side+'Score').textContent=fmt(v);const el=$(''+side+'Level');el.textContent=b?b.label:'Değerlendirilmedi';el.className='risk-tag '+(b?'risk-'+b.key:'risk-na')}
- $('afterTitle').textContent=$('verified').checked&&$('status').value==='done'?'Kalan risk doğrulandı':'Planlanan seviye';renderBands()}
-function renderBands(){const counts=BANDS.map(()=>0);for(const r of state.records){const v=score(r.before),b=bandFor(v);if(b)counts[BANDS.indexOf(b)]++}
- const mx=Math.max(1,...counts);const a=bandFor(score(working.before)),z=bandFor(score(working.after)),dist=viewMode==='distribution';
- $('modeSingle').classList.toggle('active',!dist);$('modeDistribution').classList.toggle('active',dist);$('modeSingle').setAttribute('aria-pressed',String(!dist));$('modeDistribution').setAttribute('aria-pressed',String(dist));
- $('bandVisual').innerHTML=BANDS.map((b,i)=>`<div class="band" data-band="${b.key}" data-current="${!dist&&a?.key===b.key?'yes':'no'}" data-target="${!dist&&z?.key===b.key?'yes':'no'}"><div class="band-name">${b.label}</div><div class="band-bar"><div class="band-fill" style="width:${dist?counts[i]/mx*100:100}%"></div></div><div class="band-count">${dist?counts[i]+' kayıt':b.short}</div></div>`).join('');
- const summary=$('guideSummary');if(dist)summary.textContent=`Toplam ${state.records.length} risk kaydı · Bantlarda gösterilen sayılar mevcut risklerin dağılımıdır; ortalama değildir.`;
- else if(a&&z)summary.innerHTML=`Mevcut: <strong>${fmt(score(working.before))} · ${a.label}</strong> &nbsp;→&nbsp; Hedef: <strong>${fmt(score(working.after))} · ${z.label}</strong>`;
- else summary.textContent='Mevcut ve hedef riskin Olasılık, Frekans, Şiddet değerlerini seçin.';
+function chartDistSvg(){const counts=groups.map(()=>0);for(const r of data.records){const g=groupOf(rpn(r.before));if(g)counts[groups.indexOf(g)]++}const top=Math.max(1,...counts);
+ const rows=groups.map((g,i)=>{const y=35+i*36,w=Math.round(counts[i]/top*325);return `<text x="6" y="${y+17}" font-size="12" fill="#334155" font-weight="700">${g.title}</text><rect x="113" y="${y}" width="325" height="24" rx="3" fill="#eef2f7" stroke="#e0e8f0"/><rect x="113" y="${y}" width="${w}" height="24" rx="3" fill="${g.color}"/><text x="449" y="${y+17}" fill="#1f3651" font-size="14" font-weight="800">${counts[i]} kayıt</text>`}).join('');
+ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 200" role="img" aria-label="Genel risk öncelik sayısı dağılımı" style="font-family:Segoe UI,Arial,sans-serif"><text x="6" y="17" font-size="12" font-weight="800" fill="#27425d">Kayıtların Mevcut RÖS Değerlerine Göre Dağılımı</text>${rows}<text x="113" y="195" fill="#64748b" font-size="10">Toplam ${data.records.length} kayıt · Örnek kurumsal RÖS aralıkları</text></svg>`;
 }
-function setView(v){viewMode=v==='distribution'?'distribution':'single';renderBands()}
-function clearForm(){editingId=null;$('riskForm').reset();$('status').value='';$('verified').checked=false;working={before:emptyFactors(),after:emptyFactors()};$('formTitleText').textContent='Yeni Risk Kaydı';$('saveBtn').textContent='＋ Riski Kaydet';$('formInfo').textContent='Yeni kayıt oluşturuluyor.';renderFactors()}
-function valuesFromForm(){const v=id=>$(id).value.trim();return recordNormalize({id:editingId||randomId(),method:'fine-kinney',unit:v('unit'),activity:v('activity'),hazard:v('hazard'),risk:v('risk'),affected:v('affected'),existing:v('existing'),action:v('action'),responsible:v('responsible'),deadline:v('deadline'),status:v('status'),verified:$('verified').checked,notes:v('notes'),created:editingId?(state.records.find(r=>r.id===editingId)?.created||today()):today(),before:working.before,after:working.after})}
-function startEdit(id){const r=state.records.find(x=>x.id===id);if(!r)return;editingId=r.id;for(const k of ['unit','activity','hazard','risk','affected','existing','action','responsible','deadline','status','notes'])$(k).value=r[k]||'';$('verified').checked=r.verified;working={before:{...r.before},after:{...r.after}};renderFactors();$('formTitleText').textContent='Risk Kaydını Düzenle';$('saveBtn').textContent='✓ Değişiklikleri Kaydet';$('formInfo').textContent='Kayıt düzenleniyor.';setView('single');$('formTitle').scrollIntoView({block:'start',behavior:'smooth'})}
-function copyRecord(id){const r=state.records.find(x=>x.id===id);if(!r)return;const c=structuredClone(r);c.id=randomId();c.created=today();c.verified=false;if(c.status==='done')c.status='open';state.records.push(c);renderDashboard();toast('Risk kaydı çoğaltıldı.')}
-function deleteRecord(id){if(!confirm('Bu risk kaydını silmek istiyor musunuz?'))return;state.records=state.records.filter(x=>x.id!==id);if(editingId===id)clearForm();renderDashboard();toast('Risk kaydı silindi.')}
-function renderDashboard(){const q=$('searchInput').value.trim().toLocaleLowerCase('tr-TR'),filter=$('statusFilter').value,t=today();$('statTotal').textContent=state.records.length;$('statHigh').textContent=state.records.filter(r=>!r.verified&&(score(r.before)>=200)).length;$('statOverdue').textContent=state.records.filter(r=>!r.verified&&r.deadline&&r.deadline<t).length;$('statVerified').textContent=state.records.filter(r=>r.verified).length;
- const selected=state.records.filter(r=>(!filter||r.status===filter)&&(!q||[r.unit,r.activity,r.hazard,r.risk,r.existing,r.action,r.responsible,r.notes].some(v=>asText(v).toLocaleLowerCase('tr-TR').includes(q))));$('recordCount').textContent=`(${selected.length}/${state.records.length})`;$('emptyState').hidden=selected.length>0;
- $('riskRows').innerHTML=selected.map((r,i)=>{const v=score(r.before),n=score(r.after),b=bandFor(v),a=bandFor(n);return `<tr><td>${i+1}</td><td><b>${esc(r.unit)}</b><div class="cellsub">${esc(r.activity)}</div></td><td><b class="ellips">${esc(r.hazard)}</b><div class="cellsub ellips">${esc(r.risk)}</div></td><td>${fmt(r.before.p)}×${fmt(r.before.f)}×${fmt(r.before.s)} = <b>${fmt(v)}</b><br><span class="risk-tag risk-${b.key}">${b.label}</span></td><td>${fmt(r.after.p)}×${fmt(r.after.f)}×${fmt(r.after.s)} = <b>${fmt(n)}</b><br><span class="risk-tag risk-${a.key}">${esc(r.verified?'Doğrulandı · ':'Hedef · ')}${a.label}</span></td><td class="ellips">${esc(r.action)}</td><td>${esc(r.responsible||'—')}<div class="cellsub">${esc(r.deadline||'—')}</div></td><td>${esc(statusName[r.status])}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-sm" data-act="edit" data-id="${esc(r.id)}">Düzenle</button><button class="btn btn-sm" data-act="copy" data-id="${esc(r.id)}">Kopyala</button><button class="btn btn-sm btn-danger" data-act="delete" data-id="${esc(r.id)}">Sil</button></div></td></tr>`}).join('');renderBands()}
-function baseFilename(){return 'ISG_Fine_Kinney_Risk_Analizi_'+(state.meta.date||today())}
-/* Fine-Kinney mobil: çevrimdışı JSON yedekleme ve geri yükleme.
-   Riskler yalnızca açık oturum belleğindedir; uygulama yeniden açılınca liste boştur. */
-const JSON_FORMAT='risk-ui-fine-kinney-json-v1';
-function baseJsonFileName(){return 'Fine_Kinney_Risk_Kayitlari_'+(state.meta.date||today())+'.json'}
+function drawChart(){$('tabSingle').classList.toggle('active',mode==='single');$('tabDist').classList.toggle('active',mode==='distribution');$('chart').innerHTML=mode==='single'?chartSingleSvg(working.before,working.after):chartDistSvg();const b=rpn(working.before),a=rpn(working.after);
+ $('chartSummary').textContent=mode==='single'?(b===null?'Şiddet, oluşma ve tespit değerlerini seçerek mevcut RÖS puanını hesaplayın.':'Mevcut: '+fmt(b)+' · '+groupOf(b).title+'  →  Hedef: '+(a===null?'Henüz belirlenmedi':fmt(a)+' · '+groupOf(a).title)):'Toplam '+data.records.length+' hata kaydı. Grafik mevcut RÖS dağılımını gösterir; ortalama değildir.'}
+function clearForm(){editingId=null;$('fmeaForm').reset();working={before:emptyFactor(),after:emptyFactor()};$('status').value='';$('verified').checked=false;$('formHeading').textContent='Yeni FMEA Hata Kaydı';$('saveBtn').textContent='＋ FMEA Kaydı Ekle';$('formInfo').textContent='Yeni kayıt oluşturuluyor.';showFactors()}
+function formValues(){const raw={id:editingId||uid(),created:editingId?(data.records.find(r=>r.id===editingId)?.created||today()):today(),before:{...working.before},after:{...working.after},verified:$('verified').checked};for(const k of fields)raw[k]=$(k).value.trim();return normalizeRecord(raw)}
+function startEdit(id){const r=data.records.find(x=>x.id===id);if(!r)return;editingId=id;for(const k of fields)$(k).value=r[k]||'';$('verified').checked=r.verified;working={before:{...r.before},after:{...r.after}};showFactors();mode='single';drawChart();$('formHeading').textContent='FMEA Kaydını Düzenle';$('saveBtn').textContent='✓ Değişiklikleri Kaydet';$('formInfo').textContent='Kayıt düzenleniyor.';document.getElementById('formHeading').scrollIntoView({behavior:'smooth',block:'start'})}
+function renderTable(){const filter=$('filter').value,q=$('search').value.toLocaleLowerCase('tr-TR').trim();const todayStr=today();const filtered=data.records.filter(r=>(!filter||r.status===filter)&&(!q||[r.process,r.equipment,r.function,r.failure,r.effect,r.cause,r.action,r.owner].some(x=>x.toLocaleLowerCase('tr-TR').includes(q))));
+ $('mTotal').textContent=data.records.length;$('mHigh').textContent=data.records.filter(r=>!r.verified&&rpn(r.before)>=100).length;$('mOverdue').textContent=data.records.filter(r=>!r.verified&&r.due&&r.due<todayStr).length;$('mVerified').textContent=data.records.filter(r=>r.verified).length;
+ $('recordCount').textContent=`(${filtered.length}/${data.records.length})`;$('empty').hidden=filtered.length>0;
+ $('recordRows').innerHTML=filtered.map((r,i)=>{const b=rpn(r.before),a=rpn(r.after),g=groupOf(b),h=groupOf(a);return `<tr><td>${i+1}</td><td><b>${esc(r.process)}</b><div class="sub">${esc(r.equipment)} · ${esc(r.function)}</div></td><td><b>${esc(r.failure)}</b><div class="sub">${esc(r.effect)}</div></td><td>${esc(r.cause)}</td><td>${r.before.s}×${r.before.o}×${r.before.d}=<b>${b}</b><div><span class="tag ${g.key}">${g.title}</span></div></td><td>${a===null?'—':r.after.s+'×'+r.after.o+'×'+r.after.d+'=<b>'+a+'</b>'}<div>${h?`<span class="tag ${h.key}">${r.verified?'Doğrulandı':'Hedef'} · ${h.title}</span>`:''}</div></td><td>${esc(r.action)}</td><td>${esc(r.owner)}<div class="sub">${esc(r.due)}</div></td><td>${esc(statusText[r.status])}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" class="btn btn-sm" data-act="edit" data-id="${esc(r.id)}">Düzenle</button><button type="button" class="btn btn-sm" data-act="copy" data-id="${esc(r.id)}">Kopyala</button><button type="button" class="btn btn-sm btn-red" data-act="del" data-id="${esc(r.id)}">Sil</button></div></td></tr>`}).join('');drawChart();}
+function validateForm(){for(const k of ['process','function','failure','effect','cause'])if(!$(k).value.trim()){alert('Zorunlu alan: '+({process:'Bölüm / Süreç',function:'Faaliyet / Fonksiyon',failure:'Hata Türü',effect:'Hatanın Etkisi',cause:'Hatanın Nedeni'}[k]));$(k).focus();return false}
+ if(!complete(working.before)){alert('Mevcut FMEA için Şiddet, Oluşma ve Tespit puanlarını (1–10) seçin.');return false}
+ if(anyFactor(working.after)&&!complete(working.after)){alert('Hedef FMEA için Ş, O ve T puanlarının üçünü de seçin veya tamamını boş bırakın.');return false}
+ if($('verified').checked&&($('status').value!=='done'||!complete(working.after))){alert('Doğrulama için aksiyon durumu Tamamlandı olmalı ve hedef Ş/O/T puanları eksiksiz girilmelidir.');return false}
+ return true}
+function bind(){for(const m of document.querySelectorAll('[data-meta]'))m.addEventListener('input',()=>{data.meta[m.dataset.meta]=m.value});
+ $('fmeaForm').addEventListener('change',e=>{const node=e.target;if(node.dataset.side){working[node.dataset.side][node.dataset.factor]=node.value?Number(node.value):null;showScore()}if(node.id==='status'||node.id==='verified')showScore()});
+ $('fmeaForm').addEventListener('submit',e=>{e.preventDefault();if(!validateForm())return;const record=formValues();if(!record){alert('FMEA kaydı geçersiz. Puanları kontrol edin.');return}const idx=data.records.findIndex(r=>r.id===editingId);if(idx>=0)data.records[idx]=record;else data.records.push(record);const wasEdit=idx>=0;clearForm();renderTable();mode='distribution';drawChart();message(wasEdit?'FMEA kaydı güncellendi.':'FMEA hata kaydı eklendi.')});
+ for(const b of ['newBtn','cancelBtn'])$(b).addEventListener('click',()=>{clearForm();mode='single';drawChart()});
+ $('tabSingle').addEventListener('click',()=>{mode='single';drawChart()});$('tabDist').addEventListener('click',()=>{mode='distribution';drawChart()});
+ $('recordRows').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b)return;const r=data.records.find(x=>x.id===b.dataset.id);if(!r)return;const action=b.dataset.act;if(action==='edit')startEdit(r.id);if(action==='copy'){const c=normalizeRecord({...r,id:uid(),created:today(),verified:false,status:r.status==='done'?'open':r.status});data.records.push(c);renderTable();message('FMEA kaydı çoğaltıldı.')}if(action==='del'&&confirm('Bu FMEA kaydı silinsin mi?')){data.records=data.records.filter(x=>x.id!==r.id);if(editingId===r.id)clearForm();renderTable();message('FMEA kaydı silindi.')}});
+ for(const k of ['search','filter'])$(k).addEventListener('input',renderTable);
+ $('clearBtn').addEventListener('click',()=>{if(!data.records.length)return message('Silinecek FMEA kaydı bulunmuyor.');if(!confirm(data.records.length+' FMEA kaydı silinecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;data.records=[];clearForm();renderTable();message('Tüm kayıtlar silindi.')});
+ $('exportBtn').addEventListener('click',exportJson);$('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>importJson(e.target.files?.[0]));
+ $('printBtn').addEventListener('click',printNow);window.addEventListener('beforeprint',buildPrint);
+}
+
+
+/* Çevrimdışı FMEA JSON aktarımı: tüm form alanları, puanlar ve aksiyonlar. */
+const JSON_FORMAT='olgun-fmea-json-v1';
 function exportJson(){
- const payload=JSON.stringify({
-   format:JSON_FORMAT,version:1,method:'fine-kinney',
-   exportedAt:new Date().toISOString(),
-   meta:{...state.meta},records:state.records.map(r=>({...r,before:{...r.before},after:{...r.after}}))
- },null,2);
- const name=baseJsonFileName();
+ try{
+ const contents=JSON.stringify({format:JSON_FORMAT,version:1,method:'FMEA',
+ exportedAt:new Date().toISOString(),meta:{...data.meta},
+ records:data.records.map(r=>({...r,before:{...r.before},after:{...r.after}}))},null,2);
+ const filename='FMEA_Risk_Kayitlari_'+(data.meta.date||today())+'.json';
  if(window.RiskAndroid&&typeof window.RiskAndroid.saveJson==='function'){
-   try{window.RiskAndroid.saveJson(payload,name);toast('JSON dosyasını kaydetmek için konum seçin.')}catch(e){alert('JSON kayıt ekranı açılamadı: '+e.message)}
-   return;
+   window.RiskAndroid.saveJson(contents,filename);
+   message('JSON dosyasını kaydetmek için konum seçin.');
+ }else{
+   const blob=new Blob([contents],{type:'application/json;charset=utf-8'});
+   const url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),5000);
+   message(data.records.length+' FMEA kaydı JSON olarak aktarıldı.');
  }
- const blob=new Blob([payload],{type:'application/json;charset=utf-8'});
- const url=URL.createObjectURL(blob),a=document.createElement('a');
- a.href=url;a.download=name;document.body.append(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),3000);
- toast('JSON dışarı aktarıldı: '+state.records.length+' risk kaydı.');
+ }catch(e){console.error(e);alert('JSON dışarı aktarma hatası: '+e.message)}
 }
-async function readFineKinneyJson(file){
- if(!file||!/.json$/i.test(file.name))throw new Error('Yalnızca .json uzantılı dosya seçin.');
- if(file.size>10*1024*1024)throw new Error('JSON dosyası 10 MB sınırını aşıyor.');
- let obj;
- try{obj=JSON.parse(await file.text())}catch(e){throw new Error('JSON okunamadı veya geçersiz: '+e.message)}
- if(!obj||typeof obj!=='object'||Array.isArray(obj)||obj.format!==JSON_FORMAT||obj.method!=='fine-kinney'||!Array.isArray(obj.records))
-   throw new Error('Dosya Fine-Kinney Risk UI JSON şablonuyla uyumlu değil.');
- if(obj.records.length>15000)throw new Error('Bir dosyada en fazla 15.000 risk kaydı içeri alınabilir.');
- const records=obj.records.map(recordNormalize);
- if(records.some(r=>!r))throw new Error('Dosyada geçersiz Fine-Kinney faktörleri bulunan kayıtlar var.');
- const seen=new Set();
- for(const r of records){if(seen.has(r.id))r.id=randomId();seen.add(r.id)}
- const meta=initMeta();
- if(obj.meta&&typeof obj.meta==='object'&&!Array.isArray(obj.meta)){
-   for(const k of Object.keys(meta))if(obj.meta[k]!=null)meta[k]=asText(obj.meta[k]);
- }
+async function parseFmeaJson(file){
+ if(!file||!/.json$/i.test(file.name||''))throw Error('Yalnızca .json dosyası seçin.');
+ if(file.size>12*1024*1024)throw Error('JSON dosyası 12 MB sınırını aşıyor.');
+ let o;try{o=JSON.parse(await file.text())}catch(e){throw Error('JSON okunamadı: '+e.message)}
+ if(!o||typeof o!=='object'||Array.isArray(o)||o.format!==JSON_FORMAT||o.method!=='FMEA'||!Array.isArray(o.records))
+   throw Error('FMEA JSON dosya biçimi uyumsuz.');
+ if(o.records.length>10000)throw Error('En fazla 10000 kayıt içeri alınabilir.');
+ const records=o.records.map(normalizeRecord);
+ if(records.some(r=>!r))throw Error('Geçersiz FMEA kaydı veya Ş/O/T puanı. Hiçbir kayıt aktarılmadı.');
+ const ids=new Set();for(const r of records){if(ids.has(r.id))r.id=uid();ids.add(r.id)}
+ const meta=initialMeta();
+ if(o.meta&&typeof o.meta==='object'&&!Array.isArray(o.meta))
+   for(const k of META_KEYS)if(o.meta[k]!=null)meta[k]=String(o.meta[k]).slice(0,1000);
  return {meta,records};
 }
-async function performJsonImport(file){
+async function importJson(file){
  if(!file)return;
  try{
-   const incoming=await readFineKinneyJson(file);
-   if(state.records.length&&!confirm('Mevcut '+state.records.length+' risk kaydının yerine '+incoming.records.length+' JSON kaydı yüklenecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;
-   state=incoming;renderMeta();clearForm();renderDashboard();setView('distribution');
-   toast(incoming.records.length+' risk kaydı JSON dosyasından yüklendi.');
+   const loaded=await parseFmeaJson(file);
+   if(data.records.length&&!confirm('Mevcut '+data.records.length+' FMEA kaydı yerine '+loaded.records.length+
+   ' JSON kaydı yüklenecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;
+   data=loaded;renderMeta();clearForm();renderTable();mode='distribution';drawChart();
+   message(loaded.records.length+' FMEA kaydı JSON dosyasından yüklendi.');
  }catch(e){console.error(e);alert('JSON içeri aktarma başarısız: '+e.message)}
  finally{$('importFile').value=''}
 }
-/* PDF/Yazdır: Ekrandaki iki Fine-Kinney grafiğinin SVG karşılığı; renkler PDF'de vektördür. */
-function renderPrintCharts(before,after){
- const counts=BANDS.map(()=>0);
- for(const r of state.records){const b=bandFor(score(r.before));if(b)counts[BANDS.indexOf(b)]++}
- const biggest=Math.max(1,...counts),bNow=bandFor(score(before)),bTarget=bandFor(score(after));
- const colors={low:'#73cf93',possible:'#eed572',important:'#f7b359',high:'#f28b59',critical:'#e97575'};
- const svgBase=(kind)=>{
-  const isCount=kind==='distribution';
-  const rows=BANDS.map((b,i)=>{
-   const y=8+i*28,filled=isCount?Math.max(0,(counts[i]/biggest)*244):244;
-   const haveBefore=!isCount&&bNow?.key===b.key,haveTarget=!isCount&&bTarget?.key===b.key;
-   const marker=haveBefore?`<rect x="146" y="${y+1}" width="244" height="22" rx="2" fill="none" stroke="#125ba9" stroke-width="3"/>`:'';
-   const target=haveTarget?`<rect x="150" y="${y+4}" width="236" height="16" rx="1" fill="none" stroke="#8651b4" stroke-width="2" stroke-dasharray="5 3"/>`:'';
-   const label=isCount?counts[i]+' kayıt':b.short;
-   return `<text x="6" y="${y+16}" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="#25364b">${esc(b.label)}</text>`+
-     `<rect x="146" y="${y+1}" width="244" height="22" rx="2" fill="#eff3f6" stroke="#cbd5e1" stroke-width="0.8"/>`+
-     (filled?`<rect x="147" y="${y+2}" width="${Math.max(0,filled-2)}" height="20" rx="1" fill="${colors[b.key]}"/>`:'')+
-     marker+target+
-     `<text x="404" y="${y+16}" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#334155">${esc(label)}</text>`;
-  }).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${isCount?'Genel risk dağılımı':'Mevcut ve hedef risk düzeyleri'}" viewBox="0 0 520 150" preserveAspectRatio="xMidYMid meet">${rows}</svg>`;
- };
- const current=factorsValid(before)?`${fmt(score(before))} · ${esc(bNow.label)}`:'Henüz mevcut risk seçilmedi';
- const target=factorsValid(after)?`${fmt(score(after))} · ${esc(bTarget.label)}`:'Henüz hedef risk seçilmedi';
- return `<section class="print-section print-chart-section"><h3>Fine-Kinney · Risk Grafikleri</h3><div class="print-chart-layout">`+
- `<div class="print-chart-box"><h4>Tekil Risk · Mevcut / Hedef</h4>${svgBase('single')}<div class="print-chart-key"><span><i class="mark"></i>Mevcut</span><span><i class="mark target"></i>Hedef</span></div><div class="print-chart-foot">Mevcut: <b>${current}</b> → Hedef: <b>${target}</b></div></div>`+
- `<div class="print-chart-box"><h4>Genel Risk Dağılımı · Mevcut Risk Kayıtları</h4>${svgBase('distribution')}<div class="print-chart-foot">Toplam <b>${state.records.length}</b> risk kaydı. Çubuk uzunluğu ve sayı, her seviyedeki kayıt adedini gösterir; ortalama değildir.</div></div>`+
- `</div></section>`;
-}
-function renderPrint(){const m=state.meta;
- $('printHeader').innerHTML=`<header class="print-header"><div style="width:54px;height:50px;display:grid;place-items:center"><img ${brand.logo?'src="'+brand.logo+'"':''} alt="" style="${brand.logo?'':'display:none'}"><b style="${brand.logo?'display:none':''}">LOGO</b></div><div><h1>${esc(brand.title)}</h1><p>${esc(brand.subtitle)}</p></div><div class="print-org">${esc(brand.org)}</div></header>`;
- const metaFields=[['İşyeri / Firma',m.company],['Tesis / Birim',m.facility],['Hazırlayan / Ekip',m.prepared],['Değerlendirme Tarihi',m.date],['Revizyon / Belge No.',m.revision]],pField=([k,v])=>`<div class="print-field"><b>${esc(k)}</b>${esc(v||'—')}</div>`;
- const currentForm=editingId||['unit','activity','hazard','risk','action'].some(id=>$(id).value.trim())||factorsValid(working.before)||factorsValid(working.after);
- const record=state.records.length&&!currentForm?state.records[state.records.length-1]:null;
- const fieldVal=k=>record?record[k]:$(k).value;
- const before=record?record.before:working.before,after=record?record.after:working.after, verified=record?record.verified:$('verified').checked;
- const fields=[['Bölüm / Alan',fieldVal('unit')],['Faaliyet / İş Adımı',fieldVal('activity')],['Etkilenebilecek Kişiler',fieldVal('affected')],['Tehlike Kaynağı',fieldVal('hazard')],['Risk / Olası Zarar',fieldVal('risk')],['Mevcut Önlemler',fieldVal('existing')],['Alınacak Tedbir',fieldVal('action')],['Sorumlu Kişi',fieldVal('responsible')],['Termin',fieldVal('deadline')],['Aksiyon Durumu',record?statusName[record.status]:statusName[$('status').value]||''],['Ek Açıklamalar',fieldVal('notes')],['Kalan Risk Doğrulandı',verified?'Evet':'Hayır']];
- const fval=(o,k)=>o[k]==null?'—':fmt(o[k]),showScore=o=>factorsValid(o)?fmt(score(o))+' · '+bandFor(score(o)).label:'—';
- const rows=state.records.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.unit)}<br>${esc(r.activity)}</td><td><b>Tehlike:</b> ${esc(r.hazard)}<br><b>Risk:</b> ${esc(r.risk)}<br><b>Mevcut:</b> ${esc(r.existing||'—')}</td><td>${fval(r.before,'p')}×${fval(r.before,'f')}×${fval(r.before,'s')}<br><b>${showScore(r.before)}</b></td><td>${fval(r.after,'p')}×${fval(r.after,'f')}×${fval(r.after,'s')}<br><b>${showScore(r.after)}</b></td><td>${esc(r.action)}<br>${esc(r.responsible||'—')} · ${esc(r.deadline||'—')}<br>${esc(statusName[r.status])}${r.verified?' · Doğrulandı':''}</td></tr>`).join('')||'<tr><td colspan="6">Kayıt yok.</td></tr>';
- $('printReport').innerHTML=`<section class="print-section print-no-break"><h3>01 · İşyeri ve Değerlendirme Bilgileri</h3><div class="print-grid">${metaFields.map(pField).join('')}</div></section><section class="print-section print-no-break"><h3>02 · Fine-Kinney Risk Değerlendirmesi</h3><div class="print-summary"><div>MEVCUT RİSK<b>${fmt(score(before))}</b>${factorsValid(before)?esc(bandFor(score(before)).label):'—'}</div><div>HEDEF / KALAN<b>${fmt(score(after))}</b>${factorsValid(after)?esc(bandFor(score(after)).label):'—'}</div><div>OLASILIK (O)<b>${fval(before,'p')} → ${fval(after,'p')}</b></div><div>FREKANS (F)<b>${fval(before,'f')} → ${fval(after,'f')}</b></div><div>ŞİDDET (Ş)<b>${fval(before,'s')} → ${fval(after,'s')}</b></div></div><div class="print-grid">${fields.map(pField).join('')}</div><div class="print-note">Hedef risk, önlem uygulanıp etkinliği doğrulanana kadar gerçekleşmiş kalan risk değildir.</div></section>${renderPrintCharts(before,after)}<section class="print-section"><h3>03 · Risk Kayıtları ve Aksiyon Takibi (${state.records.length})</h3><table class="print-table"><thead><tr><th style="width:4%">No.</th><th style="width:16%">Bölüm / Faaliyet</th><th style="width:25%">Tehlike / Risk / Kontrol</th><th style="width:14%">Önce O×F×Ş</th><th style="width:14%">Sonra O×F×Ş</th><th style="width:27%">Tedbir / Sorumlu / Durum</th></tr></thead><tbody>${rows}</tbody></table></section><div class="print-note">Fine-Kinney sınıflandırması örnek yöntem aralıklarına göre uygulanmıştır; işyeri risk değerlendirme ekibince doğrulanmalıdır.</div>`;
-}
-function bind(){document.querySelectorAll('[data-meta]').forEach(el=>el.addEventListener('input',()=>state.meta[el.dataset.meta]=el.value));
- for(const id of ['beforeFields','afterFields'])$(id).addEventListener('change',e=>{const el=e.target;if(!el.matches('select[data-factor]'))return;working[el.dataset.side][el.dataset.factor]=el.value===''?null:Number(el.value);renderScore()});
- $('status').addEventListener('change',()=>{if($('status').value!=='done')$('verified').checked=false;renderScore()});$('verified').addEventListener('change',()=>{if($('verified').checked&&$('status').value!=='done'){$('verified').checked=false;alert('Doğrulama için aksiyon durumu “Tamamlandı” seçilmelidir.')}renderScore()});
- $('modeSingle').addEventListener('click',()=>setView('single'));$('modeDistribution').addEventListener('click',()=>setView('distribution'));
- $('riskForm').addEventListener('submit',e=>{e.preventDefault();if(!$('riskForm').checkValidity()){$('riskForm').reportValidity();return}if(!factorsValid(working.before)||!factorsValid(working.after)){alert('Mevcut ve hedef risk için Olasılık, Frekans ve Şiddet seçimlerinin tamamını yapın.');return}if($('verified').checked&&$('status').value!=='done'){alert('Kalan risk doğrulaması yalnızca tamamlanan aksiyonlarda seçilebilir.');return}const r=valuesFromForm();if(!r){alert('Risk faktörlerinin tamamını geçerli Fine-Kinney değerlerinden seçin.');return}const wasEditing=Boolean(editingId);if(wasEditing){const ix=state.records.findIndex(x=>x.id===editingId);if(ix<0)return;state.records[ix]=r}else state.records.push(r);clearForm();renderDashboard();setView('distribution');toast(wasEditing?'Risk kaydı güncellendi.':'Risk kaydı eklendi.')});
- $('newBtn').addEventListener('click',()=>{clearForm();setView('single')});$('cancelBtn').addEventListener('click',()=>{clearForm();setView('single')});
- $('riskRows').addEventListener('click',e=>{const b=e.target.closest('button[data-act][data-id]');if(!b)return;const {act,id}=b.dataset;if(act==='edit')startEdit(id);if(act==='copy')copyRecord(id);if(act==='delete')deleteRecord(id)});
- for(const id of ['searchInput','statusFilter'])$(id).addEventListener('input',renderDashboard);
- $('clearBtn').addEventListener('click',()=>{if(!state.records.length)return toast('Silinecek kayıt bulunmuyor.');if(!confirm('Tüm '+state.records.length+' risk kaydı silinecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;state.records=[];clearForm();renderDashboard();toast('Tüm risk kayıtları silindi.')});
- $('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>performJsonImport(e.target.files?.[0]));$('exportBtn').addEventListener('click',exportJson);$('pdfBtn').addEventListener('click',()=>{renderPrint();if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function'){window.RiskAndroid.printPdf()}else{window.print()}});window.addEventListener('beforeprint',renderPrint)
-}
-function resetSessionOnOpen(){resetData();$('riskForm').reset();$('searchInput').value='';$('statusFilter').value='';$('importFile').value='';document.querySelectorAll('[data-meta]').forEach(el=>el.value='');renderMeta();clearForm();renderDashboard()}
-initializeBrand();bind();resetSessionOnOpen();window.addEventListener('pageshow',e=>{if(e.persisted)resetSessionOnOpen()});
-})();
-</script>
 
-<script>
-/* Her ekran genişliğinde ölçeğin tamamını tek satıra sığdırır.
-   Yatay kaydırma ve üç nokta ile kısaltma yapılmaz. */
-(function(){
-  'use strict';
-  function fitFineKinneyFooter(){
-    ['footerProperty','footerUsage','fineKinneyScaleSingleLine'].forEach(function(id){
-      var line=document.getElementById(id);
-      var box=line&&line.parentElement;
-      if(!line||!box||!box.clientWidth)return;
-      // Ölçüm öncesi dönüşümü kaldır; her ekran dönüşünde yeniden hesapla.
-      line.style.transform='none';
-      var natural=line.scrollWidth;
-      var usable=Math.max(1,box.clientWidth-3);
-      var scale=Math.min(1,usable/Math.max(1,natural));
-      line.style.transform='scaleX('+scale.toFixed(5)+')';
-      line.setAttribute('title',line.textContent.trim());
-    });
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fitFineKinneyFooter);
-  else fitFineKinneyFooter();
-  window.addEventListener('resize',fitFineKinneyFooter);
-  window.addEventListener('pageshow',fitFineKinneyFooter);
+function field(label,v){return `<div class="print-field"><b>${esc(label)}</b>${esc(v||'—')}</div>`}
+function recordDetails(r,i){const after=rpn(r.after);return `<div class="print-detail"><div class="print-detail-head"><span>${i+1}. ${esc(r.process)} / ${esc(r.equipment)} – ${esc(r.failure)}</span><span>RÖS ${rpn(r.before)} → ${after??'—'} · ${esc(statusText[r.status])} ${r.verified?'· Doğrulandı':''}</span></div><div class="print-detail-grid">${field('Faaliyet / Fonksiyon',r.function)}${field('Hata Etkisi',r.effect)}${field('Hata Nedeni',r.cause)}${field('Mevcut Önleme Kontrolleri',r.prevention)}${field('Mevcut Tespit Kontrolleri',r.detection)}${field('Önerilen Önlem / Aksiyon',r.action)}${field('Sorumlu / Termin',(r.owner||'—')+' / '+(r.due||'—'))}${field('Ş × O × T (Mevcut)',r.before.s+' × '+r.before.o+' × '+r.before.d+' = '+rpn(r.before))}${field('Ş × O × T (Hedef)',after===null?'—':r.after.s+' × '+r.after.o+' × '+r.after.d+' = '+after)}${field('Doğrulama Kanıtı / Not',r.evidence)}</div></div>`}
+function logoPrintSrc(){const img=$('brandLogo');if(img&&!img.hidden&&img.complete&&img.naturalWidth>0)return brand.logo&&/^data:image\//.test(brand.logo)?brand.logo:(img.currentSrc||img.src);return ''}
+function buildPrint(){const src=logoPrintSrc();const logo=src?`<img src="${esc(src)}" alt="Kurum logosu">`:`<span style="color:#64748b;font-size:10px">LOGO</span>`;
+ $('printHeader').innerHTML=`<div class="print-header">${logo}<div style="min-width:0"><h1>${esc(brand.title)}</h1><p>${esc(brand.subtitle)}</p></div><div class="print-org">${esc(brand.org)}</div></div>`;
+ const m=data.meta;
+ let current=working.before,target=working.after;
+ if(rpn(current)===null&&data.records.length){current=data.records[0].before;target=data.records[0].after}
+ const overview=`<div class="print-section"><h3>01 · İşyeri ve Değerlendirme Bilgileri</h3><div class="print-grid">${field('İşyeri / Firma',m.company)}${field('Tesis / Alan',m.facility)}${field('Hazırlayan',m.prepared)}${field('Değerlendirme Tarihi',m.date)}${field('Revizyon',m.revision)}</div></div>`;
+ const chartSection=`<div class="print-section" style="break-inside:avoid"><h3>02 · FMEA Grafik Analizi</h3><div class="print-charts"><div class="print-chart"><h4>Mevcut / Hedef RÖS</h4>${chartSingleSvg(current,target)}</div><div class="print-chart"><h4>Genel Hata Öncelik Dağılımı</h4>${chartDistSvg()}</div></div><div class="print-note">Örnek RÖS aralıkları: İzleme 1–39, Dikkat 40–99, Öncelikli 100–199, Kritik 200–1000. Bunlar resmî veya evrensel FMEA eşikleri değildir.</div></div>`;
+ const rows=data.records.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.process)} / ${esc(r.equipment)}</td><td>${esc(r.failure)}</td><td>${esc(r.effect)}</td><td>${esc(r.cause)}</td><td>${r.before.s}×${r.before.o}×${r.before.d}=${rpn(r.before)}</td><td>${rpn(r.after)===null?'—':r.after.s+'×'+r.after.o+'×'+r.after.d+'='+rpn(r.after)}</td><td>${esc(r.owner)}<br>${esc(r.due)}</td><td>${esc(statusText[r.status])}</td></tr>`).join('');
+ const table=`<div class="print-section"><h3>03 · FMEA Kayıt Özeti (${data.records.length})</h3>${data.records.length?`<table class="print-table"><colgroup><col style="width:4%"><col style="width:15%"><col style="width:14%"><col style="width:16%"><col style="width:15%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:6%"></colgroup><thead><tr><th>No</th><th>Süreç / Makine</th><th>Hata Türü</th><th>Etki</th><th>Neden</th><th>Mevcut RÖS</th><th>Hedef RÖS</th><th>Sorumlu / Tarih</th><th>Durum</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="print-note">Henüz kaydedilmiş FMEA hata kaydı bulunmuyor.</div>'}</div>`;
+ const details=data.records.length?`<div class="print-section"><h3>04 · Hata Kayıtları / Kontrol ve Aksiyon Detayları</h3>${data.records.map(recordDetails).join('')}</div>`:'';
+ const note=`<div class="print-note">FMEA = Hata Türleri ve Etkileri Analizi. RÖS = Şiddet × Oluşma × Tespit Edilebilirlik. Şiddeti yüksek hata türleri, düşük RÖS olsa dahi ayrıca değerlendirilmelidir. Kurumsal yöntem ve onay süreçlerinin yerine geçmez.</div>`;
+ $('printReport').innerHTML=overview+chartSection+table+details+note;
+}
+async function printNow(){buildPrint();const pics=[...$('printHeader').querySelectorAll('img')];await Promise.all(pics.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true});setTimeout(resolve,1800)})));if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function')window.RiskAndroid.printPdf();else window.print()}
+function resetStart(){data={meta:initialMeta(),records:[]};working={before:emptyFactor(),after:emptyFactor()};editingId=null;mode='single';$('search').value='';$('filter').value='';$('importFile').value='';renderMeta();clearForm();renderTable()}
+initializeBrand();bind();resetStart();window.addEventListener('pageshow',e=>{if(e.persisted)resetStart()});
 })();
 </script>
-</body></html>
+</body>
+</html>
