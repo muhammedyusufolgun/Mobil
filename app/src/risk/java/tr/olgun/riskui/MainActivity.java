@@ -85,7 +85,7 @@ public final class MainActivity extends Activity {
                     Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType((mime==null||mime.isEmpty())?"application/octet-stream":mime);
-                    intent.putExtra(Intent.EXTRA_TITLE,filename==null?"Risk_UI_Fine_Kinney.xlsx":filename);
+                    intent.putExtra(Intent.EXTRA_TITLE,filename==null?"FMEA_Risk_Analizi.json":filename);
                     startActivityForResult(intent,SAVE_BINARY);
                 } catch(Exception ex) {
                     pendingBinaryBytes=null;
@@ -100,8 +100,8 @@ public final class MainActivity extends Activity {
                     PrintAttributes attributes=new PrintAttributes.Builder()
                         .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
                         .setColorMode(PrintAttributes.COLOR_MODE_COLOR).build();
-                    manager.print("Risk_UI_mobil_Fine_Kinney",
-                        web.createPrintDocumentAdapter("Risk_UI_mobil_Fine_Kinney"),attributes);
+                    manager.print("FMEA_Risk_Analizi",
+                        web.createPrintDocumentAdapter("FMEA_Risk_Analizi"),attributes);
                 } catch(Exception ex) {
                     Toast.makeText(MainActivity.this,"PDF yazdırma başlatılamadı",Toast.LENGTH_LONG).show();
                 }
