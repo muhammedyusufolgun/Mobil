@@ -66,6 +66,11 @@
 }
 @media(max-width:720px){.headerinner{align-items:center}.action-panel,.bottom-tools{flex-wrap:wrap}.matrix-mode-controls{flex-wrap:wrap}}
 @media print{html,body{background:#fff!important}}
+
+/* FINE-KINNEY · tek satır puan ölçeği · Risk UI ve Risk UI mobil */
+.risk-ui-scale-footer{display:block;margin:-5px 17px 12px;padding:5px 0 2px;color:#475569;font:600 11px/1.55 "Segoe UI",Arial,sans-serif;text-align:left;white-space:nowrap;overflow-x:auto;overflow-y:hidden;max-width:calc(100% - 34px);box-sizing:border-box;scrollbar-width:thin}
+@media(max-width:720px){.risk-ui-scale-footer{margin:-4px 9px 9px;max-width:calc(100% - 18px);font-size:10px}}
+@media print{.risk-ui-scale-footer{display:none!important}}
 </style>
 </head>
 <body>
@@ -131,6 +136,7 @@
 </main>
 <div class="bottom-actions"><div class="bottom-panel" aria-label="Dosya ve yazdırma işlemleri"><button type="button" id="importBtn" class="btn btn-softblue">⬆ Excel İçeri Aktar</button><button type="button" id="exportBtn" class="btn btn-softgreen">⬇ Excel Dışarı Aktar</button><button type="button" id="pdfBtn" class="btn btn-softgray">▣ PDF / Yazdır</button><input id="importFile" type="file" class="sr-only" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div></div>
 <footer class="risk-ui-footer">Temel özelliği: Olasılık × Frekans × Şiddet &nbsp;&nbsp;&nbsp; Kullanım alanı: Fabrikalar, atölyeler, üretim tesisleri</footer>
+<div class="risk-ui-scale-footer" aria-label="Fine-Kinney olasılık frekans şiddet puan ölçekleri">(Olasılık: 0,1 – 0,2 – 0,5 – 1 – 3 – 6 – 10)   (Frekans: 0,5 – 1 – 2 – 3 – 6 – 10)   (Şiddet: 1 – 3 – 7 – 15 – 40 – 100)</div>
 </div>
 <table id="printPages" role="presentation"><thead><tr><td><div id="printHeader"></div></td></tr></thead><tbody><tr><td><div id="printReport"></div></td></tr></tbody></table><div id="printPageFrame"></div>
 <div id="toast" class="notice" role="status" aria-live="polite"></div>
