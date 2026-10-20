@@ -65,20 +65,20 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs --min-sdk-version 26 "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 12
       - name: Name APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk 'İSG_Risk_Analizi-Fine_Kinney.apk'
+        run: cp app/build/outputs/apk/debug/app-debug.apk 'Fine_Kinney.apk'
       - uses: actions/upload-artifact@v4
         with:
           name: Risk_UI_mobil_Fine_Kinney_APK
-          path: 'İSG_Risk_Analizi-Fine_Kinney.apk'
+          path: 'Fine_Kinney.apk'
           retention-days: 30
       - name: Publish APK to branch
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p release
-          cp 'İSG_Risk_Analizi-Fine_Kinney.apk' 'release/İSG_Risk_Analizi-Fine_Kinney.apk'
+          cp 'Fine_Kinney.apk' 'release/Fine_Kinney.apk'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add 'release/İSG_Risk_Analizi-Fine_Kinney.apk'
+          git add 'release/Fine_Kinney.apk'
           git diff --cached --quiet && exit 0
           git commit -m 'Publish installable Risk UI mobil Fine-Kinney APK [skip ci]'
           git push origin HEAD:risk-ui-fine-kinney
