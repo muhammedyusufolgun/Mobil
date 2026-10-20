@@ -40,19 +40,19 @@ jobs:
           d=ImageDraw.Draw(im)
           d.rounded_rectangle((6,6,505,505),radius=76,outline='#2f855a',width=14)
           d.rounded_rectangle((30,30,482,482),radius=55,outline='#9dcdae',width=3)
-          f='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+          f='/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf'
           def put(text,cy,start):
               sz=start
               while True:
                   font=ImageFont.truetype(f,sz)
                   bb=d.textbbox((0,0),text,font=font)
                   w,h=bb[2]-bb[0],bb[3]-bb[1]
-                  if w<=420 and h<=130:break
+                  if w<=416 and h<=135:break
                   sz-=2
               d.text(((512-w)/2,cy-(bb[1]+bb[3])/2),text,font=font,fill='#143d2a')
           put('Risk',156,130)
           d.line((65,256,447,256),fill='#afd4bb',width=3)
-          put('F-K',356,130)
+          put('Fine-Kinney',356,112)
           im.save(out)
           PY
       - name: Build installable APK with v2 signature
