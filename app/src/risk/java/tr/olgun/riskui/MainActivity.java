@@ -5,6 +5,8 @@ import android.print.PrintManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Rect;
+import android.view.ViewTreeObserver;
 import android.net.Uri;
 import android.util.Base64;
 import android.os.Bundle;
@@ -25,6 +27,8 @@ public final class MainActivity extends Activity {
     private ValueCallback<Uri[]> fileCallback;
     private String pendingJson;
     private byte[] pendingBinaryBytes;
+    private ViewTreeObserver.OnGlobalLayoutListener keyboardLayoutListener;
+    private boolean keyboardVisible = false;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +62,28 @@ public final class MainActivity extends Activity {
                 }
             }
         });
+        // JSON/PDF butonları Android sanal klavyesi açıkken gizlidir.
+        // Klavye kapatıldığında giriş alanı hâlâ odaklı olsa bile tekrar görünür.
+        keyboardLayoutListener = () -> {
+            if (web == null || web.getRootView() == null) return;
+            Rect visibleArea = new Rect();
+            web.getWindowVisibleDisplayFrame(visibleArea);
+            int rootHeight = web.getRootView().getHeight();
+            int hiddenHeight = rootHeight - visibleArea.bottom;
+            int threshold = Math.max(
+                (int)(120 * getResources().getDisplayMetrics().density),
+                (int)(rootHeight * 0.18f)
+            );
+            boolean nowVisible = hiddenHeight > threshold;
+            if (keyboardVisible != nowVisible) {
+                keyboardVisible = nowVisible;
+                web.evaluateJavascript(
+                    "document.documentElement.classList.toggle('hazop-keyboard-open'," +
+                    (nowVisible ? "true" : "false") + ");", null
+                );
+            }
+        };
+        web.getViewTreeObserver().addOnGlobalLayoutListener(keyboardLayoutListener);
         web.addJavascriptInterface(new RiskBridge(),"RiskAndroid");
         web.loadUrl("file:///android_asset/index.html");
     }
@@ -147,7 +173,7 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onDestroy() {
         if(fileCallback!=null){fileCallback.onReceiveValue(null);fileCallback=null;}
-        if(web!=null){web.removeJavascriptInterface("RiskAndroid");web.destroy();}
+        if(web!=null){if(keyboardLayoutListener!=null&&web.getViewTreeObserver().isAlive())web.getViewTreeObserver().removeOnGlobalLayoutListener(keyboardLayoutListener);web.removeJavascriptInterface("RiskAndroid");web.destroy();}
         super.onDestroy();
     }
 }
