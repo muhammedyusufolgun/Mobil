@@ -124,7 +124,7 @@ public final class MainActivity extends Activity {
                 try {
                     PrintManager manager=(PrintManager)getSystemService(Context.PRINT_SERVICE);
                     PrintAttributes attributes=new PrintAttributes.Builder()
-                        .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                        .setMediaSize(PrintAttributes.MediaSize.ISO_A4.asLandscape())
                         .setColorMode(PrintAttributes.COLOR_MODE_COLOR).build();
                     manager.print("HAZOP_Risk_UI",
                         web.createPrintDocumentAdapter("HAZOP_Risk_UI"),attributes);
