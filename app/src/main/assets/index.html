@@ -251,7 +251,7 @@ async function importExcel(file){if(!file)return;try{let result=await readExcel(
 async function importJson(file){
  if(!file)return;
  try{
-  if(!/\\.json$/i.test(file.name||''))throw Error('Yalnızca .json dosyası seçin.');
+  if(!/\.json$/i.test(file.name||''))throw Error('Yalnızca .json dosyası seçin.');
   if(file.size>12*1024*1024)throw Error('JSON dosyası 12 MB sınırını aşıyor.');
   let raw;
   try{raw=JSON.parse(await file.text())}catch(e){throw Error('JSON okunamadı: '+e.message)}
