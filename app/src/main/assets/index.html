@@ -79,6 +79,41 @@ body{background:#e6f5e9}
     display:none!important;
   }
 }
+/* HAZOP RAPORU – SADECE YAZDIRMA / PDF DÜZENİ
+   A4 yatay, en az kenar boşluğu, bölüm başlığı koruması,
+   gerektiğinde satır bazında taşan kayıt, yeni sayfada tekrarlanan kayıt başlığı.
+   Ekran formu, veri modeli, Excel, logo ve grafiklerin çalışma kodları değişmez. */
+@page {size:A4 landscape;margin:6mm 7mm 7mm 7mm}
+@media print {
+ html,body {font-size:8.5px!important}
+ #printPages>thead>tr>td{padding:0 0 3px!important}
+ #printPages>tbody>tr>td{padding:0!important}
+ #printContent{line-height:1.27!important}
+ .p-header {min-height:49px!important;padding:3px 8px!important;gap:8px!important}
+ .p-header img{width:43px!important;height:40px!important}
+ .p-header h1{font-size:14px!important}
+ .p-section{margin-bottom:3px!important;break-inside:auto!important;page-break-inside:auto!important}
+ .p-section h3{break-after:avoid-page!important;page-break-after:avoid!important;padding:3px 7px!important}
+ .p-charts{padding:4px!important;gap:5px!important}
+ .p-charts svg{max-height:96px!important}
+ .p-grid{gap:3px!important;padding:4px!important}
+ .p-field{padding:2px 3px!important;font-size:8px!important}
+ .p-field b{font-size:7px!important;margin-bottom:1px!important}
+ .p-table th,.p-table td{padding:2px 3px!important;font-size:7.5px!important}
+ .p-table tr{break-inside:avoid-page!important;page-break-inside:avoid!important}
+ .p-note{font-size:7px!important;padding:2px 6px!important;line-height:1.2!important}
+ /* Başlık her sayfa parçasında tablonun kendi thead kısmından yeniden yazdırılır. */
+ .p-detail{display:block!important;margin:2px 3px!important;break-inside:auto!important;page-break-inside:auto!important}
+ .p-detail-table{width:100%!important;border-collapse:separate!important;border-spacing:2px 0!important;table-layout:fixed!important;break-inside:auto!important}
+ .p-detail-table thead{display:table-header-group!important}
+ .p-detail-table th{padding:0!important;font-size:9px!important;text-align:left!important;border:0!important}
+ .p-detail-table th .p-detail-head{margin:0!important;padding:2px 4px!important;background:#eaf5fa!important;line-height:1.2!important;font-size:8.3px!important;break-after:avoid-page!important;page-break-after:avoid!important}
+ .p-detail-table tr{break-inside:avoid-page!important;page-break-inside:avoid!important}
+ .p-detail-table td{vertical-align:top!important;padding:0!important;border:0!important;overflow-wrap:anywhere!important;line-height:1.23!important}
+ .p-detail-table td .p-field{height:100%!important;padding:1px 2px!important;line-height:1.27!important;font-size:7.55px!important;break-inside:avoid-page!important;page-break-inside:avoid!important}
+ .p-detail-table td .p-field b{font-size:6.9px!important;line-height:1.2!important;margin-bottom:0!important}
+}
+
 </style></head>
 <body>
 <div id="uiShell" class="shell">
@@ -304,7 +339,7 @@ let overview='<div class="p-section"><h3>01 · Çalışma Bilgileri ve Kapsam</h
 let graphs=`<div class="p-section" style="break-inside:avoid"><h3>02 · HAZOP Risk Görünümü (Yardımcı Risk Puanlaması)</h3><div class="p-charts"><div class="p-chart"><h4>5 × 5 Risk Matrisi</h4>${chartMatrixSvg()}</div><div class="p-chart"><h4>Genel Sapma Risk Dağılımı</h4>${chartRiskSvg()}</div></div><div class="p-note">Risk aralıkları yalnızca örnektir: 1–4 Kabul Edilebilir, 5–9 Kontrol Gerekli, 10–15 Yüksek, 16–25 Çok Yüksek. HAZOP'un asli incelemesi parametre-kılavuz sözcük sapma analizi olup puanlama yardımcıdır.</div></div>`;
 let tab=data.records.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.node)}</td><td>${esc(r.parameter)} / ${esc(guideNames[r.guide]||r.guide)}</td><td>${esc(r.deviation)}</td><td>${esc(r.consequences)}</td><td>${r.before.l}×${r.before.s}=${risk(r.before)}</td><td>${r.after?`${r.after.l}×${r.after.s}=${risk(r.after)}`:'—'}</td><td>${esc(statusText[r.status])}</td></tr>`).join('');
 let table=`<div class="p-section"><h3>03 · Sapma Kayıt Özeti (${data.records.length})</h3>${data.records.length?`<table class="p-table"><colgroup><col style="width:4%"><col style="width:16%"><col style="width:17%"><col style="width:20%"><col style="width:21%"><col style="width:8%"><col style="width:8%"><col style="width:6%"></colgroup><thead><tr><th>No</th><th>Düğüm</th><th>Parametre / Kılavuz Sözcük</th><th>Sapma</th><th>Sonuç</th><th>Mevcut</th><th>Hedef</th><th>Durum</th></tr></thead><tbody>${tab}</tbody></table>`:'<div class="p-note">Henüz sapma kaydı yoktur.</div>'}</div>`;
-let details='<div class="p-section"><h3>04 · HAZOP Düğüm / Sapma Ayrıntıları</h3>'+data.records.map((r,i)=>{let f=[['Düğüm / Tag',r.node+' / '+r.tag],['Tasarım Amacı',r.intent],['Normal Çalışma Değeri',r.normal],['Parametre + Kılavuz Sözcük',r.parameter+' + '+(guideNames[r.guide]||r.guide)],['Oluşabilecek Sapma',r.deviation],['Olası Nedenler',r.causes],['Olası Sonuçlar',r.consequences],['Mevcut Koruyucular',r.safeguards],['Koruma Test / Kanıtı',r.verification],['İşletilebilirlik Notu',r.existingNotes],['Önerilen Aksiyon',r.action],['Sorumlu / Hedef Tarih',r.owner+' / '+r.due],['Mevcut Risk (O × Ş)',r.before.l+' × '+r.before.s+' = '+risk(r.before)],['Hedef Risk (O × Ş)',r.after?r.after.l+' × '+r.after.s+' = '+risk(r.after):'—'],['Durum / Doğrulama',statusText[r.status]+' / '+(r.verified?'Doğrulandı':'Doğrulanmadı')],['Uygulama Kanıtı / Not',r.evidence]];return `<div class="p-detail"><div class="p-detail-head"><span>${i+1}. ${esc(r.node)} · ${esc(r.deviation)}</span><span>Mevcut ${risk(r.before)} → Hedef ${risk(r.after)??'—'}</span></div><div class="p-detail-grid">${f.map(([k,v])=>printField(k,v)).join('')}</div></div>`}).join('')+'</div>';
+let details='<div class="p-section"><h3>04 · HAZOP Düğüm / Sapma Ayrıntıları</h3>'+data.records.map((r,i)=>{let f=[['Düğüm / Tag',r.node+' / '+r.tag],['Tasarım Amacı',r.intent],['Normal Çalışma Değeri',r.normal],['Parametre + Kılavuz Sözcük',r.parameter+' + '+(guideNames[r.guide]||r.guide)],['Oluşabilecek Sapma',r.deviation],['Olası Nedenler',r.causes],['Olası Sonuçlar',r.consequences],['Mevcut Koruyucular',r.safeguards],['Koruma Test / Kanıtı',r.verification],['İşletilebilirlik Notu',r.existingNotes],['Önerilen Aksiyon',r.action],['Sorumlu / Hedef Tarih',r.owner+' / '+r.due],['Mevcut Risk (O × Ş)',r.before.l+' × '+r.before.s+' = '+risk(r.before)],['Hedef Risk (O × Ş)',r.after?r.after.l+' × '+r.after.s+' = '+risk(r.after):'—'],['Durum / Doğrulama',statusText[r.status]+' / '+(r.verified?'Doğrulandı':'Doğrulanmadı')],['Uygulama Kanıtı / Not',r.evidence]];return `<div class="p-detail"><table class="p-detail-table"><thead><tr><th colspan="4"><div class="p-detail-head"><span>${i+1}. ${esc(r.node)} · ${esc(r.deviation)}</span><span>Mevcut ${risk(r.before)} → Hedef ${risk(r.after)??'—'}</span></div></th></tr></thead><tbody>${Array.from({length:Math.ceil(f.length/4)},(_,j)=>`<tr>${f.slice(j*4,j*4+4).map(([k,v])=>`<td>${printField(k,v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}).join('')+'</div>';
 let note='<div class="p-note">HAZOP çalışma sonuçları yetkin çok disiplinli bir ekipçe P&ID, proses tasarım verileri, güvenilirlik kanıtları ve saha koşullarıyla doğrulanmalıdır. Bu form tek başına proses emniyeti doğrulaması veya bağımsız koruma katmanı analizi yerine geçmez.</div>';
 $('printContent').innerHTML=overview+graphs+table+details+note}
 async function printNow(){await readyPrintLogo();buildPrint();try{await document.fonts.ready}catch(e){}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function')window.RiskAndroid.printPdf();else window.print()}
