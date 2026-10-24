@@ -3,7 +3,7 @@ android {
   namespace 'tr.olgun.riskui'
   compileSdk 35
   defaultConfig {
-    applicationId 'tr.olgun.riskui.fmea'
+    applicationId 'tr.olgun.riskui.hazop'
     minSdk 26
     targetSdk 34
     versionCode 1
