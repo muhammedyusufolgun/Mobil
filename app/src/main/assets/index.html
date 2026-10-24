@@ -71,6 +71,14 @@ body{background:#e6f5e9}
 }
 @media print{body{background:#fff}.shell{background:#fff}}
 
+
+/* HAZOP mobil: yazma klavyesi açıkken alt üç işlem butonunu gizle.
+   Klavye kapandığında panel yeniden normal konumunda görünür. */
+@media screen {
+  html.hazop-keyboard-open .bottom-actions {
+    display:none!important;
+  }
+}
 </style></head>
 <body>
 <div id="uiShell" class="shell">
@@ -301,4 +309,28 @@ let note='<div class="p-note">HAZOP çalışma sonuçları yetkin çok disiplinl
 $('printContent').innerHTML=overview+graphs+table+details+note}
 async function printNow(){await readyPrintLogo();buildPrint();try{await document.fonts.ready}catch(e){}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function')window.RiskAndroid.printPdf();else window.print()}
 loadBrand();bind();resetOnOpen();window.addEventListener('pageshow',e=>{if(e.persisted)resetOnOpen()});
-})();</script></body></html>
+})();</script>
+<script>
+/* Metin alanına dokunulmasıyla panel anında gizlenir.
+   Android tarafı klavye kapanışını algılayarak butonları tekrar gösterir. */
+(function(){
+  'use strict';
+  function isTypingField(el){
+    if(!el||!el.matches)return false;
+    if(el.matches('textarea,[contenteditable="true"]'))return true;
+    if(!el.matches('input'))return false;
+    return !['button','submit','reset','checkbox','radio','file','date','time','datetime-local','color','range','hidden'].includes((el.getAttribute('type')||'text').toLowerCase());
+  }
+  document.addEventListener('focusin',function(e){
+    if(isTypingField(e.target))document.documentElement.classList.add('hazop-keyboard-open');
+  });
+  document.addEventListener('focusout',function(){
+    requestAnimationFrame(function(){
+      if(!isTypingField(document.activeElement)){
+        document.documentElement.classList.remove('hazop-keyboard-open');
+      }
+    });
+  });
+})();
+</script>
+</body></html>
