@@ -1,8 +1,8 @@
-name: FMEA mobile Risk UI APK
+name: HAZOP Risk UI Mobil APK
 on:
   workflow_dispatch:
   push:
-    branches: [risk-ui-fmea]
+    branches: [risk-ui-hazop]
     paths:
       - 'app/**'
       - 'build.gradle'
@@ -28,7 +28,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Render FMEA Risk launcher icon
+      - name: Render Risk HAZOP launcher icon
         run: |
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
@@ -52,7 +52,7 @@ jobs:
               d.text(((512-w)/2,cy-(bb[1]+bb[3])/2),text,font=font,fill='#143d2a')
           put('Risk',156,152)
           d.line((65,256,447,256),fill='#afd4bb',width=3)
-          put('FMEA',356,150)
+          put('HAZOP',356,125)
           im.save(out)
           PY
       - name: Build installable APK with v2 signature
@@ -65,20 +65,20 @@ jobs:
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs --min-sdk-version 26 "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 12
       - name: Name APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk 'FMA.apk'
+        run: cp app/build/outputs/apk/debug/app-debug.apk 'Hazop.apk'
       - uses: actions/upload-artifact@v4
         with:
-          name: FMA_APK
-          path: 'FMA.apk'
+          name: Hazop_APK
+          path: 'Hazop.apk'
           retention-days: 30
       - name: Publish APK to branch
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p release
-          cp 'FMA.apk' 'release/FMA.apk'
+          cp 'Hazop.apk' 'release/Hazop.apk'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add 'release/FMA.apk'
+          git add 'release/Hazop.apk'
           git diff --cached --quiet && exit 0
-          git commit -m 'Publish installable FMA.apk [skip ci]'
-          git push origin HEAD:risk-ui-fmea
+          git commit -m 'Publish installable Hazop.apk [skip ci]'
+          git push origin HEAD:risk-ui-hazop
