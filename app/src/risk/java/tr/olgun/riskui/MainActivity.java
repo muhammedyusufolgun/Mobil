@@ -85,7 +85,7 @@ public final class MainActivity extends Activity {
                     Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType((mime==null||mime.isEmpty())?"application/octet-stream":mime);
-                    intent.putExtra(Intent.EXTRA_TITLE,filename==null?"FMEA_Risk_Analizi.json":filename);
+                    intent.putExtra(Intent.EXTRA_TITLE,filename==null?"HAZOP_Risk_UI.json":filename);
                     startActivityForResult(intent,SAVE_BINARY);
                 } catch(Exception ex) {
                     pendingBinaryBytes=null;
@@ -100,8 +100,8 @@ public final class MainActivity extends Activity {
                     PrintAttributes attributes=new PrintAttributes.Builder()
                         .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
                         .setColorMode(PrintAttributes.COLOR_MODE_COLOR).build();
-                    manager.print("FMEA_Risk_Analizi",
-                        web.createPrintDocumentAdapter("FMEA_Risk_Analizi"),attributes);
+                    manager.print("HAZOP_Risk_UI",
+                        web.createPrintDocumentAdapter("HAZOP_Risk_UI"),attributes);
                 } catch(Exception ex) {
                     Toast.makeText(MainActivity.this,"PDF yazdırma başlatılamadı",Toast.LENGTH_LONG).show();
                 }
