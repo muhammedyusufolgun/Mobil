@@ -1,397 +1,304 @@
 <!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f8fafc">
-<title>İSG Risk Analizi - FMEA</title>
+<html lang="tr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#edf4f9"><title>Risk UI mobil - HAZOP</title>
 <style>
-:root{--bg:#f8fafc;--card:#fff;--line:#cbd5e1;--text:#17283b;--muted:#63758a;--blue:#0284c7;--deep:#075985;--green:#166534}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:#edf3f8;color:var(--text);font:13px/1.42 'Segoe UI',Arial,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-input,select,textarea{width:100%;min-height:35px;padding:7px 9px;color:#20344c;border:1px solid #cbd5e1;border-radius:5px;background:#fff;outline:none}
-textarea{resize:vertical;min-height:60px}
-input:focus,textarea:focus,select:focus{border-color:#0284c7;box-shadow:0 0 0 2px #0284c71a}
-label{display:block;margin:0 0 4px;color:#334155;font-size:11.5px;font-weight:700}
-label.required:after{content:' *';color:#b91c1c}
-small,.hint{font-size:10.5px;color:var(--muted)}
-.olgun-frame{margin:8px;border:2px solid #8196a9;border-radius:7px;background:#f8fafc;min-height:calc(100vh - 16px);box-shadow:0 5px 19px #223d5511}
-.top-header{position:sticky;top:0;z-index:20;background:#fff;border-top:4px solid var(--blue);border-bottom:1px solid #bdd0dd;border-radius:4px 4px 0 0}
-.header-inner{min-height:78px;padding:9px 18px;display:flex;align-items:center;gap:13px}
-.brand-logo{flex:0 0 64px;height:57px;display:grid;place-items:center;border:1px solid #ccd5df;border-radius:5px;background:#f8fafc;color:var(--deep);font-weight:800;font-size:12px;padding:3px}
-.brand-logo img{height:100%;width:100%;object-fit:contain}
-.brand-titles{min-width:0;flex:1}
-.brand-titles h1{margin:0;font-size:19px;color:var(--deep);line-height:1.2}
-.brand-titles p{margin:3px 0 0;font-size:12px;color:#475569}
-.brand-org{max-width:40%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#21425d;font-size:16px;font-weight:800;text-align:right;margin-left:auto}
-.top-header [contenteditable=true]{outline:2px dashed var(--blue);outline-offset:2px}
-.wrap{padding:12px 17px 5px;display:grid;gap:10px}
-.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
-.metric{background:#fff;border:1px solid var(--line);border-top:3px solid var(--blue);border-radius:6px;padding:9px 12px}
-.metric small{display:block;color:#64748b;font-size:10px;font-weight:800}
-.metric b{display:block;font-size:23px;color:#0c4265;line-height:1.1;margin-top:4px}
-.card{min-width:0;border:1px solid var(--line);border-radius:6px;background:#fff;box-shadow:0 2px 8px #25425b08}
-.card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;background:#eaf5fc;border-left:4px solid var(--blue);border-bottom:1px solid #b9d4e6;border-radius:5px 5px 0 0}
-.card-head h2{margin:0;display:flex;align-items:center;gap:8px;color:#075985;font-size:14px}
-.index{display:inline-grid;place-items:center;font-size:10px;color:#075985;background:#d2eafb;padding:4px 6px;border-radius:3px}
-.card-body{padding:11px 13px}
-.grid{display:grid;gap:9px}
-.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
-.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
-.span2{grid-column:span 2}.span3{grid-column:span 3}
-.strip{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;color:#075985;margin:12px 0 8px;padding:0 0 5px;border-bottom:1px solid #dcecf5}
-.strip:first-child{margin-top:0}
-.strip em{font-style:normal;font-size:10px;display:inline-grid;place-items:center;height:22px;width:22px;border:1px solid #b8daed;background:#eaf6fc;border-radius:4px}
-.method-lock{min-height:35px;background:#eef8ff;border:1px solid #b9def7;border-radius:5px;color:#075985;font-weight:800;padding:8px 10px}
-.assessment{display:grid;grid-template-columns:minmax(350px,.87fr) minmax(470px,1.13fr);gap:12px}
-.score-stack{display:grid;gap:8px}
-.score-card{min-width:0;border:1px solid #cbd5e1;border-top:3px solid #125ba9;border-radius:6px;overflow:hidden}
-.score-card.after{border-top-color:#8651b4}
-.score-head{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f3f8fb;border-bottom:1px solid #e0e9f1}
-.score-head strong{font-size:12px}.score-head span{font-size:10px;color:#64748b}
-.factors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px}
-.score-result{display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:#f7fafc;border-top:1px solid #e8edf1}
-.score-result small{display:block;font-size:10px}.score-result b{font-size:20px;line-height:1.12}
-.tag{display:inline-block;padding:3px 6px;border-radius:4px;font-size:10px;font-weight:800;text-align:center;border:1px solid #cbd5e1;background:#e2e8f0;color:#475569}
-.tag.izleme{color:#166534;background:#ddf7e4;border-color:#a7e0bc}.tag.dikkat{color:#805b14;background:#fff5d2;border-color:#e5cc79}
-.tag.oncelikli{color:#9e4512;background:#ffe0c5;border-color:#e5a074}.tag.kritik{color:#a51d30;background:#ffdee2;border-color:#ec9eaa}
-.graph-card{border:1px solid #acc5d7;border-radius:6px;min-width:0;overflow:hidden}
-.graph-head{background:#e9f4fc;border-bottom:1px solid #cbdde8;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.graph-head strong{font-size:12px;color:#0b4669}
-.tabs{display:flex;gap:4px;flex-wrap:wrap}
-.tabs button{padding:5px 7px;border:1px solid #bfd6e7;border-radius:4px;background:white;font-size:11px;font-weight:700;color:#315d76}
-.tabs button.active{background:#dcedfb;color:#075985;border-color:#73acd0}
-.graph-body{padding:9px 10px}
-.graph-body svg{width:100%;height:auto;display:block;max-height:225px}
-.graph-summary{background:#f7fafc;border:1px solid #e2e8f0;padding:5px 7px;border-radius:4px;font-size:11px;color:#475569}
-.guidance{font-size:10.5px;color:#6b5b37;background:#fff9e9;border:1px solid #ebdbac;padding:7px 9px;border-radius:5px}
-.rubric{border:1px solid #d7e3ec;border-radius:5px;background:#f8fafc;margin-top:9px}
-.rubric summary{padding:7px 9px;font-size:11px;color:#075985;font-weight:800;cursor:pointer}
-.rubric .inner{padding:1px 10px 9px;font-size:11px;color:#485f73}
-.rubric table{border-collapse:collapse;width:100%}.rubric th,.rubric td{border:1px solid #dae5ee;padding:5px;text-align:left;vertical-align:top}.rubric th{background:#eaf5fc;color:#075985}
-.checkbox-label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650;color:#334155}
-.checkline{border:1px solid #d9e7ef;background:#f7fbfd;border-radius:5px;padding:9px 10px;margin-top:9px}
-.checkline input{width:17px;height:17px;min-height:0;accent-color:#0284c7}
-.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:11px}
-.grow{flex:1}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:34px;padding:7px 10px;background:#fff;border:1px solid #cbd5e1;color:#334155;border-radius:5px;font-weight:700;white-space:nowrap}
-.btn:hover{background:#f1f5f9}
-.btn-primary{background:#0284c7;border-color:#0284c7;color:#fff}.btn-primary:hover{background:#0369a1}
-.btn-sm{min-height:27px;padding:4px 7px;font-size:11px}
-.btn-blue{background:#e8f4ff;border-color:#b7d8fb;color:#075985}.btn-green{background:#eaf8ef;border-color:#b9e2c6;color:#166534}.btn-grey{background:#f1f3f5;border-color:#d6dbe1}
-.btn-red{color:#b42332;border-color:#f0bac3}
-.filters{display:flex;gap:7px;flex-wrap:wrap}.filters input{max-width:190px}.filters select{max-width:156px}
-.tablebox{overflow-x:auto}.tablebox table{border-collapse:collapse;width:100%;min-width:1200px}
-.tablebox th{white-space:nowrap;background:#eef5f9;color:#475569;border-bottom:1px solid #d6e2ea;padding:7px;text-align:left;font-size:10.5px}
-.tablebox td{padding:7px;border-bottom:1px solid #e9eff4;vertical-align:top;font-size:10.5px;overflow-wrap:anywhere}
-.tablebox tr:hover{background:#f7fbfe}.sub{color:#64748b;font-size:10px;margin-top:2px}
-.empty{text-align:center;padding:20px;color:#64748b}.table-bottom{padding:8px 12px}
-.bottom-actions{padding:3px 17px}.bottom-panel{display:flex;gap:9px;flex-wrap:wrap;width:max-content;max-width:100%;background:#fff;border:1px solid #b9cbd9;border-radius:6px;padding:8px 10px}
-.risk-footer{margin:3px 17px 0;border-top:1px solid #dbe3eb;padding:5px 0;white-space:nowrap;overflow-x:auto;color:#475569;font-size:10.5px}
-.toast{position:fixed;bottom:18px;right:18px;background:#143d54;color:#fff;z-index:99;opacity:0;pointer-events:none;padding:10px 12px;border-radius:6px;transition:opacity .2s}
-.toast.show{opacity:1}
-.sr-only{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
-#printPages,#printFrame{display:none}
-@media(max-width:1080px){.assessment{grid-template-columns:1fr}.g5{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.score-stack{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:720px){.olgun-frame{margin:3px}.header-inner{padding:8px 10px;flex-wrap:wrap}.brand-logo{flex-basis:50px;height:50px}.brand-titles h1{font-size:15px}.brand-titles p{font-size:10px}.brand-org{max-width:100%;width:100%;font-size:11px;white-space:normal}.wrap{padding:9px}.g5,.g4,.g3,.g2{grid-template-columns:1fr}.span2,.span3{grid-column:auto}.score-stack{grid-template-columns:1fr}.factors{grid-template-columns:1fr 1fr 1fr}.filters input,.filters select{max-width:none;flex:1}.bottom-actions{padding:3px 9px}.bottom-panel{width:100%}.bottom-panel .btn{flex:1 1 125px;white-space:normal}.risk-footer{margin:2px 9px 0;font-size:10px}}
-@media(max-width:420px){.factors{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.metric b{font-size:19px}}
-@page{size:A4 landscape;margin:9mm 9mm 16mm 9mm;@bottom-right{content:'Sayfa ' counter(page) ' / ' counter(pages);font:9pt Arial;color:#34495c}}
+:root{--ink:#183146;--dim:#5d7282;--blue:#0b72a5;--line:#c9d8e4;--pale:#e9f5fd;--bg:#f1f6fa;--radius:7px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#eaf1f6;color:var(--ink);font:13px/1.43 'Segoe UI',Arial,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}input,select,textarea{width:100%;border:1px solid #c8d6e1;background:#fff;color:#1d354a;border-radius:5px;min-height:34px;padding:7px 8px;outline:0}textarea{min-height:65px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#268dc5;box-shadow:0 0 0 2px #268dc522}
+label{display:block;color:#29465c;font-weight:700;font-size:11.5px;margin-bottom:4px}.req:after{content:' *';color:#ba2537}.hint,.small{font-size:10.5px;color:#61788b}.small{margin-top:4px}.shell{margin:8px;border:2px solid #8ca7bc;min-height:calc(100vh - 16px);border-radius:7px;background:#f9fcfe;box-shadow:0 4px 18px #23425a15}
+.header{position:sticky;top:0;z-index:20;border-top:4px solid #0579ad;border-bottom:1px solid #bed1df;background:#fff;border-radius:4px 4px 0 0}.header-in{min-height:75px;display:flex;gap:13px;padding:8px 17px;align-items:center}.logo-btn{border:1px solid #cbd9e4;background:#f6fbff;flex:0 0 61px;width:61px;height:57px;border-radius:5px;padding:3px;color:#11658b;font-weight:800;font-size:12px;display:grid;place-items:center}.logo-btn img{max-width:100%;max-height:100%;object-fit:contain}.brandtitle{flex:1;min-width:0}.brandtitle h1{color:#08658e;font-size:19px;line-height:1.22;margin:0}.brandtitle p{margin:3px 0 0;font-size:11px;color:#4d6576}.org{margin-left:auto;max-width:35%;font-size:15px;font-weight:800;text-align:right;overflow-wrap:anywhere;color:#23455e}
+.header [contenteditable=true]{outline:2px dashed #0284c7;outline-offset:3px}
+main{padding:12px 17px 7px;display:grid;gap:10px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.metric{border:1px solid #c7d8e3;border-top:3px solid #0c83bd;border-radius:6px;background:#fff;padding:9px 12px}.metric small{font-size:10px;color:#5b7386;font-weight:750;display:block}.metric strong{color:#164766;font-size:23px;display:block;line-height:1.35}
+.card{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden;min-width:0;box-shadow:0 2px 7px #17405a0a}.card-h{padding:9px 12px;background:var(--pale);border-left:4px solid #087dae;border-bottom:1px solid #c2ddea;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.card-h h2{font-size:14px;line-height:1.35;margin:0;color:#0b587c}.sect{display:inline-block;padding:3px 6px;background:#d2ecfb;color:#135d88;border-radius:4px;font-size:10px;margin-right:5px}.card-b{padding:11px 13px}.grid{display:grid;gap:10px}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.span2{grid-column:span 2}.span3{grid-column:span 3}.span4{grid-column:span 4}
+.strip{display:flex;gap:8px;align-items:center;font-size:12px;font-weight:800;color:#11618c;margin:12px 0 9px;border-bottom:1px solid #e2eef7;padding-bottom:6px}.strip:first-child{margin-top:0}.strip i{font-style:normal;font-size:10px;width:23px;height:23px;display:grid;place-items:center;background:#e8f5fc;border:1px solid #c0ddeb;border-radius:5px}
+.method{padding:7px 9px;border-radius:5px;background:#eaf7fd;border:1px solid #bdddeb;font-weight:700;color:#135f88;min-height:34px}.guidetip{background:#f5fafc;border:1px solid #e1edf5;border-radius:6px;font-size:11px;color:#546b7c;padding:9px 11px;margin-top:9px}
+.analysis{display:grid;grid-template-columns: minmax(355px,.9fr) minmax(480px,1.1fr);gap:12px}.riskstack{display:grid;gap:8px}.riskbox{border:1px solid #c8d8e2;border-top:3px solid #176eb9;border-radius:6px;overflow:hidden}.riskbox[data-side=after]{border-top-color:#8651b4}.riskhead{background:#f2f8fc;border-bottom:1px solid #dfebf1;padding:7px 10px;font-weight:800}.riskfactors{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:9px}.riskresult{background:#f7fafc;border-top:1px solid #e6eef5;padding:7px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}.riskresult b{font-size:19px}.riskpill{font-size:10px;display:inline-block;padding:4px 6px;border-radius:4px;border:1px solid #cdd6e0;font-weight:800;text-align:center;background:#eff3f6}.risk-low{background:#ddf5e3;border-color:#a4dfb5;color:#16603a}.risk-medium{background:#fff6db;border-color:#e8d490;color:#806017}.risk-high{background:#ffe4c8;border-color:#e9b07c;color:#9f4914}.risk-critical{background:#ffe1e4;border-color:#e9a0ab;color:#9d2639}
+.visual{border:1px solid #b9d2e1;border-radius:6px;overflow:hidden}.visual-h{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;align-items:center;background:#e9f5fb;border-bottom:1px solid #c3dbe8;padding:8px 10px;font-weight:800;color:#0c5579}.mode-btn{padding:5px 9px;min-height:29px;background:#fff;border:1px solid #bcd6e6;color:#2c5972;border-radius:5px;font-size:11px;font-weight:800}.mode-btn.active{background:#d0ebfb;border-color:#0f83bc;color:#075b83}.visual-b{padding:11px}.barrow{display:grid;grid-template-columns:105px minmax(0,1fr) 65px;gap:7px;align-items:center;margin-bottom:8px;font-size:11px}.bar{height:22px;background:#f2f6fa;border:1px solid #e2e9ee;border-radius:5px;overflow:hidden}.barfill{height:100%;transition:width .18s}.barlabel{font-weight:750}.barvalue{text-align:right;font-weight:750}.summary{padding:8px;background:#f6f9fb;border:1px solid #e1eaf1;font-size:11px;color:#485f70;border-radius:5px;margin-top:6px}.legend{font-size:10px;color:#667c89;margin-top:9px}.matrix{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;max-width:415px;margin:4px auto}.matrix>div{text-align:center;padding:7px 2px;font-size:10px;font-weight:750;border-radius:3px}.matrix .axis{background:#e8f1f8;color:#246080}.matrix .risk-cell{border:1px solid #ffffffaa;min-height:29px}.matrix .is-before{outline:3px solid #0c56b5;outline-offset:-3px}.matrix .is-after{box-shadow:inset 0 0 0 3px #773da9}.matrix .is-both{outline:3px solid #0c56b5;outline-offset:-3px;box-shadow:inset 0 0 0 3px #773da9}
+.checkline{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:#f5fafc;border:1px solid #dceaf0;border-radius:5px}.checkline input{width:16px;height:16px;min-height:0;accent-color:#0b7db0;flex:none;margin-top:1px}.checkline label{margin:0;font-weight:500}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}.btn{border:1px solid #c5d4df;border-radius:5px;background:#fff;padding:7px 10px;color:#2c4a5c;font-weight:700;min-height:33px;display:inline-flex;justify-content:center;align-items:center;gap:5px}.btn:hover{background:#eff6fa}.btn-primary{background:#057eb6;color:#fff;border-color:#057eb6}.btn-primary:hover{background:#086993}.btn-small{font-size:10.5px;padding:4px 7px;min-height:27px}.btn-blue{background:#e7f5ff;border-color:#b8dbf4;color:#0b5881}.btn-green{background:#e7f8ee;border-color:#b5e0c6;color:#17633d}.btn-red{color:#b32639;border-color:#efb5bf}.grow{flex:1}.filters{display:flex;gap:7px;flex-wrap:wrap}.filters input{width:200px}.filters select{width:155px}.tablewrap{overflow-x:auto}.tablewrap table{border-collapse:collapse;width:100%;min-width:1270px}.tablewrap th{padding:8px 7px;text-align:left;background:#edf5fa;color:#4e6476;border-bottom:1px solid #dae4ea;font-size:10.5px}.tablewrap td{padding:8px 7px;border-bottom:1px solid #e7eef3;font-size:10.5px;vertical-align:top;overflow-wrap:anywhere}.tablewrap tbody tr:hover{background:#f7fbff}.empty{padding:20px;text-align:center;color:#60788a;font-size:12px}.cellsub{color:#6a7c8c;font-size:10px;margin-top:3px}.table-bottom{padding:7px 11px}.bottom-actions{padding:5px 17px 4px;display:flex}.bottom-panel{border:1px solid #bed4e1;background:#fff;border-radius:6px;padding:8px 10px;display:flex;gap:9px;flex-wrap:wrap}.footer{white-space:nowrap;overflow-x:auto;font-size:11px;border-top:1px solid #d7e4ec;margin:0 17px;padding:5px 0 4px;color:#4c6074;line-height:1.35}.muted-red{color:#ac343f}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}.toast{position:fixed;z-index:40;right:17px;bottom:15px;max-width:400px;padding:9px 12px;color:#fff;background:#194b68;border-radius:5px;opacity:0;pointer-events:none;transition:opacity .18s}.toast.on{opacity:1}
+@media(max-width:1120px){.analysis{grid-template-columns:1fr}.riskstack{grid-template-columns:1fr 1fr}.g5{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.shell{margin:3px}.header-in{padding:8px 10px;flex-wrap:wrap}.brandtitle h1{font-size:15px}.brandtitle p{font-size:10px}.logo-btn{flex-basis:49px;width:49px;height:49px}.org{max-width:100%;width:100%;font-size:11px;text-align:left}.brandtitle{flex:1}.metrics{gap:5px}.metric{padding:7px}.metric strong{font-size:19px}main{padding:9px;gap:9px}.g5,.g4,.g3,.g2{grid-template-columns:1fr}.span2,.span3,.span4{grid-column:auto}.riskstack{grid-template-columns:1fr}.riskfactors{grid-template-columns:1fr 1fr}.barrow{grid-template-columns:90px 1fr 54px}.filters{width:100%}.filters input,.filters select{min-width:120px;flex:1;width:auto}.bottom-actions{padding:5px 9px}.bottom-panel{width:100%;gap:5px}.bottom-panel .btn{flex:1 1 110px;white-space:normal}.footer{font-size:10px;margin:0 9px}}
+@page{size:A4 landscape;margin:9mm 9mm 15mm 9mm}
+#printPages,#printPageFrame{display:none}
 @media print{
- html,body{margin:0!important;padding:0!important;background:#fff!important;font-size:9px!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
- #olgunFrame,.toast{display:none!important}
- #printPages{display:table!important;width:100%!important;table-layout:fixed;border-collapse:separate;border-spacing:0}
- #printPages>thead{display:table-header-group!important}#printPages>tbody{display:table-row-group!important}
- #printPages>thead>tr>td{padding:0 0 8px}#printPages>tbody>tr>td{padding:0 8px 8px}
- #printFrame{display:block!important;position:fixed;inset:0;border:1.4px solid #7f95a9;pointer-events:none}
- .print-header{display:flex;align-items:center;gap:10px;background:#fff;border-top:4px solid #0284c7;border-bottom:1px solid #9fb2c2;min-height:65px;padding:6px 12px}
- .print-header img{width:52px;height:49px;object-fit:contain;flex:none}
- .print-header h1{font-size:17px;color:#075985;margin:0}.print-header p{font-size:10px;color:#475569;margin:2px 0 0}
- .print-org{margin-left:auto;font-size:13px;font-weight:800;color:#1e3a57;text-align:right}
- .print-section{border:1px solid #b5c9d8;margin-bottom:8px;border-radius:4px;break-inside:auto}
- .print-section h3{font-size:11px;padding:5px 8px;margin:0;border-left:4px solid #0284c7;background:#eaf5fc;color:#075985;break-after:avoid}
- .print-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:8px}
- .print-field{border:1px solid #dbe3eb;border-radius:3px;padding:3px 5px;min-height:25px;font-size:9px;overflow-wrap:anywhere}
- .print-field b{display:block;font-size:8px;color:#64748b;margin-bottom:2px}
- .print-charts{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:8px;break-inside:avoid!important}
- .print-chart{border:1px solid #cbd5e1;border-radius:4px;padding:7px;background:white}
- .print-chart h4{margin:0 0 2px;color:#075985;font-size:10px}.print-chart svg{width:100%;height:auto;max-height:125px;display:block}
- .print-table{width:100%;table-layout:fixed;border-collapse:collapse}.print-table th,.print-table td{font-size:8px;border:1px solid #dbe3eb;padding:5px 5px;vertical-align:top;overflow-wrap:anywhere}
- .print-table th{background:#eaf5fc;color:#075985}.print-table thead{display:table-header-group}.print-table tr{break-inside:avoid}
- .print-detail{padding:5px 7px;border-bottom:1px solid #dce8f1;break-inside:avoid}.print-detail:last-child{border-bottom:0}
- .print-detail-head{display:flex;justify-content:space-between;gap:10px;color:#075985;font-weight:800;font-size:10px;padding:3px 0 5px}
- .print-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
- .print-note{font-size:8.5px;color:#475569;padding:6px 8px}
- .print-charts,.print-charts *{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}
+html,body{background:#fff!important;margin:0!important;padding:0!important;font-size:9px!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+#uiShell,.toast{display:none!important}
+#printPages{display:table!important;width:100%!important;border:0!important;border-collapse:separate;border-spacing:0;table-layout:fixed}
+#printPages>thead{display:table-header-group!important}#printPages>tbody{display:table-row-group!important}#printPages>thead>tr>td{padding:0 0 7px}#printPages>tbody>tr>td{padding:0 9px 8px}
+#printPageFrame{display:block!important;position:fixed;inset:0;border:1.5px solid #809bb2;pointer-events:none;z-index:15}
+.p-header{display:flex;gap:11px;align-items:center;padding:6px 11px;border-top:4px solid #0c84b8;border-bottom:1px solid #abc8d9;min-height:63px;background:#fff!important}
+.p-header img{width:54px;height:48px;object-fit:contain}.p-header h1{margin:0;font-size:16px;color:#06648d}.p-header p{font-size:9.5px;margin:3px 0;color:#526879}.p-org{margin-left:auto;font-size:12px;font-weight:800;max-width:30%;text-align:right}
+.p-section{border:1px solid #b9cdda;border-radius:3px;margin-bottom:7px;break-inside:auto}.p-section h3{font-size:10.5px;background:#eaf5fc!important;border-left:4px solid #067fb3;margin:0;padding:5px 8px;color:#075d81;break-after:avoid}
+.p-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:7px}.p-field{border:1px solid #dce8ef;border-radius:3px;padding:4px 5px;overflow-wrap:anywhere;font-size:9px;white-space:pre-wrap}.p-field b{display:block;color:#667d8e;font-weight:700;font-size:8px;margin-bottom:2px}
+.p-charts{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:7px}.p-chart{border:1px solid #d6e3eb;border-radius:3px;padding:5px}.p-chart h4{font-size:10px;margin:0 0 3px;color:#075c81}.p-chart svg{display:block;width:100%;height:auto;max-height:130px}.p-note{padding:4px 8px;color:#6a7886;font-size:8px;line-height:1.35}
+.p-table{width:100%;table-layout:fixed;border-collapse:collapse}.p-table th,.p-table td{border:1px solid #d5e4ed;padding:4px 5px;font-size:8px;vertical-align:top;overflow-wrap:anywhere}.p-table th{background:#eaf4fa!important;color:#105f84}.p-table tr{break-inside:avoid}.p-table thead{display:table-header-group}
+.p-detail{margin:5px 7px 7px;border:1px solid #d6e3eb;break-inside:avoid!important;page-break-inside:avoid!important}.p-detail-head{display:flex;justify-content:space-between;background:#eaf5fa!important;padding:5px 6px;gap:8px;font-weight:800;color:#145c7e;font-size:9px}.p-detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:5px}.p-detail-grid .p-field{font-size:8px}.p-detail-grid .p-field b{font-size:7px}
+.p-charts,.p-charts *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
 
-/* FMEA mobil: açık yeşil arka plan ve kompakt görünüm */
-@media screen {
- html,body{background:#eaf7ee!important}
- .olgun-frame{background:#f0faf3!important;border-color:#95bea0!important}
- .top-header{border-top-color:#2f855a!important}
- .card-head{background:#e7f5ea!important;border-left-color:#2f855a!important}
- .card-head h2,.brand-titles h1{color:#19623b!important}
- .risk-footer{color:#345e45}
+/* Risk UI mobil – HAZOP */
+body{background:#e6f5e9}
+.shell{margin:0;min-height:100vh;border:0;border-radius:0;background:#f4fbf5;box-shadow:none}
+.header{border-top:4px solid #2e8b57;border-bottom:1px solid #c9dfcf;border-radius:0;background:#fbfffc}
+.card-h{background:#e8f6eb;border-left-color:#2e8b57}
+.sect{background:#d7efdc;color:#1f6d40}
+.logo-btn{background:#f1fbf3;color:#1f6d40;border-color:#c9dfcf}
+.metric{border-top-color:#2e8b57;background:#fcfffd}
+.bottom-actions{padding:8px 10px 4px;display:flex}
+.bottom-panel{width:100%;border:1px solid #c9dfcf;background:#fbfffc;border-radius:10px;padding:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.footer{margin:0 10px 4px;border-top:1px solid #d6e8d9;color:#446055}
+.btn-blue{background:#d8ecff;border-color:#b7d8fa;color:#114a74}
+.btn-green{background:#ecf8ed;border-color:#cfe8d1;color:#1f6d40}
+#printBtn{background:#eef1f3;border-color:#cfd6db;color:#33424f}
+@media(max-width:920px){
+  .shell{min-height:100vh}
+  .header-in{padding:8px 10px;flex-wrap:wrap}
+  .brandtitle h1{font-size:16px}
+  .brandtitle p{font-size:10px}
+  .org{max-width:100%;width:100%;font-size:11px;text-align:left}
+  main{padding:8px;gap:8px}
+  .metrics{grid-template-columns:1fr 1fr;gap:6px}
+  .g5,.g4,.g3,.g2{grid-template-columns:1fr}
+  .span2,.span3,.span4{grid-column:auto}
+  .analysis{grid-template-columns:1fr}
+  .riskstack{grid-template-columns:1fr}
+  .riskfactors{grid-template-columns:1fr 1fr}
+  .filters{width:100%}
+  .filters input,.filters select{min-width:0;flex:1;width:auto}
+  .bottom-actions{position:sticky;bottom:0;z-index:15;background:linear-gradient(to top,#f4fbf5 82%,rgba(244,251,245,0.2))}
+  .bottom-panel{grid-template-columns:1fr}
+  .bottom-panel .btn{width:100%;min-height:42px}
+  .footer{white-space:normal;overflow:visible;font-size:10px;line-height:1.35;padding:6px 0 8px}
 }
-@media screen and (max-width:720px){
- .olgun-frame{margin:3px!important;margin-bottom:0!important;min-height:0!important;padding-bottom:0!important}
- .factors{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px}
- .factors select{padding:5px 2px!important;min-width:0}
- .risk-footer{white-space:nowrap!important;overflow:hidden!important;margin:2px 9px 0!important;padding:3px 0 0!important;font-size:9px!important}
- .risk-footer div{margin:0;padding:0;line-height:1.4}
-}
-</style>
-</head>
+@media print{body{background:#fff}.shell{background:#fff}}
+
+</style></head>
 <body>
-<div id="olgunFrame" class="olgun-frame">
-<header class="top-header"><div class="header-inner">
- <button id="logoTrigger" type="button" class="brand-logo" title="Logo değiştirmek için 5 kez tıklayın"><img id="brandLogo" alt="Kurum logosu" hidden><span id="logoFallback">LOGO</span></button>
- <div class="brand-titles"><h1 id="brandTitle" title="Düzenlemek için 5 kez tıklayın">İSG RİSK ANALİZİ – FMEA</h1><p id="brandSubtitle" title="Düzenlemek için 5 kez tıklayın">(Hata Türleri ve Etkileri Analizi · Makine, Ekipman ve Üretim Süreçleri)</p></div>
- <div id="brandOrg" class="brand-org" title="Düzenlemek için 5 kez tıklayın">OLGUN BAŞKANLIĞI</div>
-</div><input id="logoChooser" type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="sr-only"></header>
-<main class="wrap">
- <section class="metrics" aria-label="FMEA risk özeti">
-  <div class="metric"><small>TOPLAM HATA KAYDI</small><b id="mTotal">0</b></div>
-  <div class="metric"><small>ÖNCELİKLİ / KRİTİK · AÇIK</small><b id="mHigh">0</b></div>
-  <div class="metric"><small>HEDEF TARİHİ GEÇEN</small><b id="mOverdue">0</b></div>
-  <div class="metric"><small>ÖNLEMİ DOĞRULANAN</small><b id="mVerified">0</b></div>
- </section>
- <section class="card"><div class="card-head"><h2><span class="index">01</span>İşyeri ve Değerlendirme Bilgileri</h2><span class="hint">Form alanları her yeni açılışta boş başlar.</span></div>
-  <div class="card-body grid g5">
-   <div><label for="company">İşyeri / Firma</label><input id="company" data-meta="company" placeholder="Örn. ABC Makine Sanayi"></div>
-   <div><label for="facility">Tesis / Üretim Alanı</label><input id="facility" data-meta="facility" placeholder="Örn. Montaj Hattı"></div>
-   <div><label for="prepared">Hazırlayan / Ekip</label><input id="prepared" data-meta="prepared" placeholder="FMEA çalışma ekibi"></div>
-   <div><label for="assessDate">Değerlendirme Tarihi</label><input id="assessDate" data-meta="date" type="date"></div>
-   <div><label for="revision">Revizyon / Belge No.</label><input id="revision" data-meta="revision" placeholder="Örn. FMEA-2026 / Rev.00"></div>
-  </div>
- </section>
- <section class="card"><div class="card-head"><h2><span class="index">02</span><span id="formHeading">Yeni FMEA Hata Kaydı</span></h2><button type="button" id="newBtn" class="btn btn-sm">＋ Yeni Kayıt</button></div>
-  <div class="card-body"><form id="fmeaForm" novalidate autocomplete="off">
-   <div class="strip"><em>01</em> Süreç ve Hata Türü</div>
-   <div class="grid g4">
-    <div><label>Değerlendirme Yöntemi</label><div class="method-lock">FMEA &nbsp;·&nbsp; Ş × O × T</div></div>
-    <div><label for="process" class="required">Bölüm / Süreç</label><input id="process" required placeholder="Örn. Talaşlı İmalat"></div>
-    <div><label for="equipment">Makine / Ekipman</label><input id="equipment" placeholder="Örn. CNC-05"></div>
-    <div><label for="function" class="required">Faaliyet / Fonksiyon</label><input id="function" required placeholder="Örn. Mil tornalama"></div>
-   </div>
-   <div class="grid g3" style="margin-top:9px">
-    <div><label for="failure" class="required">Potansiyel Hata Türü</label><textarea id="failure" required placeholder="Örn. Mil çapının tolerans dışına çıkması"></textarea></div>
-    <div><label for="effect" class="required">Hatanın Potansiyel Etkisi</label><textarea id="effect" required placeholder="Örn. Montaj uygunsuzluğu, parça reddi"></textarea></div>
-    <div><label for="cause" class="required">Hatanın Potansiyel Nedeni</label><textarea id="cause" required placeholder="Örn. Takım aşınması, yanlış ofset"></textarea></div>
-   </div>
-   <div class="grid g2" style="margin-top:9px">
-    <div><label for="prevention">Mevcut Önleme Kontrolleri</label><textarea id="prevention" placeholder="Örn. Takım ömrü limiti, operatör eğitimi"></textarea></div>
-    <div><label for="detection">Mevcut Tespit Kontrolleri</label><textarea id="detection" placeholder="Örn. İlk parça onayı, periyodik ölçüm"></textarea></div>
-   </div>
-   <div class="strip"><em>02</em> FMEA Risk Öncelik Sayısı (RÖS / RPN)</div>
-   <div class="assessment">
-    <div class="score-stack">
-     <section class="score-card"><div class="score-head"><strong>● MEVCUT DEĞERLENDİRME</strong><span>Önlem öncesi</span></div><div class="factors" id="beforeFactors"></div><div class="score-result"><div><small>Mevcut RÖS</small><b id="beforeScore">—</b></div><span id="beforeLevel" class="tag">Değerlendirilmedi</span></div></section>
-     <section class="score-card after"><div class="score-head"><strong>◆ HEDEF / KALAN RİSK</strong><span id="afterCaption">Planlanan seviye · isteğe bağlı</span></div><div class="factors" id="afterFactors"></div><div class="score-result"><div><small>Hedef / kalan RÖS</small><b id="afterScore">—</b></div><span id="afterLevel" class="tag">Değerlendirilmedi</span></div></section>
-    </div>
-    <section class="graph-card"><div class="graph-head"><strong>▦ FMEA Risk Analizi Grafiği</strong><div class="tabs"><button type="button" id="tabSingle" class="active">Tekil FMEA</button><button type="button" id="tabDist">Genel RÖS Dağılımı</button></div></div>
-     <div class="graph-body"><div id="chart" aria-label="FMEA risk grafiği"></div><div id="chartSummary" class="graph-summary"></div></div></section>
-   </div>
-   <div class="guidance" style="margin-top:9px"><b>Önemli:</b> RÖS = Şiddet × Oluşma × Tespit Edilebilirlik. Tespit puanında 1 = kolay ve güvenilir tespit, 10 = tespit edilmesi çok güç. Aşağıdaki risk grupları örnek eşiklerdir; resmî/evrensel FMEA eşiği değildir. <b>Şiddeti yüksek hatalar RÖS düşük olsa da öncelikle ele alınmalıdır.</b></div>
-   <details class="rubric"><summary>Ş, O ve T puanları nasıl seçilir? (1–10 değerlendirme kılavuzu)</summary><div class="inner"><table><thead><tr><th>Puan</th><th>Şiddet (Ş)</th><th>Oluşma Olasılığı (O)</th><th>Tespit Edilebilirlik (T)</th></tr></thead><tbody>
-    <tr><td>1–2</td><td>İhmal edilebilir / düşük etki</td><td>Çok seyrek hata</td><td>Otomatik veya çok yüksek güvenilirlikte tespit</td></tr>
-    <tr><td>3–4</td><td>Hafif / sınırlı etki</td><td>Seyrek hata</td><td>İyi tespit olanağı</td></tr>
-    <tr><td>5–6</td><td>Orta düzeyde kalite, duruş veya iş etkisi</td><td>Orta olasılık</td><td>Orta düzey tespit yeteneği</td></tr>
-    <tr><td>7–8</td><td>Ciddi kalite, üretim veya güvenlik etkisi</td><td>Sık / yüksek olasılık</td><td>Zayıf tespit yeteneği</td></tr>
-    <tr><td>9–10</td><td>Çok ağır sonuç / tehlikeli etki</td><td>Çok sık / neredeyse kaçınılmaz</td><td>Çok zor veya pratikte tespit edilemeyen hata</td></tr>
-   </tbody></table><div class="hint" style="margin-top:5px">Bu puan açıklamaları yönlendiricidir. Kurumun/ürünün onaylı FMEA puanlama tabloları esas alınmalıdır. AIAG-VDA Action Priority bu örnek RÖS gruplarıyla eşdeğer değildir.</div></div></details>
-   <div class="strip"><em>03</em> İyileştirme ve Aksiyon Takibi</div>
-   <div class="grid g4">
-    <div class="span2"><label for="action">Önerilen / Alınacak Önlem</label><textarea id="action" placeholder="Örn. Otomatik takım aşınma uyarısı, proses içi ölçüm"></textarea></div>
-    <div><label for="owner">Sorumlu Kişi / Birim</label><input id="owner" placeholder="Örn. Üretim Mühendisi"></div>
-    <div><label for="due">Hedef Tamamlanma Tarihi</label><input id="due" type="date"></div>
-    <div><label for="status">Aksiyon Durumu</label><select id="status"><option value="">Seçiniz</option><option value="open">Açık</option><option value="progress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div>
-    <div class="span3"><label for="evidence">Doğrulama Kanıtı / Ek Açıklama</label><input id="evidence" placeholder="Örn. Yeni ölçüm raporu, bakım kaydı, test sonucu"></div>
-   </div>
-   <div class="checkline"><label class="checkbox-label"><input id="verified" type="checkbox"> Önlem uygulandı, etkinliği kontrol edildi ve <b>kalan risk doğrulandı</b></label><small>İşaretlemek için durum “Tamamlandı” ve hedef Ş/O/T puanları dolu olmalıdır.</small></div>
-   <div class="actions"><button id="saveBtn" type="submit" class="btn btn-primary">＋ FMEA Kaydı Ekle</button><button id="cancelBtn" type="button" class="btn">Vazgeç / Yeni Kayıt</button><span class="grow"></span><span id="formInfo" class="hint">Yeni kayıt oluşturuluyor.</span></div>
-  </form></div>
- </section>
- <section class="card"><div class="card-head"><h2><span class="index">03</span>FMEA Hata Kayıtları ve Aksiyon Takibi <span id="recordCount" class="hint">(0)</span></h2>
-  <div class="filters"><input id="search" type="search" placeholder="Hata kayıtlarında ara..." aria-label="Hata kayıtlarında ara"><select id="filter" aria-label="Aksiyon durumuna göre filtrele"><option value="">Tüm durumlar</option><option value="open">Açık</option><option value="progress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div></div>
-  <div class="tablebox"><table><thead><tr><th>No.</th><th>Süreç / Makine</th><th>Hata Türü / Etki</th><th>Hata Nedeni</th><th>Mevcut Ş×O×T / RÖS</th><th>Hedef Ş×O×T / RÖS</th><th>Önerilen Önlem</th><th>Sorumlu / Hedef</th><th>Durum</th><th>İşlemler</th></tr></thead><tbody id="recordRows"></tbody></table><div id="empty" class="empty">Henüz FMEA hata kaydı bulunmuyor.</div></div>
-  <div class="table-bottom"><button type="button" id="clearBtn" class="btn btn-sm btn-red">Tüm Kayıtları Sil</button></div>
- </section>
-</main>
-<div class="bottom-actions"><div class="bottom-panel" aria-label="Dosya ve yazdırma işlemleri">
- <button id="importBtn" type="button" class="btn btn-blue">⬆ JSON İçeri Aktar</button>
- <button id="exportBtn" type="button" class="btn btn-green">⬇ JSON Dışarı Aktar</button>
- <button id="printBtn" type="button" class="btn btn-grey">▣ PDF / Yazdır</button>
- <input id="importFile" type="file" accept=".json,application/json" class="sr-only">
-</div></div>
-<footer class="risk-footer">Temel özelliği: Hata Türleri ve Etkileri Analizi (FMEA)<div>Kullanım alanı: Makine, ekipman ve üretim süreçleri</div><div>RÖS = Şiddet × Oluşma × Tespit · Ş/O/T ölçeği: 1–10</div></footer>
+<div id="uiShell" class="shell">
+<header class="header"><div class="header-in">
+<button id="logoTrigger" class="logo-btn" title="Logoyu değiştirmek için art arda beş kez tıklayın"><img id="brandLogo" alt="Kurum logosu" hidden><span id="logoFallback">LOGO</span></button>
+<div class="brandtitle"><h1 id="brandTitle" title="Değiştirmek için 5 kez tıklayın">İSG RİSK ANALİZİ – HAZOP</h1><p id="brandSubtitle" title="Değiştirmek için 5 kez tıklayın">Tehlike ve İşletilebilirlik Analizi · Proses Sapmaları ve Aksiyon Takip Formu</p></div>
+<div class="org" id="brandOrg" title="Değiştirmek için 5 kez tıklayın">KURUM / İŞLETME</div></div>
+<input type="file" id="logoFile" class="sr-only" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"></header>
+<main>
+<section class="metrics" aria-label="HAZOP sonuç göstergeleri"><div class="metric"><small>TOPLAM SAPMA KAYDI</small><strong id="total">0</strong></div><div class="metric"><small>YÜKSEK / ÇOK YÜKSEK · AÇIK</small><strong id="priority">0</strong></div><div class="metric"><small>TERMİNİ GEÇEN AKSİYON</small><strong id="overdue">0</strong></div><div class="metric"><small>ÖNLEMİ DOĞRULANAN</small><strong id="verifiedCount">0</strong></div></section>
+<section class="card"><div class="card-h"><h2><span class="sect">01</span> Çalışma ve Proses Bilgileri</h2><span class="hint">Yeni açılışta değerlendirme alanları boş gelir.</span></div><div class="card-b grid g5">
+<div><label for="metaCompany">İşyeri / Firma</label><input id="metaCompany" data-meta="company" placeholder="Örn. Proses Kimya A.Ş."></div>
+<div><label for="metaFacility">Tesis / İşletme</label><input id="metaFacility" data-meta="facility" placeholder="Örn. Reaktör Tesisi"></div>
+<div><label for="metaUnit">Proses / Ünite</label><input id="metaUnit" data-meta="unit" placeholder="Örn. Ünite-210"></div>
+<div><label for="metaPid">P&ID / Doküman No.</label><input id="metaPid" data-meta="pid" placeholder="Örn. P-210-05"></div>
+<div><label for="metaDate">Değerlendirme Tarihi</label><input id="metaDate" data-meta="date" type="date"></div>
+<div><label for="metaLeader">HAZOP Lideri</label><input id="metaLeader" data-meta="leader" placeholder="Eğitimli çalışma lideri"></div>
+<div class="span2"><label for="metaTeam">Çalışma Ekibi / Disiplinler</label><input id="metaTeam" data-meta="team" placeholder="Proses, işletme, bakım, enstrümantasyon, İSG..."></div>
+<div><label for="metaRevision">Revizyon / Rapor No.</label><input id="metaRevision" data-meta="revision" placeholder="HAZOP-01 / Rev.00"></div>
+<div><label for="metaPhase">İşletme Aşaması</label><select id="metaPhase" data-meta="phase"><option value="">Seçiniz</option><option>Normal işletme</option><option>Devreye alma</option><option>Durdurma</option><option>Bakım / müdahale</option><option>Acil durum</option><option>Diğer</option></select></div>
+<div class="span4"><label for="metaScope">Kapsam / Hariç Tutulanlar / Referanslar</label><input id="metaScope" data-meta="scope" placeholder="İncelenen düğüm sınırları, P&ID revizyonu, tasarım verisi, hariç tutulan ekipmanlar..."></div>
+</div></section>
+<section class="card"><div class="card-h"><h2><span class="sect">02</span> <span id="formMode">Yeni HAZOP Sapma Kaydı</span></h2><button type="button" class="btn btn-small" id="newRecordTop">＋ Yeni Kayıt</button></div><div class="card-b"><form id="recordForm" autocomplete="off" novalidate>
+<div class="strip"><i>01</i> Düğüm, Tasarım Amacı ve Sapma Tanımı</div>
+<div class="grid g4">
+<div><label>Yöntem</label><div class="method">HAZOP <span class="hint">Kılavuz kelime + parametre</span></div></div>
+<div><label for="node" class="req">Düğüm / Node Adı</label><input id="node" required placeholder="Örn. Reaktör R-101 giriş hattı"></div>
+<div><label for="tag">Ekipman / Hat / Enstrüman Tag</label><input id="tag" placeholder="Örn. R-101 / FT-205"></div>
+<div><label for="normal">Normal Çalışma Değeri / Birim</label><input id="normal" placeholder="Örn. 4,5 bar / 90 °C"></div>
+<div class="span4"><label for="intent" class="req">Tasarım Amacı / Beklenen İşleyiş</label><textarea id="intent" required placeholder="Düğümün normal akışını, tasarım koşullarını ve hangi işlevi sağlaması gerektiğini açıklayın."></textarea></div>
+<div><label for="parameter" class="req">Proses Parametresi</label><select id="parameter" required><option value="">Seçiniz</option><option>Akış</option><option>Basınç</option><option>Sıcaklık</option><option>Seviye</option><option>Kompozisyon / Derişim</option><option>pH</option><option>Debi / Hız</option><option>Reaksiyon</option><option>Soğutma / Isıtma</option><option>Elektrik / Enstrüman Havası</option><option>Zaman / Sıralama</option><option value="Diğer">Diğer</option></select></div>
+<div><label for="guide" class="req">HAZOP Kılavuz Kelimesi</label><select id="guide" required><option value="">Seçiniz</option><option value="NO">Yok / Hiç (NO)</option><option value="MORE">Fazla (MORE)</option><option value="LESS">Az (LESS)</option><option value="REVERSE">Tersine (REVERSE)</option><option value="AS_WELL_AS">Yanı Sıra (AS WELL AS)</option><option value="PART_OF">Bir Bölümü (PART OF)</option><option value="OTHER_THAN">Başka / Farklı (OTHER THAN)</option><option value="EARLY">Erken (EARLY)</option><option value="LATE">Geç (LATE)</option><option value="BEFORE">Önce (BEFORE)</option><option value="AFTER">Sonra (AFTER)</option></select></div>
+<div class="span2"><label for="deviation" class="req">Oluşabilecek Sapma</label><input id="deviation" required placeholder="Örn. Beklenen basınçtan daha yüksek basınç"></div>
+</div><div class="guidetip">Kılavuz kelime ve parametre seçildiğinde örnek sapma otomatik önerilir; sahaya uygun olmayan kombinasyonları değiştirebilirsiniz. Sapmalar P&ID, işletme sınırları ve proses tasarım amacı esas alınarak ekipçe değerlendirilmelidir.</div>
+<div class="strip"><i>02</i> Nedenler, Sonuçlar ve Mevcut Koruyucular</div>
+<div class="grid g3">
+<div><label for="causes" class="req">Olası Sapma Nedenleri</label><textarea id="causes" required placeholder="Örn. Kontrol vanası arızası, regülatör arızası, hat tıkanması."></textarea></div>
+<div><label for="consequences" class="req">Olası Sonuçlar / Etkiler</label><textarea id="consequences" required placeholder="Örn. Aşırı basınç, kap bütünlüğünün bozulması, yangın."></textarea></div>
+<div><label for="safeguards">Mevcut Bağımsız / Diğer Koruyucular</label><textarea id="safeguards" placeholder="Örn. PSV, bağımsız alarm, SIS, operatör müdahalesi; bağımsızlık doğrulanmalı."></textarea></div>
+<div class="span2"><label for="verification">Koruma Kanıtı / Güvenilirlik / Test Referansı</label><input id="verification" placeholder="Örn. PSV test tarihi, SIS doğrulama kaydı, alarm set noktası; varsa kanıt ekleyin."></div>
+<div><label for="existingNotes">İşletilebilirlik / İnsan / Çevre Etkisi</label><input id="existingNotes" placeholder="Üretim kaybı, çevresel salım, personel maruziyeti..."></div>
 </div>
-<table id="printPages" role="presentation"><thead><tr><td><div id="printHeader"></div></td></tr></thead><tbody><tr><td><div id="printReport"></div></td></tr></tbody></table><div id="printFrame"></div>
-<div id="toast" class="toast" aria-live="polite"></div>
-<script>
-'use strict';
+<div class="strip"><i>03</i> Yardımcı Risk Önceliklendirmesi (5 × 5)</div>
+<div class="analysis"><div class="riskstack">
+<section class="riskbox" data-side="before"><div class="riskhead">MEVCUT RİSK · Koruyucuların durumu dikkate alınarak</div><div class="riskfactors"><div><label for="beforeL" class="req">Olasılık (1–5)</label><select id="beforeL" required><option value="">Seçiniz</option><option value="1">1 · Çok düşük</option><option value="2">2 · Düşük</option><option value="3">3 · Orta</option><option value="4">4 · Yüksek</option><option value="5">5 · Çok yüksek</option></select></div><div><label for="beforeS" class="req">Şiddet (1–5)</label><select id="beforeS" required><option value="">Seçiniz</option><option value="1">1 · Hafif</option><option value="2">2 · Sınırlı</option><option value="3">3 · Ciddi</option><option value="4">4 · Çok ciddi</option><option value="5">5 · Felaket düzeyi</option></select></div></div><div class="riskresult"><div><span class="hint">Mevcut O × Ş</span><br><b id="beforeScore">—</b></div><span id="beforeLevel" class="riskpill">Değerlendirilmedi</span></div></section>
+<section class="riskbox" data-side="after"><div class="riskhead">HEDEF / KALAN RİSK · Önlem sonrası tahmin</div><div class="riskfactors"><div><label for="afterL">Hedef Olasılık (1–5)</label><select id="afterL"><option value="">Seçiniz</option><option value="1">1 · Çok düşük</option><option value="2">2 · Düşük</option><option value="3">3 · Orta</option><option value="4">4 · Yüksek</option><option value="5">5 · Çok yüksek</option></select></div><div><label for="afterS">Hedef Şiddet (1–5)</label><select id="afterS"><option value="">Seçiniz</option><option value="1">1 · Hafif</option><option value="2">2 · Sınırlı</option><option value="3">3 · Ciddi</option><option value="4">4 · Çok ciddi</option><option value="5">5 · Felaket düzeyi</option></select></div></div><div class="riskresult"><div><span class="hint">Hedef O × Ş</span><br><b id="afterScore">—</b></div><span id="afterLevel" class="riskpill">Hedef girilmedi</span></div></section>
+</div><section class="visual"><div class="visual-h"><span>▦ HAZOP Risk Görünümü</span><div><button type="button" class="mode-btn active" id="singleMode">5 × 5 Matris</button> <button type="button" class="mode-btn" id="distMode">Genel Dağılım</button></div></div><div class="visual-b"><div id="chart"></div><div class="summary" id="riskSummary">Olasılık ve şiddet puanlarıyla örnek risk matrisi oluşur.</div><div class="legend">Mavi çerçeve: mevcut risk · Mor çerçeve: hedef risk. <b>Bu puanlama HAZOP yönteminin zorunlu bir unsuru değildir.</b></div></div></section></div>
+<div class="strip"><i>04</i> Öneriler, Aksiyonlar ve Doğrulama</div>
+<div class="grid g4">
+<div class="span2"><label for="action" class="req">Önerilen İlave Önlem / Aksiyon</label><textarea id="action" required placeholder="Örn. Bağımsız yüksek basınç kesmesi, enstrümantasyon revizyonu, işlem prosedürü."></textarea></div>
+<div><label for="owner">Aksiyon Sorumlusu</label><input id="owner" placeholder="Kişi / birim"></div>
+<div><label for="due">Hedef Tamamlanma Tarihi</label><input id="due" type="date"></div>
+<div><label for="status">Aksiyon Durumu</label><select id="status"><option value="open">Açık</option><option value="progress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div>
+<div class="span3"><label for="evidence">Uygulama / Etkinlik Kanıtı ve Ek Not</label><input id="evidence" placeholder="Test raporu, fotoğraf, P&ID güncelleme, önlem doğrulama tutanağı..."></div>
+</div><div class="checkline" style="margin-top:10px"><input type="checkbox" id="verified"><label for="verified">Önlem uygulandı ve koruyucu tedbirin etkinliği doğrulandı. <span class="hint">Yalnızca aksiyon “Tamamlandı” durumundaysa ve hedef puanlar girilmişse işaretlenebilir.</span></label></div>
+<div class="actions"><button class="btn btn-primary" type="submit" id="saveBtn">＋ Sapma Kaydını Ekle</button><button class="btn" type="button" id="cancelBtn">Vazgeç / Yeni Kayıt</button><span class="grow"></span><span class="hint" id="modeInfo">Yeni HAZOP kaydı oluşturuluyor.</span></div>
+</form></div></section>
+<section class="card"><div class="card-h"><h2><span class="sect">03</span> HAZOP Sapma Kayıtları ve Aksiyon Takibi <span id="recordCount" class="hint">(0)</span></h2><div class="filters"><input id="search" type="search" placeholder="Düğüm, sapma, neden, aksiyon ara..."><select id="filter"><option value="">Tüm durumlar</option><option value="open">Açık</option><option value="progress">Devam Ediyor</option><option value="done">Tamamlandı</option></select></div></div>
+<div class="tablewrap"><table><thead><tr><th>No.</th><th>Proses Düğümü / Tag</th><th>Parametre + Kılavuz Kelime</th><th>Sapma / Neden</th><th>Sonuç / Koruyucular</th><th>Mevcut Risk</th><th>Hedef Risk</th><th>Aksiyon</th><th>Sorumlu / Termin</th><th>Durum</th><th>İşlemler</th></tr></thead><tbody id="rows"></tbody></table><div class="empty" id="empty">Henüz bir sapma kaydı bulunmuyor. Yukarıdaki formdan kayıt oluşturabilirsiniz.</div></div>
+<div class="table-bottom"><button class="btn btn-small btn-red" id="clearBtn" type="button">Tüm Kayıtları Sil</button></div></section>
+</main><div class="bottom-actions"><div class="bottom-panel"><button type="button" class="btn btn-blue" id="importBtn">⬆ JSON İçeri Aktar</button><button type="button" class="btn btn-green" id="exportBtn">⬇ JSON Dışarı Aktar</button><button type="button" class="btn" id="printBtn">▣ PDF / Yazdır</button><input type="file" class="sr-only" id="fileIn" accept=".json,application/json"></div></div>
+<footer class="footer">Temel özelliği: Proses tasarım amacından sapmaları analiz eder &nbsp;&nbsp;&nbsp; Kullanım alanı: Kimya, enerji, petrol ve gaz tesisleri &nbsp;&nbsp;&nbsp; HAZOP: Parametre × Kılavuz Kelime → Sapma &nbsp;&nbsp;&nbsp; Yardımcı risk: Olasılık (1–5) × Şiddet (1–5)</footer>
+</div>
+<table id="printPages" role="presentation"><thead><tr><td><div id="printHeader"></div></td></tr></thead><tbody><tr><td><div id="printContent"></div></td></tr></tbody></table><div id="printPageFrame"></div><div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>'use strict';
 (()=>{
 const $=id=>document.getElementById(id);
-const esc=v=>String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
-const text=v=>String(v??'');
+const asText=v=>v==null?'':String(v),esc=v=>asText(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
-const uid=()=>('FMEA'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)).toUpperCase();
-const META_KEYS=['company','facility','prepared','date','revision'];
-const fields=['process','equipment','function','failure','effect','cause','prevention','detection','action','owner','due','status','evidence'];
-const groups=[{key:'izleme',min:1,short:'1–39',title:'İzleme',color:'#73cf93'}, {key:'dikkat',min:40,short:'40–99',title:'Dikkat',color:'#eed572'}, {key:'oncelikli',min:100,short:'100–199',title:'Öncelikli',color:'#f7b359'}, {key:'kritik',min:200,short:'200–1000',title:'Kritik',color:'#e97575'}];
+const uid=()=>('HZ'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)).toUpperCase();
+const keys=['company','facility','unit','pid','date','leader','team','revision','phase','scope'];
+const initMeta=()=>Object.fromEntries(keys.map(k=>[k,'']));
+const grades=[{key:'low',min:1,max:4,name:'Kabul Edilebilir',color:'#82d8a0'},{key:'medium',min:5,max:9,name:'Kontrol Gerekli',color:'#efd47c'},{key:'high',min:10,max:15,name:'Yüksek',color:'#f3ae6b'},{key:'critical',min:16,max:25,name:'Çok Yüksek',color:'#eb8991'}];
 const statusText={open:'Açık',progress:'Devam Ediyor',done:'Tamamlandı'};
-const factorLabel={s:'Şiddet (Ş)',o:'Oluşma (O)',d:'Tespit (T)'};
-const emptyFactor=()=>({s:null,o:null,d:null});
-const initialMeta=()=>({company:'',facility:'',prepared:'',date:'',revision:''});
-let data={meta:initialMeta(),records:[]},working={before:emptyFactor(),after:emptyFactor()},editingId=null,mode='single',toastTimer;
-const chosen=(k,v)=>v!==''&&v!==null&&v!==undefined&&Number.isInteger(Number(v))&&Number(v)>=1&&Number(v)<=10;
-const complete=o=>o&&['s','o','d'].every(k=>chosen(k,o[k]));
-const anyFactor=o=>o&&['s','o','d'].some(k=>o[k]!==null&&o[k]!==undefined&&o[k]!=='');
-const rpn=o=>complete(o)?Number(o.s)*Number(o.o)*Number(o.d):null;
-const groupOf=n=>n===null?null:groups[n<40?0:n<100?1:n<200?2:3];
-const fmt=n=>n===null?'—':Number(n).toLocaleString('tr-TR');
-function message(t){clearTimeout(toastTimer);$('toast').textContent=t;$('toast').classList.add('show');toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3400)}
-function normFactor(raw,optional=false){const v=raw&&typeof raw==='object'?raw:{};const out={s:null,o:null,d:null};for(const k of ['s','o','d'])if(v[k]!==null&&v[k]!==undefined&&v[k]!=='')out[k]=chosen(k,v[k])?Number(v[k]):NaN;return complete(out)?out:(optional&&!anyFactor(out)?emptyFactor():null)}
-function normalizeRecord(raw){if(!raw||typeof raw!=='object'||Array.isArray(raw))return null;
- const before=normFactor(raw.before),after=normFactor(raw.after,true);
- if(!before||!after)return null;
- const record={id:text(raw.id)||uid(),method:'FMEA',before,after};
- for(const k of fields)record[k]=text(raw[k]);
- record.status=statusText[record.status]?record.status:'open';record.verified=Boolean(raw.verified)&&record.status==='done'&&complete(after);
- record.created=text(raw.created)||today();return record;
-}
-/* Yalnızca Olgun UI logo ve başlık seçimleri kalıcıdır; risk kayıtları her açılışta sıfırdır. */
-const BRAND_KEY='risk-ui-fmea-desktop-brand-v1';
-const BRAND_DEFAULT={title:'İSG RİSK ANALİZİ – FMEA',subtitle:'(Hata Türleri ve Etkileri Analizi · Makine, Ekipman ve Üretim Süreçleri)',org:'OLGUN BAŞKANLIĞI',logo:''};
+const guideNames={NO:'Yok / Hiç',MORE:'Fazla',LESS:'Az',REVERSE:'Tersine',AS_WELL_AS:'Yanı Sıra',PART_OF:'Bir Bölümü',OTHER_THAN:'Başka / Farklı',EARLY:'Erken',LATE:'Geç',BEFORE:'Önce',AFTER:'Sonra'};
+const factorKeys=['node','tag','normal','intent','parameter','guide','deviation','causes','consequences','safeguards','verification','existingNotes','action','owner','due','status','evidence'];
+let data={meta:initMeta(),records:[]},currentEdit=null,mode='single',lastSuggestion='',timeoutMsg;
+const BRAND_KEY='risk-ui-hazop-brand-v1',BRAND_DEFAULT={title:'İSG RİSK ANALİZİ – HAZOP',subtitle:'Tehlike ve İşletilebilirlik Analizi · Proses Sapmaları ve Aksiyon Takip Formu',org:'KURUM / İŞLETME',logo:''};
 let brand={...BRAND_DEFAULT};
-function saveBrand(){try{localStorage.setItem(BRAND_KEY,JSON.stringify(brand))}catch(e){message('Başlık bilgileri bu tarayıcıda saklanamadı.')}}
-function setLogo(src){const img=$('brandLogo'),fallback=$('logoFallback');img.onload=()=>{img.hidden=false;fallback.hidden=true;};img.onerror=()=>{img.hidden=true;fallback.hidden=false;};img.src=(src&&/^data:image\//.test(src))?src:'logo.jpg';}
-function setFive(el,callback){let count=0,last=0;el.addEventListener('click',()=>{if(el.isContentEditable)return;const n=Date.now();count=n-last>1150?1:count+1;last=n;if(count>=5){count=0;callback()}})}
-function setEditable(el,key){el.contentEditable='true';el.focus();const selection=window.getSelection(),range=document.createRange();range.selectNodeContents(el);selection.removeAllRanges();selection.addRange(range);
- let done=false;const cleanup=()=>{if(done)return;done=true;el.contentEditable='false';brand[key]=el.textContent.trim()||BRAND_DEFAULT[key];el.textContent=brand[key];saveBrand();el.removeEventListener('blur',cleanup);el.removeEventListener('keydown',keyHandler)};
- const keyHandler=e=>{if(e.key==='Enter'){e.preventDefault();el.blur()}if(e.key==='Escape'){el.textContent=brand[key];el.blur()}};
- el.addEventListener('blur',cleanup);el.addEventListener('keydown',keyHandler);
-}
-function initializeBrand(){try{const st=JSON.parse(localStorage.getItem(BRAND_KEY)||'null');if(st&&typeof st==='object')for(const k of Object.keys(BRAND_DEFAULT))if(typeof st[k]==='string')brand[k]=st[k]}catch(e){}
- for(const [id,key] of [['brandTitle','title'],['brandSubtitle','subtitle'],['brandOrg','org']]){$(id).textContent=brand[key];setFive($(id),()=>setEditable($(id),key))}
- setLogo(brand.logo);setFive($('logoTrigger'),()=>$('logoChooser').click());
- $('logoChooser').addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith('image/')||file.size>1250000){alert('Lütfen 1,25 MB altında bir PNG/JPG/WebP/GIF seçin.');e.target.value='';return}const fr=new FileReader();fr.onload=()=>{brand.logo=String(fr.result||'');setLogo(brand.logo);saveBrand();message('Kurum logosu kaydedildi.')};fr.readAsDataURL(file);e.target.value=''});
-}
-function renderMeta(){for(const el of document.querySelectorAll('[data-meta]'))el.value=data.meta[el.dataset.meta]||''}
-function factorMarkup(side){return ['s','o','d'].map(k=>`<div><label for="f-${side}-${k}">${factorLabel[k]}</label><select id="f-${side}-${k}" data-side="${side}" data-factor="${k}" ${side==='before'?'required':''}><option value="">Seçiniz</option>${Array.from({length:10},(_,i)=>{const v=i+1;const extra=k==='d'?(v===1?' · Çok kolay tespit':v===10?' · Çok zor tespit':''):k==='s'?(v===1?' · Çok hafif':v===10?' · Çok ağır':''):(v===1?' · Çok seyrek':v===10?' · Çok sık':'');return `<option value="${v}" ${working[side][k]===v?'selected':''}>${v}${extra}</option>`}).join('')}</select></div>`).join('')}
-function showFactors(){$('beforeFactors').innerHTML=factorMarkup('before');$('afterFactors').innerHTML=factorMarkup('after');showScore()}
-function showScore(){for(const side of ['before','after']){const v=rpn(working[side]),group=groupOf(v);$(side+'Score').textContent=fmt(v);$(side+'Level').textContent=group?group.title:'Değerlendirilmedi';$(side+'Level').className='tag '+(group?group.key:'')}
- $('afterCaption').textContent=$('verified').checked&&$('status').value==='done'?'Kalan risk doğrulandı':'Planlanan seviye · isteğe bağlı';drawChart();}
-function chartSingleSvg(before,after){const current=rpn(before),target=rpn(after),max=Math.max(100,current||0,target||0),W=620;
- const bars=[{name:'Mevcut RÖS',value:current,color:'#125ba9',y:49},{name:'Hedef RÖS',value:target,color:'#8651b4',y:115}];
- const base=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 205" role="img" aria-label="Mevcut ve hedef RÖS karşılaştırması" style="font-family:Segoe UI,Arial,sans-serif"><text x="8" y="18" font-size="12" font-weight="700" fill="#27425d">Mevcut / Hedef Risk Öncelik Sayısı (RÖS)</text>`;
- const items=bars.map(b=>{const width=b.value===null?0:Math.round(b.value/max*380);return `<text x="8" y="${b.y+15}" font-size="12" fill="#334155">${b.name}</text><rect x="132" y="${b.y}" width="380" height="25" rx="3" fill="#edf2f7" stroke="#dce5ee"/><rect x="132" y="${b.y}" width="${width}" height="25" rx="3" fill="${b.color}"/><text x="525" y="${b.y+17}" font-size="15" font-weight="800" fill="#1f3651">${b.value===null?'—':b.value}</text>`}).join('');
- const footer=`<text x="132" y="180" font-size="11" fill="#475569">Ş / O / T · Mevcut: ${complete(before)?before.s+' / '+before.o+' / '+before.d:'—'} · Hedef: ${complete(after)?after.s+' / '+after.o+' / '+after.d:'—'}</text><text x="132" y="199" font-size="9.5" fill="#64748b">Çubukların ölçeği: 0–${max} puan (RÖS aralığı 1–1000)</text></svg>`;
- return base+items+footer;
-}
-function chartDistSvg(){const counts=groups.map(()=>0);for(const r of data.records){const g=groupOf(rpn(r.before));if(g)counts[groups.indexOf(g)]++}const top=Math.max(1,...counts);
- const rows=groups.map((g,i)=>{const y=35+i*36,w=Math.round(counts[i]/top*325);return `<text x="6" y="${y+17}" font-size="12" fill="#334155" font-weight="700">${g.title}</text><rect x="113" y="${y}" width="325" height="24" rx="3" fill="#eef2f7" stroke="#e0e8f0"/><rect x="113" y="${y}" width="${w}" height="24" rx="3" fill="${g.color}"/><text x="449" y="${y+17}" fill="#1f3651" font-size="14" font-weight="800">${counts[i]} kayıt</text>`}).join('');
- return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 200" role="img" aria-label="Genel risk öncelik sayısı dağılımı" style="font-family:Segoe UI,Arial,sans-serif"><text x="6" y="17" font-size="12" font-weight="800" fill="#27425d">Kayıtların Mevcut RÖS Değerlerine Göre Dağılımı</text>${rows}<text x="113" y="195" fill="#64748b" font-size="10">Toplam ${data.records.length} kayıt · Örnek kurumsal RÖS aralıkları</text></svg>`;
-}
-function drawChart(){$('tabSingle').classList.toggle('active',mode==='single');$('tabDist').classList.toggle('active',mode==='distribution');$('chart').innerHTML=mode==='single'?chartSingleSvg(working.before,working.after):chartDistSvg();const b=rpn(working.before),a=rpn(working.after);
- $('chartSummary').textContent=mode==='single'?(b===null?'Şiddet, oluşma ve tespit değerlerini seçerek mevcut RÖS puanını hesaplayın.':'Mevcut: '+fmt(b)+' · '+groupOf(b).title+'  →  Hedef: '+(a===null?'Henüz belirlenmedi':fmt(a)+' · '+groupOf(a).title)):'Toplam '+data.records.length+' hata kaydı. Grafik mevcut RÖS dağılımını gösterir; ortalama değildir.'}
-function clearForm(){editingId=null;$('fmeaForm').reset();working={before:emptyFactor(),after:emptyFactor()};$('status').value='';$('verified').checked=false;$('formHeading').textContent='Yeni FMEA Hata Kaydı';$('saveBtn').textContent='＋ FMEA Kaydı Ekle';$('formInfo').textContent='Yeni kayıt oluşturuluyor.';showFactors()}
-function formValues(){const raw={id:editingId||uid(),created:editingId?(data.records.find(r=>r.id===editingId)?.created||today()):today(),before:{...working.before},after:{...working.after},verified:$('verified').checked};for(const k of fields)raw[k]=$(k).value.trim();return normalizeRecord(raw)}
-function startEdit(id){const r=data.records.find(x=>x.id===id);if(!r)return;editingId=id;for(const k of fields)$(k).value=r[k]||'';$('verified').checked=r.verified;working={before:{...r.before},after:{...r.after}};showFactors();mode='single';drawChart();$('formHeading').textContent='FMEA Kaydını Düzenle';$('saveBtn').textContent='✓ Değişiklikleri Kaydet';$('formInfo').textContent='Kayıt düzenleniyor.';document.getElementById('formHeading').scrollIntoView({behavior:'smooth',block:'start'})}
-function renderTable(){const filter=$('filter').value,q=$('search').value.toLocaleLowerCase('tr-TR').trim();const todayStr=today();const filtered=data.records.filter(r=>(!filter||r.status===filter)&&(!q||[r.process,r.equipment,r.function,r.failure,r.effect,r.cause,r.action,r.owner].some(x=>x.toLocaleLowerCase('tr-TR').includes(q))));
- $('mTotal').textContent=data.records.length;$('mHigh').textContent=data.records.filter(r=>!r.verified&&rpn(r.before)>=100).length;$('mOverdue').textContent=data.records.filter(r=>!r.verified&&r.due&&r.due<todayStr).length;$('mVerified').textContent=data.records.filter(r=>r.verified).length;
- $('recordCount').textContent=`(${filtered.length}/${data.records.length})`;$('empty').hidden=filtered.length>0;
- $('recordRows').innerHTML=filtered.map((r,i)=>{const b=rpn(r.before),a=rpn(r.after),g=groupOf(b),h=groupOf(a);return `<tr><td>${i+1}</td><td><b>${esc(r.process)}</b><div class="sub">${esc(r.equipment)} · ${esc(r.function)}</div></td><td><b>${esc(r.failure)}</b><div class="sub">${esc(r.effect)}</div></td><td>${esc(r.cause)}</td><td>${r.before.s}×${r.before.o}×${r.before.d}=<b>${b}</b><div><span class="tag ${g.key}">${g.title}</span></div></td><td>${a===null?'—':r.after.s+'×'+r.after.o+'×'+r.after.d+'=<b>'+a+'</b>'}<div>${h?`<span class="tag ${h.key}">${r.verified?'Doğrulandı':'Hedef'} · ${h.title}</span>`:''}</div></td><td>${esc(r.action)}</td><td>${esc(r.owner)}<div class="sub">${esc(r.due)}</div></td><td>${esc(statusText[r.status])}</td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" class="btn btn-sm" data-act="edit" data-id="${esc(r.id)}">Düzenle</button><button type="button" class="btn btn-sm" data-act="copy" data-id="${esc(r.id)}">Kopyala</button><button type="button" class="btn btn-sm btn-red" data-act="del" data-id="${esc(r.id)}">Sil</button></div></td></tr>`}).join('');drawChart();}
-function validateForm(){for(const k of ['process','function','failure','effect','cause'])if(!$(k).value.trim()){alert('Zorunlu alan: '+({process:'Bölüm / Süreç',function:'Faaliyet / Fonksiyon',failure:'Hata Türü',effect:'Hatanın Etkisi',cause:'Hatanın Nedeni'}[k]));$(k).focus();return false}
- if(!complete(working.before)){alert('Mevcut FMEA için Şiddet, Oluşma ve Tespit puanlarını (1–10) seçin.');return false}
- if(anyFactor(working.after)&&!complete(working.after)){alert('Hedef FMEA için Ş, O ve T puanlarının üçünü de seçin veya tamamını boş bırakın.');return false}
- if($('verified').checked&&($('status').value!=='done'||!complete(working.after))){alert('Doğrulama için aksiyon durumu Tamamlandı olmalı ve hedef Ş/O/T puanları eksiksiz girilmelidir.');return false}
- return true}
-function bind(){for(const m of document.querySelectorAll('[data-meta]'))m.addEventListener('input',()=>{data.meta[m.dataset.meta]=m.value});
- $('fmeaForm').addEventListener('change',e=>{const node=e.target;if(node.dataset.side){working[node.dataset.side][node.dataset.factor]=node.value?Number(node.value):null;showScore()}if(node.id==='status'||node.id==='verified')showScore()});
- $('fmeaForm').addEventListener('submit',e=>{e.preventDefault();if(!validateForm())return;const record=formValues();if(!record){alert('FMEA kaydı geçersiz. Puanları kontrol edin.');return}const idx=data.records.findIndex(r=>r.id===editingId);if(idx>=0)data.records[idx]=record;else data.records.push(record);const wasEdit=idx>=0;clearForm();renderTable();mode='distribution';drawChart();message(wasEdit?'FMEA kaydı güncellendi.':'FMEA hata kaydı eklendi.')});
- for(const b of ['newBtn','cancelBtn'])$(b).addEventListener('click',()=>{clearForm();mode='single';drawChart()});
- $('tabSingle').addEventListener('click',()=>{mode='single';drawChart()});$('tabDist').addEventListener('click',()=>{mode='distribution';drawChart()});
- $('recordRows').addEventListener('click',e=>{const b=e.target.closest('button[data-act]');if(!b)return;const r=data.records.find(x=>x.id===b.dataset.id);if(!r)return;const action=b.dataset.act;if(action==='edit')startEdit(r.id);if(action==='copy'){const c=normalizeRecord({...r,id:uid(),created:today(),verified:false,status:r.status==='done'?'open':r.status});data.records.push(c);renderTable();message('FMEA kaydı çoğaltıldı.')}if(action==='del'&&confirm('Bu FMEA kaydı silinsin mi?')){data.records=data.records.filter(x=>x.id!==r.id);if(editingId===r.id)clearForm();renderTable();message('FMEA kaydı silindi.')}});
- for(const k of ['search','filter'])$(k).addEventListener('input',renderTable);
- $('clearBtn').addEventListener('click',()=>{if(!data.records.length)return message('Silinecek FMEA kaydı bulunmuyor.');if(!confirm(data.records.length+' FMEA kaydı silinecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;data.records=[];clearForm();renderTable();message('Tüm kayıtlar silindi.')});
- $('exportBtn').addEventListener('click',exportJson);$('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>importJson(e.target.files?.[0]));
- $('printBtn').addEventListener('click',printNow);window.addEventListener('beforeprint',buildPrint);
+function toast(msg){clearTimeout(timeoutMsg);$('toast').textContent=msg;$('toast').classList.add('on');timeoutMsg=setTimeout(()=>$('toast').classList.remove('on'),3700)}
+function saveBrand(){try{localStorage.setItem(BRAND_KEY,JSON.stringify(brand))}catch(e){toast('Başlık tercihleri kaydedilemedi.')}}
+function loadBrand(){try{let v=JSON.parse(localStorage.getItem(BRAND_KEY)||'null');if(v&&typeof v==='object')for(let k of Object.keys(BRAND_DEFAULT))if(typeof v[k]==='string')brand[k]=v[k]}catch(e){}
+ $('brandTitle').textContent=brand.title;$('brandSubtitle').textContent=brand.subtitle;$('brandOrg').textContent=brand.org;setLogo(brand.logo);
+ bindFive($('logoTrigger'),()=>$('logoFile').click());for(let [id,key] of [['brandTitle','title'],['brandSubtitle','subtitle'],['brandOrg','org']])bindFive($(id),()=>editBrand($(id),key));
+ $('logoFile').addEventListener('change',e=>{let f=e.target.files?.[0];if(!f)return;if(!/^image\//.test(f.type)||f.size>1500000){alert('1,5 MB altında PNG / JPEG / WebP / GIF / SVG görsel seçin.');e.target.value='';return}let rd=new FileReader();rd.onload=()=>{brand.logo=String(rd.result||'');setLogo(brand.logo);saveBrand();toast('Kurum logosu kaydedildi.')};rd.readAsDataURL(f);e.target.value=''})}
+function setLogo(v){const img=$('brandLogo'),alt=$('logoFallback');img.onload=()=>{img.hidden=false;alt.hidden=true};img.onerror=()=>{img.hidden=true;alt.hidden=false};img.src=v&&/^data:image\//.test(v)?v:'logo.jpg'}
+function bindFive(el,cb){let clicks=0,last=0;el.addEventListener('click',()=>{if(el.isContentEditable)return;let now=Date.now();clicks=now-last>1100?1:clicks+1;last=now;if(clicks>=5){clicks=0;cb()}})}
+function editBrand(el,key){el.contentEditable='true';el.focus();let range=document.createRange(),sel=window.getSelection();range.selectNodeContents(el);sel.removeAllRanges();sel.addRange(range);let done=false;function save(){if(done)return;done=true;el.contentEditable='false';brand[key]=el.textContent.trim()||BRAND_DEFAULT[key];el.textContent=brand[key];saveBrand();el.removeEventListener('blur',save);el.removeEventListener('keydown',keyDown)}function keyDown(e){if(e.key==='Enter'){e.preventDefault();el.blur()}if(e.key==='Escape'){e.preventDefault();el.textContent=brand[key];el.blur()}}el.addEventListener('blur',save);el.addEventListener('keydown',keyDown)}
+function factor(obj){if(!obj||obj.l==null||obj.s==null||obj.l===''||obj.s==='')return null;let l=Number(obj.l),s=Number(obj.s);return Number.isInteger(l)&&l>=1&&l<=5&&Number.isInteger(s)&&s>=1&&s<=5?{l,s}:null}
+function grade(score){return score==null?null:grades.find(g=>score>=g.min&&score<=g.max)||null}
+function risk(f){const v=factor(f);return v?v.l*v.s:null}
+function normalizeRecord(o){if(!o||typeof o!=='object'||Array.isArray(o))return null;let before=factor(o.before),after=factor(o.after);if(!before)return null;const afterInvalid=o.after&&((o.after.l!==''&&o.after.l!=null)||(o.after.s!==''&&o.after.s!=null))&&!after;if(afterInvalid)return null;
+ const r={id:asText(o.id)||uid(),method:'HAZOP',created:asText(o.created)||today()};for(let k of factorKeys)r[k]=asText(o[k]);r.status=statusText[r.status]?r.status:'open';r.verified=Boolean(o.verified)&&r.status==='done'&&!!after;r.before=before;r.after=after;return r}
+function scoreView(prefix,raw){let n=risk(raw),g=grade(n);$(prefix+'Score').textContent=n??'—';let elem=$(prefix+'Level');elem.textContent=g?g.name:prefix==='after'?'Hedef girilmedi':'Değerlendirilmedi';elem.className='riskpill '+(g?'risk-'+g.key:'')}
+function beforeAfter(){let bf={l:$('beforeL').value,s:$('beforeS').value},af={l:$('afterL').value,s:$('afterS').value};return {before:factor(bf),after:factor(af),rawBefore:bf,rawAfter:af}}
+function updateScore(){let f=beforeAfter();scoreView('before',f.before);scoreView('after',f.after);drawChart()}
+function suggested(){let p=$('parameter').value,g=$('guide').value;if(!p||!g)return '';const suffix={NO:'yok / tamamen kayıp',MORE:'normalin üzerinde / fazla',LESS:'normalin altında / az',REVERSE:'ters yönde',AS_WELL_AS:'ek / istenmeyen bileşenle birlikte',PART_OF:'eksik / kısmi',OTHER_THAN:'beklenenden farklı',EARLY:'beklenenden erken',LATE:'beklenenden geç',BEFORE:'öngörülen sıradan önce',AFTER:'öngörülen sıradan sonra'};return p+' '+suffix[g]}
+function updateSuggestion(){let guess=suggested(),input=$('deviation');if(!input.value.trim()||input.value===lastSuggestion)input.value=guess;lastSuggestion=guess}
+function renderMeta(){for(let el of document.querySelectorAll('[data-meta]'))el.value=data.meta[el.dataset.meta]||''}
+function readMeta(){for(let el of document.querySelectorAll('[data-meta]'))data.meta[el.dataset.meta]=el.value}
+function clearForm(){currentEdit=null;$('recordForm').reset();$('status').value='open';lastSuggestion='';$('formMode').textContent='Yeni HAZOP Sapma Kaydı';$('saveBtn').textContent='＋ Sapma Kaydını Ekle';$('modeInfo').textContent='Yeni HAZOP kaydı oluşturuluyor.';updateScore()}
+function fromForm(){const t=k=>$(k).value.trim(),f=beforeAfter();return normalizeRecord({id:currentEdit||uid(),created:currentEdit?(data.records.find(r=>r.id===currentEdit)?.created||today()):today(),...Object.fromEntries(factorKeys.map(k=>[k,t(k)])),before:f.rawBefore,after:f.rawAfter,verified:$('verified').checked})}
+function validateForm(){let required=['node','intent','parameter','guide','deviation','causes','consequences','action'];for(let id of required)if(!$(id).value.trim()){alert('Lütfen zorunlu alanı doldurun: '+document.querySelector('label[for="'+id+'"]')?.textContent);$(id).focus();return false}let f=beforeAfter();if(!f.before){alert('Mevcut Olasılık ve Şiddet değerlerini 1–5 arasında seçin.');return false}let afterOne=Boolean(f.rawAfter.l)||Boolean(f.rawAfter.s);if(afterOne&&!f.after){alert('Hedef risk için Olasılık ve Şiddet değerlerinin ikisini de seçin.');return false}if($('verified').checked&&($('status').value!=='done'||!f.after)){alert('Önlem ancak aksiyon tamamlanıp hedef risk puanlandığında doğrulanabilir.');return false}return true}
+function startEdit(id){let r=data.records.find(v=>v.id===id);if(!r)return;currentEdit=id;for(let k of factorKeys)$(k).value=r[k]||'';$('beforeL').value=r.before.l;$('beforeS').value=r.before.s;$('afterL').value=r.after?.l||'';$('afterS').value=r.after?.s||'';$('verified').checked=r.verified;lastSuggestion='';$('formMode').textContent='HAZOP Kaydını Düzenle';$('saveBtn').textContent='✓ Değişiklikleri Kaydet';$('modeInfo').textContent='Seçili HAZOP kaydı düzenleniyor.';mode='single';updateScore();document.querySelector('.card-h h2 #formMode').scrollIntoView({block:'start',behavior:'smooth'})}
+function duplicateRecord(id){const r=data.records.find(x=>x.id===id);if(!r)return;data.records.push({...r,id:uid(),created:today(),status:'open',verified:false,before:{...r.before},after:r.after?{...r.after}:null});renderTable();toast('HAZOP kaydı kopyalandı.')}
+function deleteRecord(id){if(!confirm('Bu HAZOP sapma kaydı silinecek. Devam edilsin mi?'))return;data.records=data.records.filter(r=>r.id!==id);if(currentEdit===id)clearForm();renderTable();toast('Kayıt silindi.')}
+function pill(n){const g=grade(n);return g?'<span class="riskpill risk-'+g.key+'">'+g.name+'</span>':'—'}
+function renderTable(){let q=$('search').value.trim().toLocaleLowerCase('tr-TR'),filter=$('filter').value;let todayStr=today();$('total').textContent=data.records.length;$('priority').textContent=data.records.filter(r=>!r.verified&&risk(r.before)>=10).length;$('overdue').textContent=data.records.filter(r=>!r.verified&&r.due&&r.due<todayStr).length;$('verifiedCount').textContent=data.records.filter(r=>r.verified).length;
+ const showing=data.records.filter(r=>(!filter||r.status===filter)&&(!q||factorKeys.some(k=>asText(r[k]).toLocaleLowerCase('tr-TR').includes(q))));$('recordCount').textContent='('+showing.length+'/'+data.records.length+')';$('empty').hidden=showing.length>0;$('rows').innerHTML=showing.map((r,i)=>`<tr><td>${i+1}</td><td><b>${esc(r.node)}</b><div class="cellsub">${esc(r.tag)}</div></td><td><b>${esc(r.parameter)}</b><div class="cellsub">${esc(guideNames[r.guide]||r.guide)}</div></td><td>${esc(r.deviation)}<div class="cellsub">${esc(r.causes)}</div></td><td>${esc(r.consequences)}<div class="cellsub">${esc(r.safeguards)}</div></td><td><b>${risk(r.before)}</b> · ${pill(risk(r.before))}<div class="cellsub">${r.before.l} × ${r.before.s}</div></td><td>${risk(r.after)??'—'} · ${pill(risk(r.after))}</td><td>${esc(r.action)}</td><td>${esc(r.owner||'—')}<div class="cellsub">${esc(r.due||'—')}</div></td><td>${esc(statusText[r.status])}${r.verified?'<div class="cellsub">Doğrulandı</div>':''}</td><td><div style="display:grid;gap:4px"><button class="btn btn-small" type="button" data-act="edit" data-id="${esc(r.id)}">Düzenle</button><button class="btn btn-small" type="button" data-act="copy" data-id="${esc(r.id)}">Kopyala</button><button class="btn btn-small btn-red" type="button" data-act="delete" data-id="${esc(r.id)}">Sil</button></div></td></tr>`).join('');drawChart()}
+function backgroundFor(n){const g=grade(n);return g?.color||'#eef2f6'}
+function drawChart(){let f=beforeAfter(),bn=risk(f.before),an=risk(f.after);$('singleMode').classList.toggle('active',mode==='single');$('distMode').classList.toggle('active',mode==='dist');if(mode==='single'){
+ let cells='<div class="axis">Ş \\ O</div>';for(let l=1;l<=5;l++)cells+='<div class="axis">'+l+'</div>';for(let s=5;s>=1;s--){cells+='<div class="axis">'+s+'</div>';for(let l=1;l<=5;l++){const r=l*s;let marker=(f.before&&f.before.l===l&&f.before.s===s?' is-before':'')+(f.after&&f.after.l===l&&f.after.s===s?' is-after':'');cells+=`<div class="risk-cell${marker}" style="background:${backgroundFor(r)}" title="Olasılık ${l} × Şiddet ${s} = ${r}">${r}</div>`}}
+ $('chart').innerHTML='<div class="matrix">'+cells+'</div>';$('riskSummary').textContent=bn!=null?'Mevcut '+bn+' puan ('+grade(bn).name+')'+(an!=null?' → Hedef '+an+' puan ('+grade(an).name+')':'')+'. Şiddet 5 olan sapmalar puandan bağımsız ayrıca incelenmelidir.':'Mevcut puanları seçtiğinizde risk matrisinde işaretlenir.';
+ }else{let counts=grades.map(()=>0);for(let r of data.records){let g=grade(risk(r.before));if(g)counts[grades.indexOf(g)]++}let max=Math.max(1,...counts);$('chart').innerHTML=grades.map((g,i)=>`<div class="barrow"><span class="barlabel">${g.name}</span><span class="bar"><span class="barfill" style="display:block;width:${counts[i]/max*100}%;background:${g.color}"></span></span><span class="barvalue">${counts[i]} kayıt</span></div>`).join('');$('riskSummary').textContent='Genel dağılım: '+data.records.length+' sapma kaydı. Çubuklar mevcut riskleri temsil eder.'}}
+function resetOnOpen(){data={meta:initMeta(),records:[]};renderMeta();clearForm();$('search').value='';$('filter').value='';$('fileIn').value='';renderTable()}
+function bind(){document.querySelectorAll('[data-meta]').forEach(el=>el.addEventListener('input',readMeta));for(let id of ['beforeL','beforeS','afterL','afterS'])$(id).addEventListener('change',updateScore);for(let id of ['guide','parameter'])$(id).addEventListener('change',updateSuggestion);
+ $('singleMode').addEventListener('click',()=>{mode='single';drawChart()});$('distMode').addEventListener('click',()=>{mode='dist';drawChart()});
+ $('recordForm').addEventListener('submit',e=>{e.preventDefault();if(!validateForm())return;const r=fromForm();if(!r)return alert('Giriş değerleri doğrulanamadı.');if(currentEdit){let i=data.records.findIndex(x=>x.id===currentEdit);if(i>=0)data.records[i]=r}else data.records.push(r);const msg=currentEdit?'HAZOP kaydı güncellendi.':'Yeni HAZOP sapması eklendi.';clearForm();renderTable();mode='dist';drawChart();toast(msg)});
+ for(let id of ['newRecordTop','cancelBtn'])$(id).addEventListener('click',()=>{clearForm();mode='single';drawChart()});
+ $('rows').addEventListener('click',e=>{let b=e.target.closest('[data-act][data-id]');if(!b)return;if(b.dataset.act==='edit')startEdit(b.dataset.id);if(b.dataset.act==='copy')duplicateRecord(b.dataset.id);if(b.dataset.act==='delete')deleteRecord(b.dataset.id)});
+ for(let id of ['search','filter'])$(id).addEventListener('input',renderTable);
+ $('clearBtn').addEventListener('click',()=>{if(!data.records.length)return toast('Silinecek kayıt bulunmuyor.');if(!confirm(data.records.length+' kaydın tamamı silinecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;data.records=[];clearForm();renderTable();toast('Tüm kayıtlar silindi.')});
+ $('importBtn').addEventListener('click',()=>$('fileIn').click());$('fileIn').addEventListener('change',e=>importJson(e.target.files?.[0]));$('exportBtn').addEventListener('click',exportJson);
+ $('printBtn').addEventListener('click',printNow);window.addEventListener('beforeprint',buildPrint)
 }
 
-
-/* Çevrimdışı FMEA JSON aktarımı: tüm form alanları, puanlar ve aksiyonlar. */
-const JSON_FORMAT='olgun-fmea-json-v1';
-function exportJson(){
- try{
- const contents=JSON.stringify({format:JSON_FORMAT,version:1,method:'FMEA',
- exportedAt:new Date().toISOString(),meta:{...data.meta},
- records:data.records.map(r=>({...r,before:{...r.before},after:{...r.after}}))},null,2);
- const filename='FMEA_Risk_Kayitlari_'+(data.meta.date||today())+'.json';
- if(window.RiskAndroid&&typeof window.RiskAndroid.saveJson==='function'){
-   window.RiskAndroid.saveJson(contents,filename);
-   message('JSON dosyasını kaydetmek için konum seçin.');
- }else{
-   const blob=new Blob([contents],{type:'application/json;charset=utf-8'});
-   const url=URL.createObjectURL(blob),a=document.createElement('a');
-   a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),5000);
-   message(data.records.length+' FMEA kaydı JSON olarak aktarıldı.');
+function xmlEsc(v){return asText(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c])).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'')}
+function colLetter(num){let res='';for(let n=num;n>0;n=Math.floor((n-1)/26))res=String.fromCharCode(65+(n-1)%26)+res;return res}
+function sheetXml(rows,{width=18,autoFilter=true}={}){
+ const maxCols=Math.max(1,...rows.map(r=>r.length));const cols=Array.from({length:maxCols},(_,i)=>{let w=width;if(i===0)w=17;if(i===5||i===6||i===8||i===9||i===26)w=42;if(i===3||i===4||i===10)w=24;return `<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`}).join('');
+ const sheetRows=rows.map((row,i)=>`<row r="${i+1}">${row.map((value,j)=>{const c=colLetter(j+1)+(i+1),st=i===0?' s="1"':'';if(typeof value==='number'&&Number.isFinite(value))return `<c r="${c}"${st}><v>${value}</v></c>`;return `<c r="${c}" t="inlineStr"${st}><is><t xml:space="preserve">${xmlEsc(value)}</t></is></c>`}).join('')}</row>`).join('');
+ return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="16"/><cols>${cols}</cols><sheetData>${sheetRows}</sheetData>${autoFilter?`<autoFilter ref="A1:${colLetter(maxCols)}${Math.max(1,rows.length)}"/>`:''}</worksheet>`
+}
+const CRC_TABLE=(()=>{const result=[];for(let i=0;i<256;i++){let x=i;for(let j=0;j<8;j++)x=(x&1)?(0xedb88320^(x>>>1)):(x>>>1);result[i]=x>>>0}return result})();
+function crc32(data){let crc=0xffffffff;for(const byte of data)crc=CRC_TABLE[(crc^byte)&255]^(crc>>>8);return (crc^0xffffffff)>>>0}
+function zipCreate(entries){
+ const enc=new TextEncoder(),pieces=[],centers=[];let offset=0;
+ const u16=(view,pos,val)=>view.setUint16(pos,val,true),u32=(view,pos,val)=>view.setUint32(pos,val>>>0,true);
+ function append(piece){pieces.push(piece);offset+=piece.length}
+ for(const [filename,text] of entries){const name=enc.encode(filename),data=enc.encode(text),crc=crc32(data),local=new Uint8Array(30+name.length),dv=new DataView(local.buffer),begin=offset;
+  u32(dv,0,0x04034b50);u16(dv,4,20);u16(dv,6,0x0800);u16(dv,8,0);u16(dv,10,0);u16(dv,12,0);u32(dv,14,crc);u32(dv,18,data.length);u32(dv,22,data.length);u16(dv,26,name.length);u16(dv,28,0);local.set(name,30);append(local);append(data);
+  const cent=new Uint8Array(46+name.length),cv=new DataView(cent.buffer);u32(cv,0,0x02014b50);u16(cv,4,20);u16(cv,6,20);u16(cv,8,0x0800);u16(cv,10,0);u16(cv,12,0);u16(cv,14,0);u32(cv,16,crc);u32(cv,20,data.length);u32(cv,24,data.length);u16(cv,28,name.length);u16(cv,30,0);u16(cv,32,0);u16(cv,34,0);u16(cv,36,0);u32(cv,38,0);u32(cv,42,begin);cent.set(name,46);centers.push(cent)
  }
- }catch(e){console.error(e);alert('JSON dışarı aktarma hatası: '+e.message)}
+ const start=offset;for(const c of centers)append(c);const end=new Uint8Array(22),e=new DataView(end.buffer);u32(e,0,0x06054b50);u16(e,4,0);u16(e,6,0);u16(e,8,centers.length);u16(e,10,centers.length);u32(e,12,offset-start);u32(e,16,start);u16(e,20,0);append(end);return new Blob(pieces,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
 }
-async function parseFmeaJson(file){
- if(!file||!/.json$/i.test(file.name||''))throw Error('Yalnızca .json dosyası seçin.');
- if(file.size>12*1024*1024)throw Error('JSON dosyası 12 MB sınırını aşıyor.');
- let o;try{o=JSON.parse(await file.text())}catch(e){throw Error('JSON okunamadı: '+e.message)}
- if(!o||typeof o!=='object'||Array.isArray(o)||o.format!==JSON_FORMAT||o.method!=='FMEA'||!Array.isArray(o.records))
-   throw Error('FMEA JSON dosya biçimi uyumsuz.');
- if(o.records.length>10000)throw Error('En fazla 10000 kayıt içeri alınabilir.');
- const records=o.records.map(normalizeRecord);
- if(records.some(r=>!r))throw Error('Geçersiz FMEA kaydı veya Ş/O/T puanı. Hiçbir kayıt aktarılmadı.');
- const ids=new Set();for(const r of records){if(ids.has(r.id))r.id=uid();ids.add(r.id)}
- const meta=initialMeta();
- if(o.meta&&typeof o.meta==='object'&&!Array.isArray(o.meta))
-   for(const k of META_KEYS)if(o.meta[k]!=null)meta[k]=String(o.meta[k]).slice(0,1000);
- return {meta,records};
-}
+function workbookFiles(rows,summary){const types=`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`;
+ const rels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+ const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Risk Kayıtları" sheetId="1" r:id="rId1"/><sheet name="Rapor Bilgileri" sheetId="2" r:id="rId2"/></sheets></workbook>`;
+ const wbRels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+ const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="10"/><name val="Calibri"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0369A1"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+ return [['[Content_Types].xml',types],['_rels/.rels',rels],['xl/workbook.xml',workbook],['xl/_rels/workbook.xml.rels',wbRels],['xl/styles.xml',styles],['xl/worksheets/sheet1.xml',sheetXml(rows)],['xl/worksheets/sheet2.xml',sheetXml(summary,{width:36,autoFilter:false})]]}
+
+
+async function unzipEntries(arrayBuffer){const bytes=new Uint8Array(arrayBuffer),view=new DataView(arrayBuffer);let end=-1;for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--)if(view.getUint32(i,true)===0x06054b50){end=i;break}if(end<0)throw new Error('Geçerli Excel ZIP yapısı bulunamadı.');const count=view.getUint16(end+10,true),base=view.getUint32(end+16,true),decoder=new TextDecoder(),entries={};let cursor=base;
+ for(let i=0;i<count;i++){if(view.getUint32(cursor,true)!==0x02014b50)throw new Error('JSON dosyası merkezi dizini okunamadı.');const method=view.getUint16(cursor+10,true),compressed=view.getUint32(cursor+20,true),nameLength=view.getUint16(cursor+28,true),extra=view.getUint16(cursor+30,true),comment=view.getUint16(cursor+32,true),localOffset=view.getUint32(cursor+42,true),name=decoder.decode(bytes.subarray(cursor+46,cursor+46+nameLength));if(view.getUint32(localOffset,true)!==0x04034b50)throw new Error('JSON dosyası veri bölümü bozuk.');const start=localOffset+30+view.getUint16(localOffset+26,true)+view.getUint16(localOffset+28,true);const content=bytes.slice(start,start+compressed);if(method===0)entries[name]=decoder.decode(content);else if(method===8){if(typeof DecompressionStream!=='function')throw new Error('Bu tarayıcı sıkıştırılmış Excel içeri aktarmayı desteklemiyor. Güncel bir Chrome veya Edge tarayıcısı deneyin.');try{const stream=new Blob([content]).stream().pipeThrough(new DecompressionStream('deflate-raw'));entries[name]=decoder.decode(await new Response(stream).arrayBuffer())}catch(e){throw new Error('Excel sıkıştırması açılamadı: '+e.message)}}else throw new Error('JSON dosyasında desteklenmeyen sıkıştırma türü.');cursor+=46+nameLength+extra+comment;
+ }return entries}
+function parseXml(source){const doc=new DOMParser().parseFromString(source,'application/xml');if(doc.querySelector('parsererror'))throw new Error('Excel XML içeriği okunamadı.');return doc}
+function parseXlsxSheet(source,shared=[]){if(!source)return [];const doc=parseXml(source),rows=[];for(const row of doc.getElementsByTagNameNS('*','row')){const cells=[];for(const c of row.getElementsByTagNameNS('*','c')){const ref=c.getAttribute('r')||'';let index=0;for(const letter of (ref.match(/^[A-Z]+/)||[''])[0])index=index*26+letter.charCodeAt(0)-64;index=Math.max(0,index-1);const type=c.getAttribute('t');let value='';if(type==='inlineStr')value=Array.from(c.getElementsByTagNameNS('*','t')).map(n=>n.textContent).join('');else{value=c.getElementsByTagNameNS('*','v')[0]?.textContent||'';if(type==='s')value=shared[Number(value)]||''}cells[index]=value}rows.push(cells)}return rows}
+
+function normalizeDate(value){const str=asText(value);if(/^\d{4}-\d{2}-\d{2}$/.test(str))return str;if(/^\d{2}\.\d{2}\.\d{4}$/.test(str)){const a=str.split('.');return a[2]+'-'+a[1]+'-'+a[0]}const n=Number(value);if(Number.isFinite(n)&&n>=1&&n<100000)return new Date(Date.UTC(1899,11,30)+Math.floor(n)*86400000).toISOString().slice(0,10);return ''}
+
+/* Excel gerçek .xlsx biçiminde, kütüphane/CDN olmadan oluşturulur. */
+
+
+const COLS=['Kayıt ID','HAZOP Düğümü','Ekipman / Tag','Tasarım Amacı','Parametre','Kılavuz Kelime','Sapma','Normal Değer','Olası Nedenler','Olası Sonuçlar','Mevcut Koruyucular','Koruma Test / Kanıtı','İşletilebilirlik Notu','Mevcut Olasılık','Mevcut Şiddet','Mevcut Risk','Mevcut Risk Grubu','Önerilen Aksiyon','Hedef Olasılık','Hedef Şiddet','Hedef Risk','Hedef Risk Grubu','Sorumlu','Termin','Aksiyon Durumu','Doğrulama','Uygulama Kanıtı / Not','Kayıt Tarihi'];
+const metaLabels={company:'İşyeri / Firma',facility:'Tesis / İşletme',unit:'Proses / Ünite',pid:'P&ID / Doküman No.',date:'Değerlendirme Tarihi',leader:'HAZOP Lideri',team:'Çalışma Ekibi',revision:'Revizyon',phase:'İşletme Aşaması',scope:'Kapsam / Referanslar'};
+function recordToRow(r){return [r.id,r.node,r.tag,r.intent,r.parameter,r.guide,r.deviation,r.normal,r.causes,r.consequences,r.safeguards,r.verification,r.existingNotes,r.before.l,r.before.s,risk(r.before),grade(risk(r.before))?.name||'',r.action,r.after?.l??'',r.after?.s??'',risk(r.after)??'',grade(risk(r.after))?.name||'',r.owner,r.due,statusText[r.status],r.verified?'Evet':'Hayır',r.evidence,r.created]}
+function downloadFile(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}
+function exportExcel(){try{readMeta();const rows=[COLS,...data.records.map(recordToRow)];const summary=[['Alan','Değer'],['Yöntem','HAZOP'],...keys.map(k=>[metaLabels[k],data.meta[k]]),['Toplam Sapma',data.records.length],['Yüksek / Çok Yüksek · Açık',data.records.filter(r=>!r.verified&&risk(r.before)>=10).length],['Doğrulanan',data.records.filter(r=>r.verified).length],['Yardımcı Puan','Olasılık × Şiddet (1–5)'],['Uyarı','HAZOP kılavuz kelime incelemesi esas olup risk matrisi yardımcıdır.']];downloadFile(zipCreate(workbookFiles(rows,summary)),'ISG_HAZOP_Risk_Analizi_'+(data.meta.date||today())+'.xlsx');toast(data.records.length+' sapma kaydı JSON olarak dışarı aktarıldı.')}catch(e){console.error(e);alert('JSON dışarı aktarma hatası: '+e.message)}}
+function fromRow(row,idx){const get=k=>row[idx.get(k)]??'';const statusRaw=get('Aksiyon Durumu'),status=Object.keys(statusText).find(k=>statusText[k]===statusRaw)||(statusText[statusRaw]?statusRaw:'open');return normalizeRecord({id:get('Kayıt ID'),method:'HAZOP',node:get('HAZOP Düğümü'),tag:get('Ekipman / Tag'),intent:get('Tasarım Amacı'),parameter:get('Parametre'),guide:get('Kılavuz Kelime'),deviation:get('Sapma'),normal:get('Normal Değer'),causes:get('Olası Nedenler'),consequences:get('Olası Sonuçlar'),safeguards:get('Mevcut Koruyucular'),verification:get('Koruma Test / Kanıtı'),existingNotes:get('İşletilebilirlik Notu'),action:get('Önerilen Aksiyon'),before:{l:get('Mevcut Olasılık'),s:get('Mevcut Şiddet')},after:{l:get('Hedef Olasılık'),s:get('Hedef Şiddet')},owner:get('Sorumlu'),due:normalizeDate(get('Termin')),status,verified:get('Doğrulama')==='Evet',evidence:get('Uygulama Kanıtı / Not'),created:normalizeDate(get('Kayıt Tarihi'))||today()})}
+async function readExcel(file){if(!/\.xlsx$/i.test(file.name))throw Error('Yalnızca .xlsx dosyaları seçin.');if(file.size>15*1024*1024)throw Error('JSON dosyası 15 MB sınırını aşıyor.');const entries=await unzipEntries(await file.arrayBuffer()),strings=[];if(entries['xl/sharedStrings.xml']){let doc=parseXml(entries['xl/sharedStrings.xml']);for(let item of doc.getElementsByTagNameNS('*','si'))strings.push(Array.from(item.getElementsByTagNameNS('*','t')).map(x=>x.textContent).join(''))}
+ let rows=parseXlsxSheet(entries['xl/worksheets/sheet1.xml'],strings);if(!rows.length)throw Error('HAZOP kayıt sayfası boş veya bulunamadı.');let idx=new Map(rows[0].map((v,i)=>[asText(v).trim(),i]));let needed=['Kayıt ID','HAZOP Düğümü','Parametre','Kılavuz Kelime','Sapma','Olası Nedenler','Olası Sonuçlar','Mevcut Olasılık','Mevcut Şiddet'];if(needed.some(x=>!idx.has(x)))throw Error('JSON dosyası HAZOP şablonuna uygun değil.');let nonempty=rows.slice(1).filter(r=>r.some(c=>asText(c).trim()));if(nonempty.length>10000)throw Error('Bir dosyada en fazla 10.000 sapma kaydı desteklenir.');let records=nonempty.map(r=>fromRow(r,idx));if(records.some(r=>!r))throw Error('Geçersiz Olasılık/Şiddet puanları veya eksik hedef faktörleri bulundu.');let seen=new Set();for(let r of records){if(seen.has(r.id))r.id=uid();seen.add(r.id)}
+ let info=parseXlsxSheet(entries['xl/worksheets/sheet2.xml'],strings),lookup=new Map(info.slice(1).map(r=>[r[0],r[1]])),meta=initMeta();for(let k of keys)if(lookup.has(metaLabels[k]))meta[k]=asText(lookup.get(metaLabels[k]));return {records,meta}}
+async function importExcel(file){if(!file)return;try{let result=await readExcel(file);if(data.records.length&&!confirm('Mevcut '+data.records.length+' HAZOP kaydı yerine '+result.records.length+' JSON kaydı yüklenecek. Önce yedek alın. Devam edilsin mi?'))return;data=result;renderMeta();clearForm();renderTable();mode='dist';drawChart();toast(result.records.length+' HAZOP kaydı içeri alındı.')}catch(e){console.error(e);alert('JSON içeri aktarma başarısız: '+e.message)}finally{$('fileIn').value=''}}
+
+
+
 async function importJson(file){
  if(!file)return;
  try{
-   const loaded=await parseFmeaJson(file);
-   if(data.records.length&&!confirm('Mevcut '+data.records.length+' FMEA kaydı yerine '+loaded.records.length+
-   ' JSON kaydı yüklenecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;
-   data=loaded;renderMeta();clearForm();renderTable();mode='distribution';drawChart();
-   message(loaded.records.length+' FMEA kaydı JSON dosyasından yüklendi.');
+  if(!/\\.json$/i.test(file.name||''))throw Error('Yalnızca .json dosyası seçin.');
+  if(file.size>12*1024*1024)throw Error('JSON dosyası 12 MB sınırını aşıyor.');
+  let raw;
+  try{raw=JSON.parse(await file.text())}catch(e){throw Error('JSON okunamadı: '+e.message)}
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)||raw.method!=='HAZOP'||!Array.isArray(raw.records)
+     ||(raw.format&&raw.format!=='risk-ui-hazop-json-v1'))throw Error('Dosya Risk UI HAZOP JSON yapısıyla uyumlu değil.');
+  if(raw.records.length>10000)throw Error('En fazla 10.000 HAZOP kaydı içeri alınabilir.');
+  if(!raw.records.length)throw Error('JSON dosyasında risk kaydı bulunmuyor.');
+  const records=raw.records.map(normalizeRecord);
+  if(records.some(r=>!r))throw Error('Geçersiz risk faktörü olan kayıt bulundu. Veriler değiştirilmedi.');
+  const used=new Set();
+  for(const r of records){if(used.has(r.id))r.id=uid();used.add(r.id)}
+  const incomingMeta=initMeta();
+  if(raw.meta&&typeof raw.meta==='object'&&!Array.isArray(raw.meta)){
+    for(const k of keys)if(raw.meta[k]!=null)incomingMeta[k]=asText(raw.meta[k]).slice(0,4000);
+  }
+  if(data.records.length&&!confirm('Mevcut '+data.records.length+' HAZOP kaydı yerine '+records.length+' JSON kaydı yüklenecek. Önce JSON yedeği alın. Devam edilsin mi?'))return;
+  data={meta:incomingMeta,records};
+  renderMeta();clearForm();renderTable();mode='dist';drawChart();
+  toast(records.length+' HAZOP kaydı JSON ile içeri alındı.');
  }catch(e){console.error(e);alert('JSON içeri aktarma başarısız: '+e.message)}
- finally{$('importFile').value=''}
+ finally{$('fileIn').value=''}
 }
-
-function field(label,v){return `<div class="print-field"><b>${esc(label)}</b>${esc(v||'—')}</div>`}
-function recordDetails(r,i){const after=rpn(r.after);return `<div class="print-detail"><div class="print-detail-head"><span>${i+1}. ${esc(r.process)} / ${esc(r.equipment)} – ${esc(r.failure)}</span><span>RÖS ${rpn(r.before)} → ${after??'—'} · ${esc(statusText[r.status])} ${r.verified?'· Doğrulandı':''}</span></div><div class="print-detail-grid">${field('Faaliyet / Fonksiyon',r.function)}${field('Hata Etkisi',r.effect)}${field('Hata Nedeni',r.cause)}${field('Mevcut Önleme Kontrolleri',r.prevention)}${field('Mevcut Tespit Kontrolleri',r.detection)}${field('Önerilen Önlem / Aksiyon',r.action)}${field('Sorumlu / Termin',(r.owner||'—')+' / '+(r.due||'—'))}${field('Ş × O × T (Mevcut)',r.before.s+' × '+r.before.o+' × '+r.before.d+' = '+rpn(r.before))}${field('Ş × O × T (Hedef)',after===null?'—':r.after.s+' × '+r.after.o+' × '+r.after.d+' = '+after)}${field('Doğrulama Kanıtı / Not',r.evidence)}</div></div>`}
-function logoPrintSrc(){const img=$('brandLogo');if(img&&!img.hidden&&img.complete&&img.naturalWidth>0)return brand.logo&&/^data:image\//.test(brand.logo)?brand.logo:(img.currentSrc||img.src);return ''}
-function buildPrint(){const src=logoPrintSrc();const logo=src?`<img src="${esc(src)}" alt="Kurum logosu">`:`<span style="color:#64748b;font-size:10px">LOGO</span>`;
- $('printHeader').innerHTML=`<div class="print-header">${logo}<div style="min-width:0"><h1>${esc(brand.title)}</h1><p>${esc(brand.subtitle)}</p></div><div class="print-org">${esc(brand.org)}</div></div>`;
- const m=data.meta;
- let current=working.before,target=working.after;
- if(rpn(current)===null&&data.records.length){current=data.records[0].before;target=data.records[0].after}
- const overview=`<div class="print-section"><h3>01 · İşyeri ve Değerlendirme Bilgileri</h3><div class="print-grid">${field('İşyeri / Firma',m.company)}${field('Tesis / Alan',m.facility)}${field('Hazırlayan',m.prepared)}${field('Değerlendirme Tarihi',m.date)}${field('Revizyon',m.revision)}</div></div>`;
- const chartSection=`<div class="print-section" style="break-inside:avoid"><h3>02 · FMEA Grafik Analizi</h3><div class="print-charts"><div class="print-chart"><h4>Mevcut / Hedef RÖS</h4>${chartSingleSvg(current,target)}</div><div class="print-chart"><h4>Genel Hata Öncelik Dağılımı</h4>${chartDistSvg()}</div></div><div class="print-note">Örnek RÖS aralıkları: İzleme 1–39, Dikkat 40–99, Öncelikli 100–199, Kritik 200–1000. Bunlar resmî veya evrensel FMEA eşikleri değildir.</div></div>`;
- const rows=data.records.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.process)} / ${esc(r.equipment)}</td><td>${esc(r.failure)}</td><td>${esc(r.effect)}</td><td>${esc(r.cause)}</td><td>${r.before.s}×${r.before.o}×${r.before.d}=${rpn(r.before)}</td><td>${rpn(r.after)===null?'—':r.after.s+'×'+r.after.o+'×'+r.after.d+'='+rpn(r.after)}</td><td>${esc(r.owner)}<br>${esc(r.due)}</td><td>${esc(statusText[r.status])}</td></tr>`).join('');
- const table=`<div class="print-section"><h3>03 · FMEA Kayıt Özeti (${data.records.length})</h3>${data.records.length?`<table class="print-table"><colgroup><col style="width:4%"><col style="width:15%"><col style="width:14%"><col style="width:16%"><col style="width:15%"><col style="width:10%"><col style="width:10%"><col style="width:10%"><col style="width:6%"></colgroup><thead><tr><th>No</th><th>Süreç / Makine</th><th>Hata Türü</th><th>Etki</th><th>Neden</th><th>Mevcut RÖS</th><th>Hedef RÖS</th><th>Sorumlu / Tarih</th><th>Durum</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="print-note">Henüz kaydedilmiş FMEA hata kaydı bulunmuyor.</div>'}</div>`;
- const details=data.records.length?`<div class="print-section"><h3>04 · Hata Kayıtları / Kontrol ve Aksiyon Detayları</h3>${data.records.map(recordDetails).join('')}</div>`:'';
- const note=`<div class="print-note">FMEA = Hata Türleri ve Etkileri Analizi. RÖS = Şiddet × Oluşma × Tespit Edilebilirlik. Şiddeti yüksek hata türleri, düşük RÖS olsa dahi ayrıca değerlendirilmelidir. Kurumsal yöntem ve onay süreçlerinin yerine geçmez.</div>`;
- $('printReport').innerHTML=overview+chartSection+table+details+note;
+function exportJson(){
+ try{
+  readMeta();
+  const payload={format:'risk-ui-hazop-json-v1',method:'HAZOP',app:'Risk UI mobil',version:'1.0.0',exportedAt:new Date().toISOString(),meta:{...data.meta},records:data.records.map(r=>({...r,before:{...r.before},after:r.after?{...r.after}:null}))};
+  const text=JSON.stringify(payload,null,2);
+  const filename='HAZOP_Risk_UI_Mobil_'+(data.meta.date||today())+'.json';
+  if(window.RiskAndroid&&typeof window.RiskAndroid.saveJson==='function')window.RiskAndroid.saveJson(text,filename);
+  else downloadFile(new Blob([text],{type:'application/json;charset=utf-8'}),filename);
+  toast(data.records.length+' HAZOP kaydı JSON olarak dışarı aktarıldı.');
+ }catch(e){console.error(e);alert('JSON dışarı aktarma hatası: '+e.message)}
 }
-async function printNow(){buildPrint();const pics=[...$('printHeader').querySelectorAll('img')];await Promise.all(pics.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true});setTimeout(resolve,1800)})));if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function')window.RiskAndroid.printPdf();else window.print()}
-function resetStart(){data={meta:initialMeta(),records:[]};working={before:emptyFactor(),after:emptyFactor()};editingId=null;mode='single';$('search').value='';$('filter').value='';$('importFile').value='';renderMeta();clearForm();renderTable()}
-initializeBrand();bind();resetStart();window.addEventListener('pageshow',e=>{if(e.persisted)resetStart()});
-})();
-</script>
-</body>
-</html>
+function printField(label,v){return `<div class="p-field"><b>${esc(label)}</b>${esc(v==null||v===''?'—':v)}</div>`}
+function chartRiskSvg(){let colors=grades.map(g=>g.color),w=490,h=145;let counts=grades.map(()=>0);for(let r of data.records){let g=grade(risk(r.before));if(g)counts[grades.indexOf(g)]++}let max=Math.max(1,...counts);let rows=grades.map((g,i)=>{let y=8+i*33,bw=counts[i]/max*248;return `<text x="6" y="${y+17}" font-size="11" fill="#34495d">${g.name}</text><rect x="148" y="${y+3}" width="250" height="20" fill="#eef3f7"/><rect x="149" y="${y+4}" width="${bw}" height="18" fill="${g.color}"/><text x="412" y="${y+17}" font-size="11" fill="#34495d">${counts[i]} kayıt</text>`}).join('');return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}">${rows}</svg>`}
+function chartMatrixSvg(){let width=490,height=145,cell=25,ox=185,oy=8;let rows='';let f=beforeAfter(),markB=f.before,markA=f.after;if(!markB&&data.records.length){markB=data.records[0].before;markA=data.records[0].after}for(let s=5;s>=1;s--)for(let l=1;l<=5;l++){let n=l*s,x=ox+(l-1)*cell,y=oy+(5-s)*cell,isB=markB?.l===l&&markB?.s===s,isA=markA?.l===l&&markA?.s===s;rows+=`<rect x="${x}" y="${y}" width="${cell-2}" height="${cell-2}" rx="2" fill="${backgroundFor(n)}" ${isB?'stroke="#125ba9" stroke-width="2.8"':''}/><text x="${x+11.5}" y="${y+16}" text-anchor="middle" font-size="11" fill="#354b58">${n}</text>${isA?`<rect x="${x+3}" y="${y+3}" width="${cell-8}" height="${cell-8}" fill="none" stroke="#854fb9" stroke-width="2"/>`:''}`}
+let axes='';for(let i=1;i<=5;i++){axes+=`<text x="${ox+(i-1)*cell+12}" y="143" text-anchor="middle" font-size="10">${i}</text><text x="${ox-8}" y="${oy+(5-i)*cell+16}" text-anchor="end" font-size="10">${i}</text>`}return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}"><text x="6" y="20" font-size="11" fill="#34556a">Yatay: Olasılık (1–5)</text><text x="6" y="35" font-size="11" fill="#34556a">Dikey: Şiddet (1–5)</text><text x="6" y="54" font-size="10" fill="#145fa0">Mavi: Mevcut</text><text x="6" y="69" font-size="10" fill="#854fb9">Mor: Hedef</text>${rows}${axes}</svg>`}
+function printLogoSrc(){let img=$('brandLogo');if(img&&!img.hidden&&img.complete&&img.naturalWidth)return img.dataset.printData||(brand.logo&&/^data:image\//.test(brand.logo)?brand.logo:(img.currentSrc||img.src));return ''}
+async function readyPrintLogo(){let img=$('brandLogo');if(!img||img.hidden)return;try{if(!img.complete||!img.naturalWidth)await Promise.race([img.decode(),new Promise(resolve=>setTimeout(resolve,800))]);if(img.complete&&img.naturalWidth){let canvas=document.createElement('canvas'),ratio=Math.min(1,512/Math.max(img.naturalWidth,img.naturalHeight));canvas.width=Math.max(1,Math.round(img.naturalWidth*ratio));canvas.height=Math.max(1,Math.round(img.naturalHeight*ratio));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);img.dataset.printData=canvas.toDataURL('image/png')}}catch(e){/* Dosya şeması resmi canvas'a aktarılmayabilir; doğrudan kaynağa dön. */}}
+function buildPrint(){readMeta();let src=printLogoSrc(),logo=src?`<img src="${esc(src)}" alt="Kurum logosu">`:'<span style="color:#70879c">LOGO</span>'; $('printHeader').innerHTML=`<div class="p-header">${logo}<div><h1>${esc(brand.title)}</h1><p>${esc(brand.subtitle)}</p></div><span class="p-org">${esc(brand.org)}</span></div>`;
+let overview='<div class="p-section"><h3>01 · Çalışma Bilgileri ve Kapsam</h3><div class="p-grid">'+keys.map(k=>printField(metaLabels[k],data.meta[k])).join('')+'</div></div>';
+let graphs=`<div class="p-section" style="break-inside:avoid"><h3>02 · HAZOP Risk Görünümü (Yardımcı Risk Puanlaması)</h3><div class="p-charts"><div class="p-chart"><h4>5 × 5 Risk Matrisi</h4>${chartMatrixSvg()}</div><div class="p-chart"><h4>Genel Sapma Risk Dağılımı</h4>${chartRiskSvg()}</div></div><div class="p-note">Risk aralıkları yalnızca örnektir: 1–4 Kabul Edilebilir, 5–9 Kontrol Gerekli, 10–15 Yüksek, 16–25 Çok Yüksek. HAZOP'un asli incelemesi parametre-kılavuz sözcük sapma analizi olup puanlama yardımcıdır.</div></div>`;
+let tab=data.records.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.node)}</td><td>${esc(r.parameter)} / ${esc(guideNames[r.guide]||r.guide)}</td><td>${esc(r.deviation)}</td><td>${esc(r.consequences)}</td><td>${r.before.l}×${r.before.s}=${risk(r.before)}</td><td>${r.after?`${r.after.l}×${r.after.s}=${risk(r.after)}`:'—'}</td><td>${esc(statusText[r.status])}</td></tr>`).join('');
+let table=`<div class="p-section"><h3>03 · Sapma Kayıt Özeti (${data.records.length})</h3>${data.records.length?`<table class="p-table"><colgroup><col style="width:4%"><col style="width:16%"><col style="width:17%"><col style="width:20%"><col style="width:21%"><col style="width:8%"><col style="width:8%"><col style="width:6%"></colgroup><thead><tr><th>No</th><th>Düğüm</th><th>Parametre / Kılavuz Sözcük</th><th>Sapma</th><th>Sonuç</th><th>Mevcut</th><th>Hedef</th><th>Durum</th></tr></thead><tbody>${tab}</tbody></table>`:'<div class="p-note">Henüz sapma kaydı yoktur.</div>'}</div>`;
+let details='<div class="p-section"><h3>04 · HAZOP Düğüm / Sapma Ayrıntıları</h3>'+data.records.map((r,i)=>{let f=[['Düğüm / Tag',r.node+' / '+r.tag],['Tasarım Amacı',r.intent],['Normal Çalışma Değeri',r.normal],['Parametre + Kılavuz Sözcük',r.parameter+' + '+(guideNames[r.guide]||r.guide)],['Oluşabilecek Sapma',r.deviation],['Olası Nedenler',r.causes],['Olası Sonuçlar',r.consequences],['Mevcut Koruyucular',r.safeguards],['Koruma Test / Kanıtı',r.verification],['İşletilebilirlik Notu',r.existingNotes],['Önerilen Aksiyon',r.action],['Sorumlu / Hedef Tarih',r.owner+' / '+r.due],['Mevcut Risk (O × Ş)',r.before.l+' × '+r.before.s+' = '+risk(r.before)],['Hedef Risk (O × Ş)',r.after?r.after.l+' × '+r.after.s+' = '+risk(r.after):'—'],['Durum / Doğrulama',statusText[r.status]+' / '+(r.verified?'Doğrulandı':'Doğrulanmadı')],['Uygulama Kanıtı / Not',r.evidence]];return `<div class="p-detail"><div class="p-detail-head"><span>${i+1}. ${esc(r.node)} · ${esc(r.deviation)}</span><span>Mevcut ${risk(r.before)} → Hedef ${risk(r.after)??'—'}</span></div><div class="p-detail-grid">${f.map(([k,v])=>printField(k,v)).join('')}</div></div>`}).join('')+'</div>';
+let note='<div class="p-note">HAZOP çalışma sonuçları yetkin çok disiplinli bir ekipçe P&ID, proses tasarım verileri, güvenilirlik kanıtları ve saha koşullarıyla doğrulanmalıdır. Bu form tek başına proses emniyeti doğrulaması veya bağımsız koruma katmanı analizi yerine geçmez.</div>';
+$('printContent').innerHTML=overview+graphs+table+details+note}
+async async function printNow(){await readyPrintLogo();buildPrint();try{await document.fonts.ready}catch(e){}await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));if(window.RiskAndroid&&typeof window.RiskAndroid.printPdf==='function')window.RiskAndroid.printPdf();else window.print()}
+loadBrand();bind();resetOnOpen();window.addEventListener('pageshow',e=>{if(e.persisted)resetOnOpen()});
+})();</script></body></html>
