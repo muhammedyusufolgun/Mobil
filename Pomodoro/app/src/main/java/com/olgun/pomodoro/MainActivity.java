@@ -12,6 +12,10 @@ import android.view.WindowManager;
 public class MainActivity extends Activity {
  private WebView web;
  private final Handler handler = new Handler(Looper.getMainLooper());
+ private ToneGenerator currentTone;
+ private final Runnable stopAlarm = () -> {
+  if (currentTone != null) { currentTone.stopTone(); currentTone.release(); currentTone = null; }
+ };
  @Override public void onCreate(Bundle b) {
   super.onCreate(b);
   getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -26,11 +30,16 @@ public class MainActivity extends Activity {
  public class Bridge {
   @JavascriptInterface public void alarm() {
    handler.post(() -> {
-    final ToneGenerator tone = new ToneGenerator(AudioManager.STREAM_ALARM, 75);
-    for (int i=0;i<6;i++) handler.postDelayed(() -> tone.startTone(ToneGenerator.TONE_PROP_BEEP, 220), i*500L);
-    handler.postDelayed(tone::release, 3000L);
+    handler.removeCallbacks(stopAlarm);
+    stopAlarm.run();
+    currentTone = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+    final ToneGenerator tone = currentTone;
+    for (int i = 0; i < 6; i++) {
+     handler.postDelayed(() -> { if (currentTone == tone) tone.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 350); }, i * 500L);
+    }
+    handler.postDelayed(stopAlarm, 3000L);
    });
   }
  }
- @Override public void onDestroy() { web.destroy(); super.onDestroy(); }
+ @Override public void onDestroy() { handler.removeCallbacksAndMessages(null); stopAlarm.run(); web.destroy(); super.onDestroy(); }
 }
